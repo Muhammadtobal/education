@@ -1,0 +1,106 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { join } from 'path';
+import { GraphQLError } from 'graphql';
+import { VendorModule } from './vendor/vendor.module';
+import { TeacherModule } from './teacher/teacher.module';
+
+import { SubscriptionModule } from './subscription/subscription.module';
+import { ReviewModule } from './review/review.module';
+import { PaymentModule } from './payment/payment.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { CityModule } from './city/city.module';
+import { PermissionModule } from './permission/permission.module';
+import { EmployeeModule } from './employee/employee.module';
+import { EmployeePermissionModule } from './employee_permission/employee_permission.module';
+import { LevelModule } from './level/level.module';
+import { VendorLevelModule } from './vendor-level/vendor-level.module';
+import { EmployeeVendorModule } from './employee_vendor/employee_vendor.module';
+import { PlanModule } from './plan/plan.module';
+import { CourseModule } from './course/course.module';
+import { PlanCourseModule } from './plan_course/plan_course.module';
+import { ExamModule } from './exam/exam.module';
+import { QuestionModule } from './question/question.module';
+import { AnswerModule } from './answer/answer.module';
+import { DiscussionModule } from './discussion/discussion.module';
+import { ContentModule } from './content/content.module';
+import { NotificationModule } from './notification/notification.module';
+import { CouponModule } from './coupon/coupon.module';
+import { PlanCouponModule } from "./plan_coupon/plan_coupon.module";
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
+    TypeOrmModule.forRoot({
+      type: process.env.DB_TYPE as any,
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      autoLoadEntities: true,
+      synchronize: true,
+      logging: true,
+    }),
+
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      playground: false,
+      debug: process.env.NODE_ENV !== 'production',
+      path: process.env.BASE_URL,
+      formatError: (formattedError, error) => {
+        const graphQLError = error as GraphQLError;
+        if (process.env.NODE_ENV === 'production')
+          return { message: formattedError.message };
+        return {
+          message: formattedError.message,
+          originalError:
+            graphQLError.extensions?.originalError || graphQLError.message,
+        };
+      },
+      plugins:
+        process.env.NODE_ENV !== 'production'
+          ? [ApolloServerPluginLandingPageLocalDefault()]
+          : [],
+    }),
+    VendorModule,
+    TeacherModule,
+
+    SubscriptionModule,
+    ReviewModule,
+    PaymentModule,
+    AuthModule,
+    UserModule,
+    CityModule,
+    PermissionModule,
+    EmployeeModule,
+    EmployeePermissionModule,
+    LevelModule,
+    VendorLevelModule,
+    NotificationModule,
+    EmployeeVendorModule,
+    PlanModule,
+    CourseModule,
+    PlanCourseModule,
+    ExamModule,
+    QuestionModule,
+    AnswerModule,
+    DiscussionModule,
+    ContentModule,
+    EmployeeModule,
+    EmployeePermissionModule,
+    PermissionModule,
+    CouponModule,
+        PlanCouponModule
+    ],
+})
+export class AppModule {}

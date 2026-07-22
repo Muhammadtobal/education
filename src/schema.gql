@@ -1,0 +1,1245 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Permission {
+  id: String!
+  name: String!
+  translation: String
+  description: String
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type EmployeePermission {
+  id: String!
+  employee_id: String!
+  permission_id: String!
+  created_at: DateTime!
+  employee: Employee
+  permission: Permission
+}
+
+type Content {
+  id: String!
+  course_id: String!
+  content_type: ContentType!
+  content_info: JSON
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
+}
+
+"""Content type (file, video, or audio)"""
+enum ContentType {
+  FILE
+  VIDEO
+  AUDIO
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type Answer {
+  id: String!
+  name: String!
+  question_id: String!
+  is_true: Boolean!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  question: Question
+}
+
+type Question {
+  id: String!
+  name: String!
+  exam_id: String!
+  parent_id: String
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  exam: Exam
+  parent: Question
+  children: [Question!]
+}
+
+type Exam {
+  id: String!
+  name: String!
+  course_id: String!
+  exam_date: DateTime
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
+}
+
+type UserCoupon {
+  id: String!
+  user_id: String!
+  coupon_id: String!
+  created_at: DateTime!
+  active: Boolean!
+  user: User
+  coupon: Coupon
+}
+
+type Coupon {
+  id: String!
+  code: String!
+  description: String
+  user_id: String
+  usage_limit: Int
+  used_count: Int!
+  discount_value: Float!
+  min_order_amount: Float!
+  max_discount: Float
+  discount_type: DiscountType!
+  active: Boolean!
+  starts_at: DateTime
+  expires_at: DateTime
+  created_at: DateTime!
+  updated_at: DateTime!
+  user: User
+}
+
+"""DiscountType   (fixed or percentage)"""
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+type PlanCoupon {
+  id: String!
+  value: Float!
+  coupon_id: String!
+  plan_id: String!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  coupon: Coupon
+  plan: Plan
+}
+
+type Plan {
+  id: String!
+  name: String!
+  vendor_id: String!
+  plan_type: PlanType!
+  end_date: DateTime!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  vendor: Vendor
+}
+
+"""Plan type (daily or seasonal)"""
+enum PlanType {
+  DAILY
+  SEASONAL
+  FREE
+}
+
+type PlanCourse {
+  id: String!
+  plan_id: String!
+  course_id: String!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
+  plan: Plan
+}
+
+type VendorLevel {
+  id: String!
+  vendor_id: String!
+  level_id: String!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  vendor: Vendor
+  level: Level
+}
+
+type Level {
+  id: String!
+  name: String!
+  parent_id: String
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  parent: Level
+  children: [Level!]
+}
+
+type Subscription {
+  id: String!
+  course_id: String!
+  user_id: String!
+  actual_remaining_date: DateTime
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
+  user: User
+}
+
+type Review {
+  id: String!
+  user_id: String!
+  course_id: String!
+  active: Boolean!
+  comment: String
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
+  user: User
+}
+
+type Payment {
+  id: String!
+  course_id: String!
+  user_id: String!
+  value: Float!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
+  user: User
+}
+
+type Course {
+  id: String!
+  name: String!
+  level_id: String!
+  vendor_id: String!
+  teacher_id: String!
+  parent_id: String
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  teacher: Teacher
+  vendor: Vendor
+  level: Level
+  parent: Course
+  children: [Course!]
+}
+
+type City {
+  id: String!
+  name: String!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type Teacher {
+  id: String!
+  name: String!
+  vendor_id: String!
+  city_id: String!
+  description: String
+  phone: String!
+  device_info: JSON
+  image_url: String
+  count_review: Float
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  vendor: Vendor
+  city: City
+}
+
+type Discussion {
+  id: String!
+  teacher_id: String!
+  user_id: String!
+  message: String!
+  url: String
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  teacher: Teacher
+  user: User
+}
+
+type User {
+  id: String!
+  full_name: String!
+  phone: String!
+  gender: String!
+  img_url: String
+  ads_count: Int!
+  active: Boolean!
+  device_info: JSON
+  lang: String!
+  city_id: String!
+  level_id: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+  city: City
+  level: Level
+}
+
+type Notification {
+  id: String!
+  title: String!
+  body: String!
+  active: Boolean!
+  is_property: Boolean
+  link: String
+  img_url: String
+  user_id: String
+  teacher_id: String
+  created_at: DateTime!
+  vendor_id: String
+  filter_data: JSON!
+  employee_id: String
+  global: Boolean!
+  approved: Boolean!
+  receivers_count: Int!
+  user: User
+  employee: Employee
+}
+
+type Employee {
+  id: String!
+  phone: String!
+  full_name: String!
+  active: Boolean!
+  city_id: String!
+  device_info: JSON
+  socket_id: String
+  created_at: DateTime!
+  updated_at: DateTime!
+  city: City
+  employee_permissions: [EmployeePermission!]
+}
+
+type EmployeeVendor {
+  id: String!
+  vendor_id: String!
+  employee_id: String!
+  level_id: String!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  vendor: Vendor
+  employee: Employee
+  level: Level
+}
+
+type Vendor {
+  id: String!
+  name: String!
+  icon: String
+  phone: String!
+  lang: String!
+  img_url: String
+  device_info: JSON
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type PaginationMetadata {
+  total: Int
+  current_page: Int
+  items_per_page: Int
+  total_pages: Int
+}
+
+type VendorPaginationResultOutput {
+  items: [Vendor!]!
+  meta: PaginationMetadata!
+}
+
+type DoneResponseOutput {
+  done: Boolean!
+}
+
+type TeacherPaginationResultOutput {
+  items: [Teacher!]!
+  meta: PaginationMetadata!
+}
+
+type SubscriptionPaginationResultOutput {
+  items: [Subscription!]!
+  meta: PaginationMetadata!
+}
+
+type ReviewPaginationResultOutput {
+  items: [Review!]!
+  meta: PaginationMetadata!
+}
+
+type PaymentPaginationResultOutput {
+  items: [Payment!]!
+  meta: PaginationMetadata!
+}
+
+type RefreshTokenOutput {
+  access_token: String!
+  expires_in: Int!
+}
+
+type SendActivationCodeOutput {
+  sent: Boolean!
+  code: String
+}
+
+type CheckActivationTeacherCodeOutput {
+  teacher: Teacher
+  access_token: String
+  refresh_token: String
+  expires_in: Int
+}
+
+type CheckActivationUserCodeOutput {
+  user: User
+  access_token: String
+  refresh_token: String
+  expires_in: Int
+}
+
+type CheckActivationEmployeeCodeOutput {
+  employee: Employee
+  access_token: String
+  refresh_token: String
+  expires_in: Int
+}
+
+type UserPaginationResultOutput {
+  items: [User!]!
+  meta: PaginationMetadata!
+}
+
+type EmployeePaginationResultOutput {
+  items: [Employee!]!
+  meta: PaginationMetadata!
+}
+
+type PermissionPaginationResultOutput {
+  items: [Permission!]!
+  meta: PaginationMetadata!
+}
+
+type CityPaginationResultOutput {
+  items: [City!]!
+  meta: PaginationMetadata!
+}
+
+type LevelPaginationResultOutput {
+  items: [Level!]!
+  meta: PaginationMetadata!
+}
+
+type VendorLevelPaginationResultOutput {
+  items: [VendorLevel!]!
+  meta: PaginationMetadata!
+}
+
+type EmployeeVendorPaginationResultOutput {
+  items: [EmployeeVendor!]!
+  meta: PaginationMetadata!
+}
+
+type PlanPaginationResultOutput {
+  items: [Plan!]!
+  meta: PaginationMetadata!
+}
+
+type CoursePaginationResultOutput {
+  items: [Course!]!
+  meta: PaginationMetadata!
+}
+
+type PlanCoursePaginationResultOutput {
+  items: [PlanCourse!]!
+  meta: PaginationMetadata!
+}
+
+type ExamPaginationResultOutput {
+  items: [Exam!]!
+  meta: PaginationMetadata!
+}
+
+type QuestionPaginationResultOutput {
+  items: [Question!]!
+  meta: PaginationMetadata!
+}
+
+type AnswerPaginationResultOutput {
+  items: [Answer!]!
+  meta: PaginationMetadata!
+}
+
+type DiscussionPaginationResultOutput {
+  items: [Discussion!]!
+  meta: PaginationMetadata!
+}
+
+type ContentPaginationResultOutput {
+  items: [Content!]!
+  meta: PaginationMetadata!
+}
+
+type NotificationPaginationResultOutput {
+  items: [Notification!]!
+  meta: PaginationMetadata!
+}
+
+type CouponPaginationResultOutput {
+  items: [Coupon!]!
+  meta: PaginationMetadata!
+}
+
+type PlanCouponPaginationResultOutput {
+  items: [PlanCoupon!]!
+  meta: PaginationMetadata!
+}
+
+type Query {
+  vendors(filter: FindAllVendorInput!): VendorPaginationResultOutput!
+  vendor(id: String!): Vendor!
+  teachers(filter: FindAllTeacherInput!): TeacherPaginationResultOutput!
+  teacher(id: String!): Teacher!
+  subscriptions(filter: FindAllSubscriptionInput!): SubscriptionPaginationResultOutput!
+  subscription(id: String!): Subscription!
+  reviews(filter: FindAllReviewInput!): ReviewPaginationResultOutput!
+  review(id: String!): Review!
+  payments(filter: FindAllPaymentInput!): PaymentPaginationResultOutput!
+  payment(id: String!): Payment!
+  users(filter: FindAllUserInput!): UserPaginationResultOutput!
+  user(id: String!): User!
+  employees(filter: FindAllEmployeeInput!): EmployeePaginationResultOutput!
+  employee(id: String!): Employee!
+  myEmployeeProfile: Employee
+  permissions(filter: FindAllPermissionInput!): PermissionPaginationResultOutput!
+  permission(id: String!): Permission!
+  cities(filter: FindAllCityInput!): CityPaginationResultOutput!
+  city(id: String!): City!
+  levels(filter: FindAllLevelInput!): LevelPaginationResultOutput!
+  level(id: String!): Level!
+  vendorLevels(filter: FindAllVendorLevelInput!): VendorLevelPaginationResultOutput!
+  vendorLevel(id: String!): VendorLevel!
+  notifications(filter: FindAllNotificationInput!): NotificationPaginationResultOutput!
+  notification(id: String!): Notification!
+  employeeVendors(filter: FindAllEmployeeVendorInput!): EmployeeVendorPaginationResultOutput!
+  employeeVendor(id: String!): EmployeeVendor!
+  plans(filter: FindAllPlanInput!): PlanPaginationResultOutput!
+  plan(id: String!): Plan!
+  courses(filter: FindAllCourseInput!): CoursePaginationResultOutput!
+  course(id: String!): Course!
+  planCourses(filter: FindAllPlanCourseInput!): PlanCoursePaginationResultOutput!
+  planCourse(id: String!): PlanCourse!
+  exams(filter: FindAllExamInput!): ExamPaginationResultOutput!
+  exam(id: String!): Exam!
+  questions(filter: FindAllQuestionInput!): QuestionPaginationResultOutput!
+  question(id: String!): Question!
+  answers(filter: FindAllAnswerInput!): AnswerPaginationResultOutput!
+  answer(id: String!): Answer!
+  discussions(filter: FindAllDiscussionInput!): DiscussionPaginationResultOutput!
+  discussion(id: String!): Discussion!
+  contents(filter: FindAllContentInput!): ContentPaginationResultOutput!
+  content(id: String!): Content!
+  coupons(filter: FindAllCouponInput!): CouponPaginationResultOutput!
+  coupon(id: String!): Coupon!
+  planCoupons(filter: FindAllPlanCouponInput!): PlanCouponPaginationResultOutput!
+  planCoupon(id: String!): PlanCoupon!
+}
+
+input FindAllVendorInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  name: MatchInput
+  icon: MatchInput
+}
+
+input PaginationInput {
+  limit: Int!
+  page: Int!
+}
+
+input SortInput {
+  by: String!
+  type: String!
+}
+
+input MatchInput {
+  value: String!
+  op: String!
+}
+
+input FindAllTeacherInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  name: MatchInput
+  description: MatchInput
+  image_url: MatchInput
+  count_review: JSON
+  vendor_id: JSON
+}
+
+input FindAllSubscriptionInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  active: Boolean
+  video_id: JSON
+}
+
+input FindAllReviewInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  active: Boolean
+  video_id: JSON
+}
+
+input FindAllPaymentInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  video_id: JSON
+}
+
+input FindAllUserInput {
+  id: JSON
+  full_name: MatchInput
+  select: [String!]
+  phone: MatchInput
+  active: Boolean
+  gender: MatchInput
+  created_at: JSON
+  updated_at: JSON
+  city_id: JSON
+  pagination: PaginationInput!
+  sort: SortInput
+  lang: MatchInput
+}
+
+input FindAllEmployeeInput {
+  username: MatchInput
+  full_name: MatchInput
+  account_type: MatchInput
+  active: Boolean
+  pagination: PaginationInput!
+  sort: SortInput
+  created_at: JSON
+}
+
+input FindAllPermissionInput {
+  name: MatchInput
+  description: MatchInput
+  active: Boolean
+  created_at: JSON
+  pagination: PaginationInput!
+  sort: SortInput
+}
+
+input FindAllCityInput {
+  name: MatchInput
+  active: Boolean
+  created_at: JSON
+  pagination: PaginationInput!
+  sort: SortInput
+}
+
+input FindAllLevelInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  name: MatchInput
+  active: Boolean
+}
+
+input FindAllVendorLevelInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  active: Boolean
+  vendor_id: JSON
+  level_id: JSON
+}
+
+input FindAllNotificationInput {
+  title: MatchInput
+  body: Boolean
+  created_at: JSON
+  active: Boolean
+  user_id: JSON
+  employee_id: JSON
+  vendor_id: JSON
+  pagination: PaginationInput!
+  sort: SortInput
+}
+
+input FindAllEmployeeVendorInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  vendor_id: JSON
+  employee_id: JSON
+  level_id: JSON
+}
+
+input FindAllPlanInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  name: MatchInput
+}
+
+input FindAllCourseInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  name: MatchInput
+  level_id: JSON
+  teacher_id: JSON
+}
+
+input FindAllPlanCourseInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  plan_id: JSON
+  course_id: JSON
+}
+
+input FindAllExamInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  name: MatchInput
+  course_id: JSON
+}
+
+input FindAllQuestionInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  name: MatchInput
+  exam_id: JSON
+}
+
+input FindAllAnswerInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  name: MatchInput
+  question_id: JSON
+}
+
+input FindAllDiscussionInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  teacher_id: JSON
+  user_id: JSON
+}
+
+input FindAllContentInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  course_id: JSON
+}
+
+input FindAllCouponInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  code: MatchInput
+  description: MatchInput
+  discount_type: MatchInput
+  usage_limit: JSON
+  used_count: JSON
+  active: Boolean
+  store_id: JSON
+  created_at: JSON
+  expires_at: JSON
+}
+
+input FindAllPlanCouponInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  value: JSON
+  coupon_id: JSON
+  plan_id: JSON
+}
+
+type Mutation {
+  createVendor(createVendorInput: CreateVendorInput!): Vendor!
+  updateVendor(updateVendorInput: UpdateVendorInput!): Vendor!
+  removeVendor(id: String!): DoneResponseOutput!
+  createTeacher(createTeacherInput: CreateTeacherInput!): Teacher!
+  updateTeacher(updateTeacherInput: UpdateTeacherInput!): Teacher!
+  removeTeacher(id: String!): DoneResponseOutput!
+  createSubscription(createSubscriptionInput: CreateSubscriptionInput!): Subscription!
+  updateSubscription(updateSubscriptionInput: UpdateSubscriptionInput!): Subscription!
+  removeSubscription(id: String!): DoneResponseOutput!
+  createReview(createReviewInput: CreateReviewInput!): Review!
+  updateReview(updateReviewInput: UpdateReviewInput!): Review!
+  removeReview(id: String!): DoneResponseOutput!
+  createPayment(createPaymentInput: CreatePaymentInput!): Payment!
+  updatePayment(updatePaymentInput: UpdatePaymentInput!): Payment!
+  removePayment(id: String!): DoneResponseOutput!
+  refreshTokenEmployee(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
+  checkEmployeeActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationEmployeeCodeOutput!
+  sendActivationCode(sendActivationCodeInput: SendActivationCodeInput!): SendActivationCodeOutput!
+  refreshTokenTeacher(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
+  checkTeacherActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationTeacherCodeOutput!
+  refreshTokenUser(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
+  checkUserActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationUserCodeOutput!
+  createUser(createUserInput: CreateUserInput!): CheckActivationUserCodeOutput!
+  createEmployee(createEmployeeInput: CreateEmployeeInput!): Employee!
+  updateEmployee(updateEmployeeInput: UpdateEmployeeInput!): Employee!
+  assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
+  unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
+  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
+  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
+  removePermission(id: String!): DoneResponseOutput!
+  createCity(createCityInput: CreateCityInput!): City!
+  updateCity(updateCityInput: UpdateCityInput!): City!
+  removeCity(id: String!): DoneResponseOutput!
+  createLevel(createLevelInput: CreateLevelInput!): Level!
+  updateLevel(updateLevelInput: UpdateLevelInput!): Level!
+  removeLevel(id: String!): DoneResponseOutput!
+  createVendorLevel(createVendorLevelInput: CreateVendorLevelInput!): VendorLevel!
+  updateVendorLevel(updateVendorLevelInput: UpdateVendorLevelInput!): VendorLevel!
+  removeVendorLevel(id: String!): DoneResponseOutput!
+  createNotification(createNotificationInput: CreateNotificationInput!): Notification!
+  updateNotification(updateNotificationInput: UpdateNotificationInput!): Notification!
+  removeNotification(id: String!): DoneResponseOutput!
+  sendNotification(sendNotification: CreateNotificationInput!): Notification!
+  createEmployeeVendor(createEmployeeVendorInput: CreateEmployeeVendorInput!): EmployeeVendor!
+  updateEmployeeVendor(updateEmployeeVendorInput: UpdateEmployeeVendorInput!): EmployeeVendor!
+  removeEmployeeVendor(id: String!): DoneResponseOutput!
+  createPlan(createPlanInput: CreatePlanInput!): Plan!
+  updatePlan(updatePlanInput: UpdatePlanInput!): Plan!
+  removePlan(id: String!): DoneResponseOutput!
+  createCourse(createCourseInput: CreateCourseInput!): Course!
+  updateCourse(updateCourseInput: UpdateCourseInput!): Course!
+  removeCourse(id: String!): DoneResponseOutput!
+  createPlanCourse(createPlanCourseInput: CreatePlanCourseInput!): PlanCourse!
+  updatePlanCourse(updatePlanCourseInput: UpdatePlanCourseInput!): PlanCourse!
+  removePlanCourse(id: String!): DoneResponseOutput!
+  createExam(createExamInput: CreateExamInput!): Exam!
+  updateExam(updateExamInput: UpdateExamInput!): Exam!
+  removeExam(id: String!): DoneResponseOutput!
+  createQuestion(createQuestionInput: CreateQuestionInput!): Question!
+  updateQuestion(updateQuestionInput: UpdateQuestionInput!): Question!
+  removeQuestion(id: String!): DoneResponseOutput!
+  createAnswer(createAnswerInput: CreateAnswerInput!): Answer!
+  updateAnswer(updateAnswerInput: UpdateAnswerInput!): Answer!
+  removeAnswer(id: String!): DoneResponseOutput!
+  createDiscussion(createDiscussionInput: CreateDiscussionInput!): Discussion!
+  updateDiscussion(updateDiscussionInput: UpdateDiscussionInput!): Discussion!
+  removeDiscussion(id: String!): DoneResponseOutput!
+  createContent(createContentInput: CreateContentInput!): Content!
+  updateContent(updateContentInput: UpdateContentInput!): Content!
+  removeContent(id: String!): DoneResponseOutput!
+  createCoupon(createCouponInput: CreateCouponInput!): Coupon!
+  updateCoupon(updateCouponInput: UpdateCouponInput!): Coupon!
+  removeCoupon(id: String!): DoneResponseOutput!
+  createUserCoupon(createUserCouponInput: CreateUserCouponInput!): UserCoupon!
+  checkActivationCoupon(checkActivationCouponInput: CheckActivationCouponInput!): Coupon!
+  createPlanCoupon(createPlanCouponInput: CreatePlanCouponInput!): PlanCoupon!
+  updatePlanCoupon(updatePlanCouponInput: UpdatePlanCouponInput!): PlanCoupon!
+  removePlanCoupon(id: String!): DoneResponseOutput!
+}
+
+input CreateVendorInput {
+  name: String!
+  phone: String!
+  icon: String
+  lang: String
+  img_url: String
+  active: Boolean
+  device_info: JSON
+}
+
+input UpdateVendorInput {
+  name: String
+  phone: String
+  icon: String
+  lang: String
+  img_url: String
+  active: Boolean
+  device_info: JSON
+  id: String!
+}
+
+input CreateTeacherInput {
+  name: String!
+  phone: String!
+  vendor_id: String!
+  description: String
+  image_url: String
+  count_review: Float
+  active: Boolean
+  device_info: JSON
+  fcm_token: String
+}
+
+input UpdateTeacherInput {
+  name: String
+  phone: String
+  vendor_id: String
+  description: String
+  image_url: String
+  count_review: Float
+  active: Boolean
+  device_info: JSON
+  fcm_token: String
+  id: String!
+}
+
+input CreateSubscriptionInput {
+  video_id: String!
+  user_id: String!
+  active: Boolean
+}
+
+input UpdateSubscriptionInput {
+  video_id: String
+  user_id: String
+  active: Boolean
+  id: String!
+}
+
+input CreateReviewInput {
+  video_id: String!
+  user_id: String!
+  active: Boolean
+  comment: String
+}
+
+input UpdateReviewInput {
+  video_id: String
+  user_id: String
+  active: Boolean
+  comment: String
+  id: String!
+}
+
+input CreatePaymentInput {
+  video_id: String!
+  user_id: String!
+  price: Float!
+  active: Boolean
+}
+
+input UpdatePaymentInput {
+  video_id: String
+  user_id: String
+  price: Float
+  active: Boolean
+  id: String!
+}
+
+input RefreshTokenInput {
+  refresh_token: String!
+}
+
+input CheckActivationCodeInput {
+  phone: String!
+  code: String!
+  fcm_token: String
+}
+
+input SendActivationCodeInput {
+  phone: String!
+  autofill_code: String
+}
+
+input CreateUserInput {
+  full_name: String!
+  phone: String!
+  gender: Gender!
+  city_id: String!
+  img_url: String
+  device_info: JSON
+  active: Boolean
+  fcm_token: String
+  lang: String
+  ads_count: Float
+}
+
+"""User gender (male or female)"""
+enum Gender {
+  MALE
+  FEMALE
+}
+
+input CreateEmployeeInput {
+  phone: String!
+  full_name: String!
+  password: String!
+  active: Boolean
+  socket_id: String
+  refresh_token: String
+  fcm_token: String
+  hmac_secret: String
+}
+
+input UpdateEmployeeInput {
+  phone: String
+  full_name: String
+  password: String
+  active: Boolean
+  socket_id: String
+  refresh_token: String
+  fcm_token: String
+  hmac_secret: String
+  id: String!
+}
+
+input AssignPermissionInput {
+  permission_id: String!
+  employee_id: String!
+}
+
+input CreatePermissionInput {
+  name: String!
+  description: String
+  translation: String
+  active: Boolean
+}
+
+input UpdatePermissionInput {
+  name: String
+  description: String
+  translation: String
+  active: Boolean
+  id: String!
+}
+
+input CreateCityInput {
+  name: String!
+  active: Boolean
+}
+
+input UpdateCityInput {
+  name: String
+  active: Boolean
+  id: String!
+}
+
+input CreateLevelInput {
+  name: String!
+  active: Boolean
+}
+
+input UpdateLevelInput {
+  name: String
+  active: Boolean
+  id: String!
+}
+
+input CreateVendorLevelInput {
+  active: Boolean
+  vendor_id: String!
+  level_id: String!
+}
+
+input UpdateVendorLevelInput {
+  active: Boolean
+  vendor_id: String
+  level_id: String
+  id: String!
+}
+
+input CreateNotificationInput {
+  title: String!
+  body: String!
+  filter_data: NotificationFilterDataInput
+  is_property: Boolean
+  active: Boolean
+  img_url: String
+  link: String
+  global: Boolean
+  vendor_id: String
+  user_id: String
+  employee_id: String
+  approved: Boolean
+  extraData: JSON
+}
+
+input NotificationFilterDataInput {
+  city: CityInput!
+  is_user: Boolean
+}
+
+input CityInput {
+  id: String!
+  name: String!
+}
+
+input UpdateNotificationInput {
+  title: String
+  body: String
+  filter_data: NotificationFilterDataInput
+  is_property: Boolean
+  active: Boolean
+  img_url: String
+  link: String
+  global: Boolean
+  vendor_id: String
+  user_id: String
+  employee_id: String
+  approved: Boolean
+  extraData: JSON
+  id: String!
+}
+
+input CreateEmployeeVendorInput {
+  vendor_id: String!
+  employee_id: String!
+  level_id: String!
+}
+
+input UpdateEmployeeVendorInput {
+  vendor_id: String
+  employee_id: String
+  level_id: String
+  id: String!
+}
+
+input CreatePlanInput {
+  name: String!
+}
+
+input UpdatePlanInput {
+  name: String
+  id: String!
+}
+
+input CreateCourseInput {
+  name: String!
+  level_id: String!
+  teacher_id: String!
+}
+
+input UpdateCourseInput {
+  name: String
+  level_id: String
+  teacher_id: String
+  id: String!
+}
+
+input CreatePlanCourseInput {
+  plan_id: String!
+  course_id: String!
+}
+
+input UpdatePlanCourseInput {
+  plan_id: String
+  course_id: String
+  id: String!
+}
+
+input CreateExamInput {
+  name: String!
+  course_id: String!
+}
+
+input UpdateExamInput {
+  name: String
+  course_id: String
+  id: String!
+}
+
+input CreateQuestionInput {
+  name: String!
+  exam_id: String!
+}
+
+input UpdateQuestionInput {
+  name: String
+  exam_id: String
+  id: String!
+}
+
+input CreateAnswerInput {
+  name: String!
+  question_id: String!
+}
+
+input UpdateAnswerInput {
+  name: String
+  question_id: String
+  id: String!
+}
+
+input CreateDiscussionInput {
+  teacher_id: String!
+  user_id: String!
+}
+
+input UpdateDiscussionInput {
+  teacher_id: String
+  user_id: String
+  id: String!
+}
+
+input CreateContentInput {
+  course_id: String!
+}
+
+input UpdateContentInput {
+  course_id: String
+  id: String!
+}
+
+input CreateCouponInput {
+  code: String!
+  discount_type: DiscountType!
+  used_count: Int!
+  min_order_amount: Float!
+  discount_value: Float!
+  active: Boolean
+  description: String
+  usage_limit: Int
+  store_id: String
+  max_discount: Float
+  starts_at: DateTime
+  expires_at: DateTime
+}
+
+input UpdateCouponInput {
+  code: String
+  discount_type: DiscountType
+  used_count: Int
+  min_order_amount: Float
+  discount_value: Float
+  active: Boolean
+  description: String
+  usage_limit: Int
+  store_id: String
+  max_discount: Float
+  starts_at: DateTime
+  expires_at: DateTime
+  id: String!
+}
+
+input CreateUserCouponInput {
+  user_id: String!
+  coupon_id: String!
+}
+
+input CheckActivationCouponInput {
+  code: String!
+  store_id: String
+}
+
+input CreatePlanCouponInput {
+  value: Float!
+  coupon_id: String!
+  plan_id: String!
+}
+
+input UpdatePlanCouponInput {
+  value: Float
+  coupon_id: String
+  plan_id: String
+  id: String!
+}
