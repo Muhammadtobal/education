@@ -30,6 +30,14 @@ export class Course {
   @Field()
   name: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  @Field()
+  url: string;
+
+  @Column({ type: 'text' })
+  @Field()
+  description: string;
+
   @Column('bigint')
   @Field()
   level_id: string;
@@ -42,9 +50,19 @@ export class Course {
   @Field()
   teacher_id: string;
 
-  @Column({ type: 'bigint', nullable: true })
-  @Field({ nullable: true })
-  parent_id?: string;
+  @Column({
+    type: 'float',
+    default: 0,
+  })
+  @Field(() => Float)
+  teacher_share: number;
+
+  @Column({
+    type: 'float',
+    default: 0,
+  })
+  @Field(() => Float)
+  vendor_share: number;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
@@ -76,17 +94,6 @@ export class Course {
   @JoinColumn({ name: 'level_id' })
   @Field(() => Level, { nullable: true })
   level?: Level;
-
-  @ManyToOne(() => Course, (course) => course.children, {
-    nullable: true,
-  })
-  @JoinColumn({ name: 'parent_id' })
-  @Field(() => Course, { nullable: true })
-  parent?: Course;
-
-  @OneToMany(() => Course, (course) => course.parent)
-  @Field(() => [Course], { nullable: true })
-  children?: Course[];
 
   @OneToMany(() => PlanCourse, (plan_course) => plan_course.course)
   plan_courses: PlanCourse[];

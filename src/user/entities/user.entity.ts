@@ -18,6 +18,9 @@ import { Level } from 'src/level/entities/level.entity';
 import { Notification } from 'src/notification/entities/notification.entity';
 import { UserCoupon } from 'src/coupon/entities/user_coupon.entity';
 import { Coupon } from 'src/coupon/entities/coupon.entity';
+import { ExamUser } from 'src/exam/entities/exam-user.entity';
+import { AnswerUser } from 'src/answer/entities/answer-user.entity';
+import { ScheduledNotification } from 'src/notification/entities/scheduled-notification.entity';
 
 @Entity()
 @ObjectType()
@@ -41,10 +44,6 @@ export class User {
   @Field({ nullable: true })
   img_url?: string;
 
-  @Column('int', { default: 6 })
-  @Field(() => Int)
-  ads_count: number;
-
   @Column('boolean', { default: true })
   @Field()
   active: boolean;
@@ -58,9 +57,6 @@ export class User {
 
   @Column('varchar', { length: 255, nullable: true })
   refresh_token?: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  socket_id?: string;
 
   @Column('varchar', { length: 2, default: 'ar' })
   @Field()
@@ -116,4 +112,16 @@ export class User {
 
   @OneToMany(() => Coupon, (coupon) => coupon.user)
   coupons: Coupon[];
+
+  @OneToMany(() => ExamUser, (exam_user) => exam_user.user)
+  exam_users: ExamUser[];
+
+  @OneToMany(() => AnswerUser, (answer_user) => answer_user.user)
+  answer_users: AnswerUser[];
+
+  @OneToMany(
+    () => ScheduledNotification,
+    (scheduled_notification) => scheduled_notification.user,
+  )
+  scheduled_notifications: ScheduledNotification[];
 }

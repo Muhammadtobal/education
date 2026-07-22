@@ -1,5 +1,5 @@
-import { InputType, Field } from "@nestjs/graphql";
-import { Type } from "class-transformer";
+import { InputType, Field } from '@nestjs/graphql';
+import { Type } from 'class-transformer';
 import {
   IsEnum,
   IsNotEmpty,
@@ -10,10 +10,10 @@ import {
   IsNumberString,
   IsEmpty,
   IsDate,
-} from "class-validator";
-import { GraphQLJSON } from "graphql-type-json";
+} from 'class-validator';
+import { GraphQLJSON } from 'graphql-type-json';
 
-import { Gender } from "src/shared/enums/gender.enum";
+import { Gender } from 'src/shared/enums/gender.enum';
 
 @InputType()
 export class CreateUserInput {
@@ -65,9 +65,6 @@ export class CreateUserInput {
   @IsNumber()
   @Field({ nullable: true })
   ads_count?: number;
-
-  @IsEmpty()
-  socket_id?: string;
 
   @IsEmpty()
   refresh_token?: string;

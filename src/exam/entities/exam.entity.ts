@@ -11,6 +11,9 @@ import {
 import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 
 import { Course } from 'src/course/entities/course.entity';
+import { Direction } from 'src/shared/enums/direction.enum';
+import { ExamUser } from './exam-user.entity';
+import { AnswerUser } from 'src/answer/entities/answer-user.entity';
 
 @ObjectType()
 @Entity()
@@ -26,6 +29,17 @@ export class Exam {
   @Column('bigint')
   @Field()
   course_id: string;
+
+  @Column({
+    type: 'enum',
+    enum: Direction,
+  })
+  @Field(() => Direction)
+  direction: Direction;
+
+  @Column('int', { default: 60 })
+  @Field(() => Int)
+  exam_duration: number;
 
   @Column({ type: 'timestamp', nullable: true })
   @Field(() => Date, { nullable: true })
@@ -54,4 +68,10 @@ export class Exam {
 
   @OneToMany(() => Question, (question) => question.exam)
   questions: Question[];
+
+  @OneToMany(() => ExamUser, (exam_user) => exam_user.exam)
+  exam_users: ExamUser[];
+
+  @OneToMany(() => AnswerUser, (answer_user) => answer_user.exam)
+  answer_users: AnswerUser[];
 }

@@ -9,10 +9,11 @@ import { UserModule } from 'src/user/user.module';
 import { CityModule } from 'src/city/city.module';
 
 import { EmployeeModule } from 'src/employee/employee.module';
+import { ScheduledNotification } from './entities/scheduled-notification.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Notification]),
+    TypeOrmModule.forFeature([Notification, ScheduledNotification]),
     forwardRef(() => UserModule),
     forwardRef(() => CityModule),
 

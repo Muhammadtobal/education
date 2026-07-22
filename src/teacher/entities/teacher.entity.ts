@@ -14,6 +14,8 @@ import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 
 import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { City } from 'src/city/entities/city.entity';
+import { TeacherVendor } from './teacher-vedor.entity';
+import { Review } from 'src/review/entities/review.entity';
 
 @ObjectType()
 @Entity()
@@ -26,9 +28,20 @@ export class Teacher {
   @Field()
   name: string;
 
-  @Column({ type: 'bigint' })
-  @Field()
-  vendor_id: string;
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  @Field(() => Float)
+  balance: number;
+
+  @Column({
+    type: 'float',
+    default: 0,
+  })
+  @Field(() => Float)
+  review_count: number;
 
   @Column({ type: 'bigint' })
   @Field()
@@ -76,11 +89,6 @@ export class Teacher {
   @Field(() => Date)
   updated_at: Date;
 
-  @ManyToOne(() => Vendor, (vendor) => vendor.teachers)
-  @JoinColumn({ name: 'vendor_id' })
-  @Field(() => Vendor, { nullable: true })
-  vendor?: Vendor;
-
   @ManyToOne(() => City, (city) => city.teachers)
   @JoinColumn({ name: 'city_id' })
   @Field(() => City, { nullable: true })
@@ -91,4 +99,10 @@ export class Teacher {
 
   @OneToMany(() => Discussion, (discussion) => discussion.teacher)
   discussions: Discussion[];
+
+  @OneToMany(() => TeacherVendor, (teacher_vendor) => teacher_vendor.teacher)
+  teacher_vendors: TeacherVendor[];
+
+  @OneToMany(() => Review, (review) => review.teacher)
+  reviews: Review[];
 }

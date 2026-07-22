@@ -14,6 +14,8 @@ import GraphQLJSON from 'graphql-type-json';
 import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 import { Plan } from 'src/plan/entities/plan.entity';
 import { Course } from 'src/course/entities/course.entity';
+import { TeacherVendor } from 'src/teacher/entities/teacher-vedor.entity';
+import { Review } from 'src/review/entities/review.entity';
 
 @ObjectType()
 @Entity()
@@ -25,6 +27,21 @@ export class Vendor {
   @Column({ type: 'varchar', length: 255 })
   @Field()
   name: string;
+
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  @Field(() => Float)
+  balance: number;
+
+  @Column({
+    type: 'float',
+    default: 0,
+  })
+  @Field(() => Float)
+  review_count: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   @Field({ nullable: true })
@@ -74,12 +91,15 @@ export class Vendor {
   @OneToMany(() => EmployeeVendor, (employee_vendor) => employee_vendor.vendor)
   employee_vendors: EmployeeVendor[];
 
-  @OneToMany(() => Teacher, (teacher) => teacher.vendor)
-  teachers: Teacher[];
-
   @OneToMany(() => Plan, (plan) => plan.vendor)
   plans: Plan[];
 
   @OneToMany(() => Course, (course) => course.vendor)
   courses: Course[];
+
+  @OneToMany(() => TeacherVendor, (teacher_vendor) => teacher_vendor.vendor)
+  teacher_vendors: TeacherVendor[];
+
+  @OneToMany(() => Review, (review) => review.vendor)
+  reviews: Review[];
 }

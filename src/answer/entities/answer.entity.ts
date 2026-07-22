@@ -10,6 +10,8 @@ import {
 import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 
 import { Question } from 'src/question/entities/question.entity';
+import { Direction } from 'src/shared/enums/direction.enum';
+import { AnswerUser } from './answer-user.entity';
 
 @ObjectType()
 @Entity()
@@ -20,11 +22,22 @@ export class Answer {
 
   @Column({ type: 'varchar', length: 255 })
   @Field()
-  name: string;
+  answer_text: string;
+
+  @Column({ type: 'text' })
+  @Field()
+  hint_text: string;
 
   @Column('bigint')
   @Field()
   question_id: string;
+
+  @Column({
+    type: 'enum',
+    enum: Direction,
+  })
+  @Field(() => Direction)
+  direction: Direction;
 
   @Column('boolean')
   @Field(() => Boolean)
@@ -50,4 +63,7 @@ export class Answer {
   @JoinColumn({ name: 'question_id' })
   @Field(() => Question, { nullable: true })
   question?: Question;
+
+  @OneToMany(() => AnswerUser, (answer_user) => answer_user.answer)
+  answer_users: AnswerUser[];
 }

@@ -15,7 +15,7 @@ import { User } from 'src/user/entities/user.entity';
 
 @Entity()
 @ObjectType()
-export class Notification {
+export class ScheduledNotification {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   @Field()
   id: string;
@@ -44,10 +44,6 @@ export class Notification {
   @Field({ nullable: true })
   user_id: string;
 
-  @Column('bigint', { nullable: true })
-  @Field({ nullable: true })
-  teacher_id: string;
-
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
   @Field()
   created_at: Date;
@@ -66,24 +62,12 @@ export class Notification {
   @Field({ nullable: true })
   employee_id: string;
 
-  @Column('boolean', { default: false })
-  @Field()
-  global: boolean;
-
-  @Column('boolean', { default: false })
-  @Field()
-  approved: boolean;
-
-  @Column('int', { width: 8, default: 1 })
-  @Field(() => Int)
-  receivers_count: number;
-
-  @ManyToOne(() => User, (user) => user.notifications)
+  @ManyToOne(() => User, (user) => user.scheduled_notifications)
   @JoinColumn({ name: 'user_id' })
   @Field(() => User, { nullable: true })
   user?: User;
 
-  @ManyToOne(() => Employee, (employee) => employee.notifications)
+  @ManyToOne(() => Employee, (employee) => employee.scheduled_notifications)
   @JoinColumn({ name: 'employee_id' })
   @Field(() => Employee, { nullable: true })
   employee?: Employee;

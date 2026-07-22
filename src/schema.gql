@@ -26,64 +26,6 @@ type EmployeePermission {
   permission: Permission
 }
 
-type Content {
-  id: String!
-  course_id: String!
-  content_type: ContentType!
-  content_info: JSON
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  course: Course
-}
-
-"""Content type (file, video, or audio)"""
-enum ContentType {
-  FILE
-  VIDEO
-  AUDIO
-}
-
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
-
-type Answer {
-  id: String!
-  name: String!
-  question_id: String!
-  is_true: Boolean!
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  question: Question
-}
-
-type Question {
-  id: String!
-  name: String!
-  exam_id: String!
-  parent_id: String
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  exam: Exam
-  parent: Question
-  children: [Question!]
-}
-
-type Exam {
-  id: String!
-  name: String!
-  course_id: String!
-  exam_date: DateTime
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  course: Course
-}
-
 type UserCoupon {
   id: String!
   user_id: String!
@@ -153,12 +95,88 @@ enum PlanType {
 type PlanCourse {
   id: String!
   plan_id: String!
-  course_id: String!
+  course_id: String
+  content_id: String
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
   course: Course
+  content: Content
   plan: Plan
+}
+
+type Content {
+  id: String!
+  course_id: String!
+  url: String!
+  content_type: ContentType!
+  parent_id: String
+  content_info: JSON
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  parent: Content
+  children: [Content!]
+  course: Course
+}
+
+"""Content type (file, video, or audio)"""
+enum ContentType {
+  FILE
+  VIDEO
+  AUDIO
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type Answer {
+  id: String!
+  answer_text: String!
+  hint_text: String!
+  question_id: String!
+  direction: Direction!
+  is_true: Boolean!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  question: Question
+}
+
+"""Text direction (right to left or left to right)"""
+enum Direction {
+  RIGHT_TO_LEFT
+  LEFT_TO_RIGHT
+}
+
+type Question {
+  id: String!
+  question_text: String!
+  hint_text: String!
+  exam_id: String!
+  parent_id: String
+  direction: Direction!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  exam: Exam
+  parent: Question
+  children: [Question!]
+}
+
+type Exam {
+  id: String!
+  name: String!
+  course_id: String!
+  direction: Direction!
+  exam_duration: Int!
+  exam_date: DateTime
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
 }
 
 type VendorLevel {
@@ -187,7 +205,7 @@ type Subscription {
   id: String!
   course_id: String!
   user_id: String!
-  actual_remaining_date: DateTime
+  end_date: DateTime
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
@@ -198,12 +216,17 @@ type Subscription {
 type Review {
   id: String!
   user_id: String!
-  course_id: String!
+  course_id: String
+  vendor_id: String
+  teacher_id: String
+  value: Float!
   active: Boolean!
   comment: String
   created_at: DateTime!
   updated_at: DateTime!
   course: Course
+  vendor: Vendor
+  teacher: Teacher
   user: User
 }
 
@@ -222,18 +245,19 @@ type Payment {
 type Course {
   id: String!
   name: String!
+  url: String!
+  description: String!
   level_id: String!
   vendor_id: String!
   teacher_id: String!
-  parent_id: String
+  teacher_share: Float!
+  vendor_share: Float!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
   teacher: Teacher
   vendor: Vendor
   level: Level
-  parent: Course
-  children: [Course!]
 }
 
 type City {
@@ -247,7 +271,8 @@ type City {
 type Teacher {
   id: String!
   name: String!
-  vendor_id: String!
+  balance: Float!
+  review_count: Float!
   city_id: String!
   description: String
   phone: String!
@@ -257,7 +282,6 @@ type Teacher {
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
-  vendor: Vendor
   city: City
 }
 
@@ -280,7 +304,6 @@ type User {
   phone: String!
   gender: String!
   img_url: String
-  ads_count: Int!
   active: Boolean!
   device_info: JSON
   lang: String!
@@ -297,7 +320,6 @@ type Notification {
   title: String!
   body: String!
   active: Boolean!
-  is_property: Boolean
   link: String
   img_url: String
   user_id: String
@@ -343,6 +365,8 @@ type EmployeeVendor {
 type Vendor {
   id: String!
   name: String!
+  balance: Float!
+  review_count: Float!
   icon: String
   phone: String!
   lang: String!

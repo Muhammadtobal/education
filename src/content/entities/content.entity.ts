@@ -12,6 +12,7 @@ import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 
 import { Course } from 'src/course/entities/course.entity';
 import { ContentType } from 'src/shared/enums/content_type.enum';
+import { PlanCourse } from 'src/plan_course/entities/plan_course.entity';
 
 @ObjectType()
 @Entity()
@@ -24,12 +25,20 @@ export class Content {
   @Field()
   course_id: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  @Field()
+  url: string;
+
   @Column({
     type: 'enum',
     enum: ContentType,
   })
   @Field(() => ContentType)
   content_type: ContentType;
+
+  @Column({ type: 'bigint', nullable: true })
+  @Field({ nullable: true })
+  parent_id?: string;
 
   @Column('simple-json', { nullable: true })
   @Field(() => GraphQLJSON, { nullable: true })
@@ -51,8 +60,22 @@ export class Content {
   @Field(() => Date)
   updated_at: Date;
 
+  @ManyToOne(() => Content, (content) => content.children, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'parent_id' })
+  @Field(() => Content, { nullable: true })
+  parent?: Content;
+
+  @OneToMany(() => Content, (content) => content.parent)
+  @Field(() => [Content], { nullable: true })
+  children?: Content[];
+
   @ManyToOne(() => Course, (course) => course.contents)
   @JoinColumn({ name: 'course_id' })
   @Field(() => Course, { nullable: true })
   course?: Course;
+
+  @OneToMany(() => PlanCourse, (plan_course) => plan_course.course)
+  plan_courses: PlanCourse[];
 }

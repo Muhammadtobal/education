@@ -1,35 +1,37 @@
+import { Exam } from 'src/exam/entities/exam.entity';
+import { User } from 'src/user/entities/user.entity';
+
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  OneToMany,
   JoinColumn,
 } from 'typeorm';
 
-import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
-
-import { User } from 'src/user/entities/user.entity';
-import { Course } from 'src/course/entities/course.entity';
+import { ObjectType, Field, Float } from '@nestjs/graphql';
 
 @ObjectType()
-@Entity()
-export class Subscription {
+@Entity('exam_user')
+export class ExamUser {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   @Field()
   id: string;
 
   @Column('bigint')
   @Field()
-  course_id: string;
+  exam_id: string;
 
   @Column('bigint')
   @Field()
   user_id: string;
 
-  @Column({ type: 'timestamp', nullable: true })
-  @Field(() => Date, { nullable: true })
-  end_date?: Date;
+  @Column({
+    type: 'float',
+    nullable: true,
+  })
+  @Field(() => Float, { nullable: true })
+  mark?: number;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
@@ -47,13 +49,13 @@ export class Subscription {
   @Field(() => Date)
   updated_at: Date;
 
-  @ManyToOne(() => Course, (course) => course.subscriptions)
-  @JoinColumn({ name: 'course_id' })
-  @Field(() => Course, { nullable: true })
-  course?: Course;
+  @ManyToOne(() => Exam, (exam) => exam.exam_users, {})
+  @JoinColumn({ name: 'exam_id' })
+  @Field(() => Exam)
+  exam: Exam;
 
-  @ManyToOne(() => User, (user) => user.subscriptions)
+  @ManyToOne(() => User, (user) => user.exam_users, {})
   @JoinColumn({ name: 'user_id' })
-  @Field(() => User, { nullable: true })
-  user?: User;
+  @Field(() => User)
+  user: User;
 }
