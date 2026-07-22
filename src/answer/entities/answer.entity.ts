@@ -24,9 +24,9 @@ export class Answer {
   @Field()
   answer_text: string;
 
-  @Column({ type: 'text' })
-  @Field()
-  hint_text: string;
+  @Column({ type: 'text', nullable: true })
+  @Field({ nullable: true })
+  hint_text?: string;
 
   @Column('bigint')
   @Field()

@@ -135,7 +135,7 @@ scalar JSON
 type Answer {
   id: String!
   answer_text: String!
-  hint_text: String!
+  hint_text: String
   question_id: String!
   direction: Direction!
   is_true: Boolean!
@@ -154,7 +154,7 @@ enum Direction {
 type Question {
   id: String!
   question_text: String!
-  hint_text: String!
+  hint_text: String
   exam_id: String!
   parent_id: String
   direction: Direction!
