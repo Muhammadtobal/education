@@ -13,7 +13,7 @@ import { EmployeePermission } from 'src/employee_permission/entities/employee_pe
 import { Notification } from 'src/notification/entities/notification.entity';
 import { City } from 'src/city/entities/city.entity';
 import GraphQLJSON from 'graphql-type-json';
-import { ScheduledNotification } from 'src/notification/entities/scheduled-notification.entity';
+import { ScheduledNotification } from 'src/notification/entities/scheduled_notification.entity';
 import { Gender } from 'src/shared/enums/gender.enum';
 
 @Entity()

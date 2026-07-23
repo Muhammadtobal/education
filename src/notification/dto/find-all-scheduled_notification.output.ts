@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
-import { ScheduledNotification } from '../entities/scheduled-notification.entity';
+import { ScheduledNotification } from '../entities/scheduled_notification.entity';
 
 @ObjectType()
 export class ScheduledNotificationPaginationResultOutput {

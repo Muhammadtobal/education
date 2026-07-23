@@ -19,7 +19,7 @@ import { PermissionModule } from './permission/permission.module';
 import { EmployeeModule } from './employee/employee.module';
 import { EmployeePermissionModule } from './employee_permission/employee_permission.module';
 import { LevelModule } from './level/level.module';
-import { VendorLevelModule } from './vendor-level/vendor-level.module';
+import { VendorLevelModule } from './vendor_level/vendor_level.module';
 import { EmployeeVendorModule } from './employee_vendor/employee_vendor.module';
 import { PlanModule } from './plan/plan.module';
 import { CourseModule } from './course/course.module';
@@ -31,9 +31,9 @@ import { DiscussionModule } from './discussion/discussion.module';
 import { ContentModule } from './content/content.module';
 import { NotificationModule } from './notification/notification.module';
 import { CouponModule } from './coupon/coupon.module';
-import { PlanCouponModule } from "./plan_coupon/plan_coupon.module";
-import { StoryModule } from "./story/story.module";
-import { LoginHistoryModule } from "./login_history/login_history.module";
+import { PlanCouponModule } from './plan_coupon/plan_coupon.module';
+import { StoryModule } from './story/story.module';
+import { LoginHistoryModule } from './login_history/login_history.module';
 
 @Module({
   imports: [
@@ -102,9 +102,9 @@ import { LoginHistoryModule } from "./login_history/login_history.module";
     EmployeePermissionModule,
     PermissionModule,
     CouponModule,
-        PlanCouponModule,
-        StoryModule,
-        LoginHistoryModule
-    ],
+    PlanCouponModule,
+    StoryModule,
+    LoginHistoryModule,
+  ],
 })
 export class AppModule {}

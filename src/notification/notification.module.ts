@@ -9,7 +9,7 @@ import { UserModule } from 'src/user/user.module';
 import { CityModule } from 'src/city/city.module';
 
 import { EmployeeModule } from 'src/employee/employee.module';
-import { ScheduledNotification } from './entities/scheduled-notification.entity';
+import { ScheduledNotification } from './entities/scheduled_notification.entity';
 
 @Module({
   imports: [

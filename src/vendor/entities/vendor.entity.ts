@@ -1,6 +1,6 @@
 import { Story } from 'src/story/entities/story.entity';
 import { EmployeeVendor } from 'src/employee_vendor/entities/employee_vendor.entity';
-import { VendorLevel } from 'src/vendor-level/entities/vendor-level.entity';
+import { VendorLevel } from 'src/vendor_level/entities/vendor_level.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
 import {
   Entity,

@@ -1,7 +1,7 @@
 import { Story } from 'src/story/entities/story.entity';
 import { Course } from 'src/course/entities/course.entity';
 import { EmployeeVendor } from 'src/employee_vendor/entities/employee_vendor.entity';
-import { VendorLevel } from 'src/vendor-level/entities/vendor-level.entity';
+import { VendorLevel } from 'src/vendor_level/entities/vendor_level.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
