@@ -3,10 +3,9 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
-export class JwtAuthSharedGuard extends AuthGuard([
+export class JwtAuthTeacherUserGuard extends AuthGuard([
   'jwt-teacher',
   'jwt-user',
-  'jwt-employee',
 ]) {
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);

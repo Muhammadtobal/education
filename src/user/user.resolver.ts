@@ -18,7 +18,7 @@ import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
 import { booleanSchema } from 'src/shared/types/zod-schemas';
 import { UpdateMeUserInput } from './dto/update-me-user.inputs';
-import { JwtAuthVendorGuard } from 'src/auth/guards/jwt-auth-vendor.guard';
+import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 import { CheckActivationUserCodeOutput } from 'src/auth/dto/check-activation-user-code.output';
 @Resolver(() => User)
 export class UserResolver {
@@ -71,14 +71,14 @@ export class UserResolver {
   }
 
   @Query(() => UserPaginationResultOutput, { name: 'users' })
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   @Permissions(Operation.GET + User.name)
   public findAll(@Args('filter') filter: FindAllUserInput) {
     return this.userService.findAll(filter);
   }
 
   @Query(() => User, { name: 'user' })
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   @Permissions(Operation.GET + User.name)
   public findOne(@Args('id') id: string) {
     return this.userService.findOne(
@@ -92,7 +92,7 @@ export class UserResolver {
   }
 
   // @Mutation(() => User)
-  // @UseGuards(JwtAuthVendorGuard)
+  // @UseGuards(JwtAuthEmployeeGuard)
   // @Permissions(Operation.UPDATE + User.name)
   // public async updateUser(
   //   @Args("updateUserInput") updateUserInput: UpdateUserInput,

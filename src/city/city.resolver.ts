@@ -11,42 +11,42 @@ import { DoneResponseOutput } from 'src/shared/types/done-output';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
-import { JwtAuthVendorGuard } from 'src/auth/guards/jwt-auth-vendor.guard';
+import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 @Resolver(() => City)
 export class CityResolver {
   constructor(private readonly cityService: CityService) {}
 
   @Mutation(() => City)
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   @Permissions(Operation.CREATE + City.name)
   public createCity(@Args('createCityInput') createCityInput: CreateCityInput) {
     return this.cityService.create(createCityInput);
   }
 
   @Query(() => CityPaginationResultOutput, { name: 'cities' })
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   @Permissions(Operation.GET + City.name)
   public findAll(@Args('filter') filter: FindAllCityInput) {
     return this.cityService.findAll(filter);
   }
 
   @Query(() => City, { name: 'city' })
-  @UseGuards(JwtAuthVendorGuard)
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   @Permissions(Operation.GET + City.name)
   public findOne(@Args('id') id: string) {
     return this.cityService.findOne({ id });
   }
 
   @Mutation(() => City)
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   @Permissions(Operation.UPDATE + City.name)
   public updateCity(@Args('updateCityInput') updateCityInput: UpdateCityInput) {
     return this.cityService.update(updateCityInput);
   }
 
   @Mutation(() => DoneResponseOutput)
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   @Permissions(Operation.DELETE + City.name)
   public removeCity(@Args('id') id: string) {
     this.cityService.remove(id);

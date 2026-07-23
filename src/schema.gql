@@ -2,6 +2,33 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type LoginHistory {
+  id: String!
+  user_id: String!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  user: User
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type EmployeeVendor {
+  id: String!
+  vendor_id: String!
+  employee_id: String!
+  level_id: String!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  vendor: Vendor
+  employee: Employee
+  level: Level
+}
+
 type Permission {
   id: String!
   name: String!
@@ -12,11 +39,6 @@ type Permission {
   updated_at: DateTime!
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type EmployeePermission {
   id: String!
   employee_id: String!
@@ -24,6 +46,134 @@ type EmployeePermission {
   created_at: DateTime!
   employee: Employee
   permission: Permission
+}
+
+type Notification {
+  id: String!
+  title: String!
+  body: String!
+  active: Boolean!
+  link: String
+  img_url: String
+  user_id: String
+  teacher_id: String
+  created_at: DateTime!
+  vendor_id: String
+  filter_data: JSON!
+  employee_id: String
+  global: Boolean!
+  approved: Boolean!
+  receivers_count: Int!
+  user: User
+  employee: Employee
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type Employee {
+  id: String!
+  phone: String!
+  gender: String!
+  full_name: String!
+  active: Boolean!
+  city_id: String!
+  device_info: JSON
+  socket_id: String
+  created_at: DateTime!
+  updated_at: DateTime!
+  city: City
+  employee_permissions: [EmployeePermission!]
+}
+
+type City {
+  id: String!
+  name: String!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type Review {
+  id: String!
+  user_id: String!
+  course_id: String
+  vendor_id: String
+  teacher_id: String
+  value: Float!
+  active: Boolean!
+  comment: String
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
+  vendor: Vendor
+  teacher: Teacher
+  user: User
+}
+
+type Teacher {
+  id: String!
+  name: String!
+  balance: Float!
+  review_count: Float!
+  gender: String!
+  city_id: String!
+  description: String
+  phone: String!
+  device_info: JSON
+  image_url: String
+  count_review: Float
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  city: City
+}
+
+type Discussion {
+  id: String!
+  teacher_id: String!
+  course_id: String!
+  user_id: String!
+  title: String
+  description: String!
+  url: String
+  parent_id: String
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  teacher: Teacher
+  user: User
+  course: Course
+  parent: Discussion
+  children: [Discussion!]
+}
+
+type Payment {
+  id: String!
+  course_id: String!
+  user_id: String!
+  vendor_id: String!
+  value: Float!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
+  user: User
+  vendor: Vendor
+}
+
+type Subscription {
+  id: String!
+  course_id: String!
+  user_id: String!
+  end_date: DateTime
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
+  user: User
 }
 
 type UserCoupon {
@@ -34,6 +184,70 @@ type UserCoupon {
   active: Boolean!
   user: User
   coupon: Coupon
+}
+
+type Answer {
+  id: String!
+  answer_text: String!
+  hint_text: String
+  question_id: String!
+  direction: Direction!
+  is_true: Boolean!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  question: Question
+}
+
+"""Text direction (right to left or left to right)"""
+enum Direction {
+  RIGHT_TO_LEFT
+  LEFT_TO_RIGHT
+}
+
+type Question {
+  id: String!
+  question_text: String!
+  hint_text: String
+  exam_id: String!
+  parent_id: String
+  direction: Direction!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  exam: Exam
+  parent: Question
+  children: [Question!]
+}
+
+type Exam {
+  id: String!
+  name: String!
+  course_id: String!
+  direction: Direction!
+  exam_duration: Int!
+  exam_date: DateTime
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  course: Course
+}
+
+type User {
+  id: String!
+  full_name: String!
+  phone: String!
+  gender: String!
+  img_url: String
+  active: Boolean!
+  device_info: JSON
+  lang: String!
+  city_id: String!
+  level_id: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+  city: City
+  level: Level
 }
 
 type Coupon {
@@ -109,6 +323,7 @@ type Content {
   id: String!
   course_id: String!
   url: String!
+  title: String!
   content_type: ContentType!
   parent_id: String
   content_info: JSON
@@ -127,56 +342,23 @@ enum ContentType {
   AUDIO
 }
 
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
-
-type Answer {
-  id: String!
-  answer_text: String!
-  hint_text: String
-  question_id: String!
-  direction: Direction!
-  is_true: Boolean!
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  question: Question
-}
-
-"""Text direction (right to left or left to right)"""
-enum Direction {
-  RIGHT_TO_LEFT
-  LEFT_TO_RIGHT
-}
-
-type Question {
-  id: String!
-  question_text: String!
-  hint_text: String
-  exam_id: String!
-  parent_id: String
-  direction: Direction!
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  exam: Exam
-  parent: Question
-  children: [Question!]
-}
-
-type Exam {
+type Course {
   id: String!
   name: String!
-  course_id: String!
-  direction: Direction!
-  exam_duration: Int!
-  exam_date: DateTime
+  url: String!
+  description: String!
+  level_id: String!
+  vendor_id: String!
+  teacher_id: String!
+  teacher_share: Float!
+  vendor_share: Float!
+  review_count: Float!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
-  course: Course
+  teacher: Teacher
+  vendor: Vendor
+  level: Level
 }
 
 type VendorLevel {
@@ -201,165 +383,14 @@ type Level {
   children: [Level!]
 }
 
-type Subscription {
+type Story {
   id: String!
-  course_id: String!
-  user_id: String!
-  end_date: DateTime
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  course: Course
-  user: User
-}
-
-type Review {
-  id: String!
-  user_id: String!
-  course_id: String
-  vendor_id: String
-  teacher_id: String
-  value: Float!
-  active: Boolean!
-  comment: String
-  created_at: DateTime!
-  updated_at: DateTime!
-  course: Course
-  vendor: Vendor
-  teacher: Teacher
-  user: User
-}
-
-type Payment {
-  id: String!
-  course_id: String!
-  user_id: String!
-  value: Float!
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  course: Course
-  user: User
-}
-
-type Course {
-  id: String!
-  name: String!
-  url: String!
-  description: String!
-  level_id: String!
-  vendor_id: String!
-  teacher_id: String!
-  teacher_share: Float!
-  vendor_share: Float!
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  teacher: Teacher
-  vendor: Vendor
-  level: Level
-}
-
-type City {
-  id: String!
-  name: String!
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-}
-
-type Teacher {
-  id: String!
-  name: String!
-  balance: Float!
-  review_count: Float!
-  city_id: String!
-  description: String
-  phone: String!
-  device_info: JSON
-  image_url: String
-  count_review: Float
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  city: City
-}
-
-type Discussion {
-  id: String!
-  teacher_id: String!
-  user_id: String!
-  message: String!
   url: String
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  teacher: Teacher
-  user: User
-}
-
-type User {
-  id: String!
-  full_name: String!
-  phone: String!
-  gender: String!
-  img_url: String
-  active: Boolean!
-  device_info: JSON
-  lang: String!
-  city_id: String!
+  title: String
   level_id: String!
-  created_at: DateTime!
-  updated_at: DateTime!
-  city: City
-  level: Level
-}
-
-type Notification {
-  id: String!
-  title: String!
-  body: String!
-  active: Boolean!
-  link: String
-  img_url: String
-  user_id: String
-  teacher_id: String
-  created_at: DateTime!
-  vendor_id: String
-  filter_data: JSON!
-  employee_id: String
-  global: Boolean!
-  approved: Boolean!
-  receivers_count: Int!
-  user: User
-  employee: Employee
-}
-
-type Employee {
-  id: String!
-  phone: String!
-  full_name: String!
-  active: Boolean!
-  city_id: String!
-  device_info: JSON
-  socket_id: String
-  created_at: DateTime!
-  updated_at: DateTime!
-  city: City
-  employee_permissions: [EmployeePermission!]
-}
-
-type EmployeeVendor {
-  id: String!
   vendor_id: String!
-  employee_id: String!
-  level_id: String!
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  vendor: Vendor
-  employee: Employee
   level: Level
+  vendor: Vendor
 }
 
 type Vendor {
@@ -369,9 +400,7 @@ type Vendor {
   review_count: Float!
   icon: String
   phone: String!
-  lang: String!
   img_url: String
-  device_info: JSON
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
@@ -534,6 +563,16 @@ type PlanCouponPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type StoryPaginationResultOutput {
+  items: [Story!]!
+  meta: PaginationMetadata!
+}
+
+type LoginHistoryPaginationResultOutput {
+  items: [LoginHistory!]!
+  meta: PaginationMetadata!
+}
+
 type Query {
   vendors(filter: FindAllVendorInput!): VendorPaginationResultOutput!
   vendor(id: String!): Vendor!
@@ -582,6 +621,10 @@ type Query {
   coupon(id: String!): Coupon!
   planCoupons(filter: FindAllPlanCouponInput!): PlanCouponPaginationResultOutput!
   planCoupon(id: String!): PlanCoupon!
+  storys(filter: FindAllStoryInput!): StoryPaginationResultOutput!
+  story(id: String!): Story!
+  loginHistorys(filter: FindAllLoginHistoryInput!): LoginHistoryPaginationResultOutput!
+  loginHistory(id: String!): LoginHistory!
 }
 
 input FindAllVendorInput {
@@ -790,6 +833,20 @@ input FindAllPlanCouponInput {
   plan_id: JSON
 }
 
+input FindAllStoryInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  url: MatchInput
+  level_id: JSON
+  vendor_id: JSON
+}
+
+input FindAllLoginHistoryInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  user_id: JSON
+}
+
 type Mutation {
   createVendor(createVendorInput: CreateVendorInput!): Vendor!
   updateVendor(updateVendorInput: UpdateVendorInput!): Vendor!
@@ -869,6 +926,12 @@ type Mutation {
   createPlanCoupon(createPlanCouponInput: CreatePlanCouponInput!): PlanCoupon!
   updatePlanCoupon(updatePlanCouponInput: UpdatePlanCouponInput!): PlanCoupon!
   removePlanCoupon(id: String!): DoneResponseOutput!
+  createStory(createStoryInput: CreateStoryInput!): Story!
+  updateStory(updateStoryInput: UpdateStoryInput!): Story!
+  removeStory(id: String!): DoneResponseOutput!
+  createLoginHistory(createLoginHistoryInput: CreateLoginHistoryInput!): LoginHistory!
+  updateLoginHistory(updateLoginHistoryInput: UpdateLoginHistoryInput!): LoginHistory!
+  removeLoginHistory(id: String!): DoneResponseOutput!
 }
 
 input CreateVendorInput {
@@ -1265,5 +1328,27 @@ input UpdatePlanCouponInput {
   value: Float
   coupon_id: String
   plan_id: String
+  id: String!
+}
+
+input CreateStoryInput {
+  url: String!
+  level_id: String
+  vendor_id: String
+}
+
+input UpdateStoryInput {
+  url: String
+  level_id: String
+  vendor_id: String
+  id: String!
+}
+
+input CreateLoginHistoryInput {
+  user_id: String!
+}
+
+input UpdateLoginHistoryInput {
+  user_id: String
   id: String!
 }

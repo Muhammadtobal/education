@@ -14,6 +14,7 @@ import { Notification } from 'src/notification/entities/notification.entity';
 import { City } from 'src/city/entities/city.entity';
 import GraphQLJSON from 'graphql-type-json';
 import { ScheduledNotification } from 'src/notification/entities/scheduled-notification.entity';
+import { Gender } from 'src/shared/enums/gender.enum';
 
 @Entity()
 @ObjectType()
@@ -25,6 +26,10 @@ export class Employee {
   @Column('varchar', { length: 255 })
   @Field()
   phone: string;
+
+  @Column({ type: 'enum', enum: Gender })
+  @Field()
+  gender: Gender;
 
   @Column('varchar', { length: 255 })
   @Field()

@@ -16,6 +16,7 @@ import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { City } from 'src/city/entities/city.entity';
 import { TeacherVendor } from './teacher-vedor.entity';
 import { Review } from 'src/review/entities/review.entity';
+import { Gender } from 'src/shared/enums/gender.enum';
 
 @ObjectType()
 @Entity()
@@ -42,6 +43,10 @@ export class Teacher {
   })
   @Field(() => Float)
   review_count: number;
+
+  @Column({ type: 'enum', enum: Gender })
+  @Field()
+  gender: Gender;
 
   @Column({ type: 'bigint' })
   @Field()

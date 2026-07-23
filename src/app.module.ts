@@ -32,6 +32,8 @@ import { ContentModule } from './content/content.module';
 import { NotificationModule } from './notification/notification.module';
 import { CouponModule } from './coupon/coupon.module';
 import { PlanCouponModule } from "./plan_coupon/plan_coupon.module";
+import { StoryModule } from "./story/story.module";
+import { LoginHistoryModule } from "./login_history/login_history.module";
 
 @Module({
   imports: [
@@ -100,7 +102,9 @@ import { PlanCouponModule } from "./plan_coupon/plan_coupon.module";
     EmployeePermissionModule,
     PermissionModule,
     CouponModule,
-        PlanCouponModule
+        PlanCouponModule,
+        StoryModule,
+        LoginHistoryModule
     ],
 })
 export class AppModule {}

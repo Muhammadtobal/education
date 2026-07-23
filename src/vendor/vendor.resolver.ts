@@ -7,14 +7,14 @@ import { VendorPaginationResultOutput } from './dto/find-all-vendor.output';
 import { FindAllVendorInput } from './dto/find-all-vendor.input';
 import { DoneResponseOutput } from 'src/shared/types/done-output';
 import { UseGuards } from '@nestjs/common';
-import { JwtAuthVendorGuard } from 'src/auth/guards/jwt-auth-vendor.guard';
+import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 
 @Resolver(() => Vendor)
 export class VendorResolver {
   constructor(private readonly vendorService: VendorService) {}
 
   @Mutation(() => Vendor)
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   public createVendor(
     @Args('createVendorInput') createVendorInput: CreateVendorInput,
   ) {
@@ -22,19 +22,19 @@ export class VendorResolver {
   }
 
   @Query(() => VendorPaginationResultOutput, { name: 'vendors' })
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   public findAll(@Args('filter') filter: FindAllVendorInput) {
     return this.vendorService.findAll(filter);
   }
 
   @Query(() => Vendor, { name: 'vendor' })
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   public findOne(@Args('id') id: string) {
     return this.vendorService.findOne({ id });
   }
 
   @Mutation(() => Vendor)
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   public updateVendor(
     @Args('updateVendorInput') updateVendorInput: UpdateVendorInput,
   ) {
@@ -42,7 +42,7 @@ export class VendorResolver {
   }
 
   @Mutation(() => DoneResponseOutput)
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   public removeVendor(@Args('id') id: string) {
     this.vendorService.remove(id);
     return { done: true };

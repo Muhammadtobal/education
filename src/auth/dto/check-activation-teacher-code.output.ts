@@ -1,6 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 
 @ObjectType()
 export class CheckActivationTeacherCodeOutput {

@@ -26,8 +26,6 @@ import {
   verifyJwtToken,
 } from 'src/shared/types/jwt-payload';
 import { EmployeeService } from 'src/employee/employee.service';
-import { RefreshTokenEmployeeOutput } from './dto/refresh-token-employee.output';
-import { RefreshTokenEmployeeInput } from './dto/refresh-token-employee.input';
 import { TeacherService } from 'src/teacher/teacher.service';
 import { CheckActivationEmployeeCodeOutput } from './dto/check-activation-employee-code.output';
 

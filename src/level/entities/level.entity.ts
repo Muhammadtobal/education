@@ -1,3 +1,4 @@
+import { Story } from 'src/story/entities/story.entity';
 import { Course } from 'src/course/entities/course.entity';
 import { EmployeeVendor } from 'src/employee_vendor/entities/employee_vendor.entity';
 import { VendorLevel } from 'src/vendor-level/entities/vendor-level.entity';
@@ -66,4 +67,7 @@ export class Level {
 
   @OneToMany(() => VendorLevel, (vendor_level) => vendor_level.level)
   vendor_levels: VendorLevel[];
+
+  @OneToMany(() => Story, (story) => story.level)
+  stories: Story[];
 }

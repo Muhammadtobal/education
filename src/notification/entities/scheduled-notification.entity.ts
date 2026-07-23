@@ -12,6 +12,7 @@ import {
 import { City } from 'src/city/entities/city.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { User } from 'src/user/entities/user.entity';
+import { ScheduledNotificationType } from 'src/shared/enums/scheduled_notification.enum';
 
 @Entity()
 @ObjectType()
@@ -35,6 +36,17 @@ export class ScheduledNotification {
   @Column('varchar', { length: 255, nullable: true })
   @Field({ nullable: true })
   link?: string;
+
+  @Column('int')
+  @Field(() => Int)
+  count: number;
+
+  @Column({
+    type: 'enum',
+    enum: ScheduledNotificationType,
+  })
+  @Field(() => ScheduledNotificationType)
+  scheduled_notification_type: ScheduledNotificationType;
 
   @Column('varchar', { length: 255, nullable: true })
   @Field({ nullable: true })

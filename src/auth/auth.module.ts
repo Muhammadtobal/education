@@ -1,4 +1,4 @@
-import { JwtVendorStrategy } from './strategies/jwt-vendor.strategy';
+import { JwtAuthEmployeeGuard } from './guards/jwt-auth-employee.guard';
 import { JwtUserStrategy } from './strategies/jwt-user.strategy';
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -21,7 +21,7 @@ import { TeacherModule } from 'src/teacher/teacher.module';
   providers: [
     AuthService,
     AuthResolver,
-    JwtVendorStrategy,
+    JwtAuthEmployeeGuard,
     JwtUserStrategy,
     JwtEmployeeStrategy,
   ],

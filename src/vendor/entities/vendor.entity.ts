@@ -1,3 +1,4 @@
+import { Story } from 'src/story/entities/story.entity';
 import { EmployeeVendor } from 'src/employee_vendor/entities/employee_vendor.entity';
 import { VendorLevel } from 'src/vendor-level/entities/vendor-level.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
@@ -16,6 +17,7 @@ import { Plan } from 'src/plan/entities/plan.entity';
 import { Course } from 'src/course/entities/course.entity';
 import { TeacherVendor } from 'src/teacher/entities/teacher-vedor.entity';
 import { Review } from 'src/review/entities/review.entity';
+import { Payment } from 'src/payment/entities/payment.entity';
 
 @ObjectType()
 @Entity()
@@ -51,23 +53,9 @@ export class Vendor {
   @Field()
   phone: string;
 
-  @Column('varchar', { length: 2, default: 'ar' })
-  @Field()
-  lang: string;
-
   @Column('varchar', { length: 255, nullable: true })
   @Field({ nullable: true })
   img_url?: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  fcm_token?: string;
-
-  @Column('varchar', { length: 255, nullable: true })
-  refresh_token?: string;
-
-  @Column('simple-json', { nullable: true })
-  @Field(() => GraphQLJSON, { nullable: true })
-  device_info?: Record<string, any>;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
@@ -102,4 +90,10 @@ export class Vendor {
 
   @OneToMany(() => Review, (review) => review.vendor)
   reviews: Review[];
+
+  @OneToMany(() => Story, (story) => story.vendor)
+  stories: Story[];
+
+  @OneToMany(() => Payment, (payment) => payment.vendor)
+  payments: Payment[];
 }

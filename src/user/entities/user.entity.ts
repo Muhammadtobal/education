@@ -1,3 +1,4 @@
+import { LoginHistory } from 'src/login_history/entities/login_history.entity';
 import { Discussion } from 'src/discussion/entities/discussion.entity';
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { Gender } from 'src/shared/enums/gender.enum';
@@ -124,4 +125,7 @@ export class User {
     (scheduled_notification) => scheduled_notification.user,
   )
   scheduled_notifications: ScheduledNotification[];
+
+  @OneToMany(() => LoginHistory, (login_history) => login_history.user)
+  login_histories: LoginHistory[];
 }

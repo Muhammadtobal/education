@@ -29,6 +29,10 @@ export class Content {
   @Field()
   url: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  @Field()
+  title: string;
+
   @Column({
     type: 'enum',
     enum: ContentType,

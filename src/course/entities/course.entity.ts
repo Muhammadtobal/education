@@ -18,6 +18,7 @@ import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { Vendor } from 'src/vendor/entities/vendor.entity';
+import { Discussion } from 'src/discussion/entities/discussion.entity';
 
 @ObjectType()
 @Entity()
@@ -63,6 +64,13 @@ export class Course {
   })
   @Field(() => Float)
   vendor_share: number;
+
+  @Column({
+    type: 'float',
+    default: 0,
+  })
+  @Field(() => Float)
+  review_count: number;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
@@ -112,4 +120,7 @@ export class Course {
 
   @OneToMany(() => Payment, (payment) => payment.course)
   payments: Payment[];
+
+  @OneToMany(() => Discussion, (discussion) => discussion.course)
+  discussions: Discussion[];
 }

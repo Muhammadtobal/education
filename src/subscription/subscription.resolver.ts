@@ -8,7 +8,7 @@ import { FindAllSubscriptionInput } from './dto/find-all-subscription.input';
 import { DoneResponseOutput } from 'src/shared/types/done-output';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { UseGuards } from '@nestjs/common';
-import { JwtAuthVendorGuard } from 'src/auth/guards/jwt-auth-vendor.guard';
+import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 
 @Resolver(() => Subscription)
 export class SubscriptionResolver {
@@ -44,7 +44,7 @@ export class SubscriptionResolver {
   }
 
   @Mutation(() => DoneResponseOutput)
-  @UseGuards(JwtAuthVendorGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   public removeSubscription(@Args('id') id: string) {
     this.subscriptionService.remove(id);
     return { done: true };

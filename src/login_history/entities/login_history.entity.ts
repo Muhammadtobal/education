@@ -5,40 +5,26 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  CreateDateColumn,
 } from 'typeorm';
 
 import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 
 import { User } from 'src/user/entities/user.entity';
-import { Course } from 'src/course/entities/course.entity';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 
 @ObjectType()
 @Entity()
-export class Payment {
+export class LoginHistory {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   @Field()
   id: string;
 
   @Column('bigint')
   @Field()
-  course_id: string;
-
-  @Column('bigint')
-  @Field()
   user_id: string;
 
-  @Column('bigint')
-  @Field()
-  vendor_id: string;
-
-  @Column('decimal', {
-    precision: 10,
-    scale: 2,
-    default: 0,
-  })
-  @Field(() => Float)
-  value: number;
+  @Column('simple-json', { nullable: true })
+  device_info: Record<string, any>;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
@@ -56,18 +42,8 @@ export class Payment {
   @Field(() => Date)
   updated_at: Date;
 
-  @ManyToOne(() => Course, (course) => course.payments)
-  @JoinColumn({ name: 'course_id' })
-  @Field(() => Course, { nullable: true })
-  course?: Course;
-
-  @ManyToOne(() => User, (user) => user.payments)
+  @ManyToOne(() => User, (user) => user.login_histories)
   @JoinColumn({ name: 'user_id' })
   @Field(() => User, { nullable: true })
   user?: User;
-
-  @ManyToOne(() => Vendor, (vendor) => vendor.payments)
-  @JoinColumn({ name: 'vendor_id' })
-  @Field(() => Vendor, { nullable: true })
-  vendor?: Vendor;
 }
