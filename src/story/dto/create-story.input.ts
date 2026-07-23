@@ -1,35 +1,30 @@
-import { InputType, Int, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from '@nestjs/graphql';
 import {
-  IsArray,
-  IsBoolean,
-  IsDecimal,
-  IsEmail,
-  IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsNumberString,
   IsOptional,
   IsString,
-} from "class-validator";
+} from 'class-validator';
 
 @InputType()
 export class CreateStoryInput {
+  @IsNotEmpty()
+  @IsNumberString()
+  @Field()
+  level_id: string;
 
   @IsNotEmpty()
+  @IsNumberString()
+  @Field()
+  vendor_id: string;
+
+  @IsOptional()
   @IsString()
-  @Field( )
-  url: string;
-
+  @Field({ nullable: true })
+  url?: string;
 
   @IsOptional()
-  @IsNumberString()
+  @IsString()
   @Field({ nullable: true })
-  level_id?: string;
-
-
-  @IsOptional()
-  @IsNumberString()
-  @Field({ nullable: true })
-  vendor_id?: string;
-
+  title?: string;
 }

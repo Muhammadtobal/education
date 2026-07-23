@@ -37,13 +37,6 @@ export class Teacher {
   @Field(() => Float)
   balance: number;
 
-  @Column({
-    type: 'float',
-    default: 0,
-  })
-  @Field(() => Float)
-  review_count: number;
-
   @Column({ type: 'enum', enum: Gender })
   @Field()
   gender: Gender;

@@ -25,26 +25,26 @@ export class EmployeeResolver {
     private readonly authService: AuthService,
   ) {}
 
-  @Mutation(() => Employee)
-  @UseGuards(JwtAuthEmployeeGuard)
-  @Permissions(Operation.CREATE + Employee.name)
-  public async createEmployee(
-    @Args('createEmployeeInput') createEmployeeInput: CreateEmployeeInput,
-  ) {
-    createEmployeeInput.password = await bcrypt.hash(
-      createEmployeeInput.password,
-      10,
-    );
+  // @Mutation(() => Employee)
+  // @UseGuards(JwtAuthEmployeeGuard)
+  // @Permissions(Operation.CREATE + Employee.name)
+  // public async createEmployee(
+  //   @Args('createEmployeeInput') createEmployeeInput: CreateEmployeeInput,
+  // ) {
+  //   createEmployeeInput.password = await bcrypt.hash(
+  //     createEmployeeInput.password,
+  //     10,
+  //   );
 
-    const refreshToken = await this.authService.generateRefreshToken();
+  //   const refreshToken = await this.authService.generateRefreshToken();
 
-    const employee = await this.employeeService.create({
-      ...createEmployeeInput,
-      refresh_token: refreshToken,
-    });
+  //   const employee = await this.employeeService.create({
+  //     ...createEmployeeInput,
+  //     refresh_token: refreshToken,
+  //   });
 
-    return this.employeeService.findOne({ id: employee.id });
-  }
+  //   return this.employeeService.findOne({ id: employee.id });
+  // }
 
   @Query(() => EmployeePaginationResultOutput, { name: 'employees' })
   @UseGuards(JwtAuthEmployeeGuard)
@@ -63,21 +63,6 @@ export class EmployeeResolver {
         relations: { employee_permissions: { permission: true } },
       },
     );
-  }
-
-  @Mutation(() => Employee)
-  @UseGuards(JwtAuthEmployeeGuard)
-  @Permissions(Operation.UPDATE + Employee.name)
-  public async updateEmployee(
-    @Args('updateEmployeeInput') updateEmployeeInput: UpdateEmployeeInput,
-  ) {
-    if (updateEmployeeInput.password) {
-      updateEmployeeInput.password = await bcrypt.hash(
-        updateEmployeeInput.password,
-        10,
-      );
-    }
-    return this.employeeService.update(updateEmployeeInput);
   }
 
   @Query(() => Employee, { name: 'myEmployeeProfile', nullable: true })

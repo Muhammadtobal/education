@@ -1,7 +1,7 @@
-import { InputType, Field } from "@nestjs/graphql";
-import { Type } from "class-transformer";
-import { IsOptional, IsObject, IsNotEmpty } from "class-validator";
-import GraphQLJSON from "graphql-type-json";
+import { InputType, Field } from '@nestjs/graphql';
+import { Type } from 'class-transformer';
+import { IsOptional, IsObject, IsNotEmpty } from 'class-validator';
+import GraphQLJSON from 'graphql-type-json';
 import {
   MatchInput,
   PaginationInput,
@@ -12,9 +12,9 @@ import {
   SortInput,
   SingleIdInput,
   ListOfIdsInput,
-} from "src/shared/types/graphql-input-types";
-import { IsSingleDateOrRange } from "src/shared/decorators/is-single-date-or-range.decorator";
-import { IsSingleIdOrList } from "src/shared/decorators/is-single-id-or-list.decorator";
+} from 'src/shared/types/graphql-input-types';
+import { IsSingleDateOrRange } from 'src/shared/decorators/is-single-date-or-range.decorator';
+import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
 
 @InputType()
 export class FindAllEmployeePermissionInput {

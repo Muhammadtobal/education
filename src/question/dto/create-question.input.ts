@@ -1,29 +1,44 @@
-import { InputType, Int, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from '@nestjs/graphql';
 import {
-  IsArray,
   IsBoolean,
-  IsDecimal,
-  IsEmail,
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsNumberString,
   IsOptional,
   IsString,
-} from "class-validator";
+} from 'class-validator';
+
+import { Direction } from 'src/shared/enums/direction.enum';
 
 @InputType()
 export class CreateQuestionInput {
-
   @IsNotEmpty()
   @IsString()
-  @Field( )
-  name: string;
-
+  @Field()
+  question_text: string;
 
   @IsNotEmpty()
   @IsNumberString()
   @Field()
   exam_id: string;
 
+  @IsNotEmpty()
+  @IsEnum(Direction)
+  @Field(() => Direction)
+  direction: Direction;
+
+  @IsOptional()
+  @IsString()
+  @Field({ nullable: true })
+  hint_text?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  parent_id?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  active?: boolean;
 }

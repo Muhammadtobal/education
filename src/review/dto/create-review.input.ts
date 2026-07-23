@@ -1,10 +1,6 @@
-import { InputType, Int, Field, Float } from '@nestjs/graphql';
+import { InputType, Field, Float } from '@nestjs/graphql';
 import {
-  IsArray,
   IsBoolean,
-  IsDecimal,
-  IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
@@ -14,23 +10,40 @@ import {
 
 @InputType()
 export class CreateReviewInput {
-  @IsNotEmpty()
-  @IsNumberString()
-  @Field()
-  video_id: string;
+  // Required Fields
 
   @IsNotEmpty()
   @IsNumberString()
   @Field()
   user_id: string;
 
+  @IsNotEmpty()
+  @IsNumber()
+  @Field(() => Float)
+  value: number;
+
   @IsOptional()
-  @IsBoolean()
-  @Field(() => Boolean, { nullable: true })
-  active?: boolean;
+  @IsNumberString()
+  @Field({ nullable: true })
+  course_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  vendor_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  teacher_id?: string;
 
   @IsOptional()
   @IsString()
   @Field({ nullable: true })
   comment?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  active?: boolean;
 }

@@ -19,10 +19,6 @@ export class PlanCoupon {
   @Field()
   id: string;
 
-  @Column({ type: 'float' })
-  @Field(() => Float)
-  value: number;
-
   @Column('bigint')
   @Field()
   coupon_id: string;

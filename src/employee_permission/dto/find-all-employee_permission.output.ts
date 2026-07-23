@@ -1,6 +1,6 @@
-import { Field, ObjectType } from "@nestjs/graphql";
-import { PaginationMetadata } from "src/shared/types/pagination-metadata";
-import { EmployeePermission } from "../entities/employee_permission.entity";
+import { Field, ObjectType } from '@nestjs/graphql';
+import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
+import { EmployeePermission } from '../entities/employee_permission.entity';
 
 @ObjectType()
 export class EmployeePermissionPaginationResultOutput {

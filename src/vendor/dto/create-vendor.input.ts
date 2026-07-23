@@ -1,55 +1,46 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { InputType, Field, Float } from '@nestjs/graphql';
 import {
   IsBoolean,
-  IsObject,
+  IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
-  IsNotEmpty,
 } from 'class-validator';
-import GraphQLJSON from 'graphql-type-json';
 
 @InputType()
 export class CreateVendorInput {
-  @Field()
   @IsNotEmpty()
   @IsString()
+  @Field()
   name: string;
 
-  @Field()
   @IsNotEmpty()
   @IsString()
+  @Field()
   phone: string;
 
-  @Field({ nullable: true })
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Float, { nullable: true })
+  balance?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Float, { nullable: true })
+  review_count?: number;
+
   @IsOptional()
   @IsString()
+  @Field({ nullable: true })
   icon?: string;
 
-  @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  lang?: string;
-
   @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
   img_url?: string;
 
-  @Field({ nullable: true })
   @IsOptional()
   @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
   active?: boolean;
-
-  @IsOptional()
-  @IsString()
-  fcm_token?: string;
-
-  @IsOptional()
-  @IsString()
-  refresh_token?: string;
-
-  @Field(() => GraphQLJSON, { nullable: true })
-  @IsOptional()
-  @IsObject()
-  device_info?: Record<string, any>;
 }

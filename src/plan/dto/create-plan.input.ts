@@ -1,23 +1,44 @@
-import { InputType, Int, Field, Float } from "@nestjs/graphql";
+import { InputType, Field, Float } from '@nestjs/graphql';
 import {
-  IsArray,
   IsBoolean,
-  IsDecimal,
-  IsEmail,
   IsEnum,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
   IsOptional,
   IsString,
-} from "class-validator";
+} from 'class-validator';
+
+import { PlanType } from 'src/shared/enums/plan_type.enum';
 
 @InputType()
 export class CreatePlanInput {
-
   @IsNotEmpty()
   @IsString()
-  @Field( )
+  @Field()
   name: string;
 
+  @IsNotEmpty()
+  @IsNumberString()
+  @Field()
+  vendor_id: string;
+
+  @IsNotEmpty()
+  @IsEnum(PlanType)
+  @Field(() => PlanType)
+  plan_type: PlanType;
+
+  @IsNotEmpty()
+  @Field(() => Date)
+  end_date: Date;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Field(() => Float)
+  price: number;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  active?: boolean;
 }

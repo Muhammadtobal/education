@@ -1,15 +1,10 @@
-import { InputType, Int, Field, Float } from '@nestjs/graphql';
+import { InputType, Field, Float } from '@nestjs/graphql';
 import {
-  IsArray,
   IsBoolean,
-  IsDecimal,
-  IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
   IsOptional,
-  IsString,
 } from 'class-validator';
 
 @InputType()
@@ -17,7 +12,7 @@ export class CreatePaymentInput {
   @IsNotEmpty()
   @IsNumberString()
   @Field()
-  video_id: string;
+  course_id: string;
 
   @IsNotEmpty()
   @IsNumberString()
@@ -25,9 +20,14 @@ export class CreatePaymentInput {
   user_id: string;
 
   @IsNotEmpty()
+  @IsNumberString()
+  @Field()
+  vendor_id: string;
+
+  @IsNotEmpty()
   @IsNumber()
   @Field(() => Float)
-  price: number;
+  value: number;
 
   @IsOptional()
   @IsBoolean()

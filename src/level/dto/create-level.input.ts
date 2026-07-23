@@ -1,29 +1,26 @@
-import { InputType, Int, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from '@nestjs/graphql';
 import {
-  IsArray,
   IsBoolean,
-  IsDecimal,
-  IsEmail,
-  IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsNumberString,
   IsOptional,
   IsString,
-} from "class-validator";
+} from 'class-validator';
 
 @InputType()
 export class CreateLevelInput {
-
   @IsNotEmpty()
   @IsString()
-  @Field( )
+  @Field()
   name: string;
 
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  parent_id?: string;
 
   @IsOptional()
   @IsBoolean()
-  @Field(() => Boolean , { nullable: true })
+  @Field(() => Boolean, { nullable: true })
   active?: boolean;
-
 }

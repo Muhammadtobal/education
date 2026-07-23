@@ -41,9 +41,9 @@ export class Exam {
   @Field(() => Int)
   exam_duration: number;
 
-  @Column({ type: 'timestamp', nullable: true })
-  @Field(() => Date, { nullable: true })
-  exam_date?: Date;
+  @Column({ type: 'timestamp' })
+  @Field(() => Date)
+  exam_date: Date;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)

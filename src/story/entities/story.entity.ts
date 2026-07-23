@@ -35,6 +35,26 @@ export class Story {
   @Field()
   vendor_id: string;
 
+  @Column('boolean', { default: true })
+  @Field(() => Boolean)
+  active: boolean;
+
+  @Column('varchar', { length: 255, nullable: true })
+  @Field({ nullable: true })
+  comment?: string;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Field(() => Date)
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  @Field(() => Date)
+  updated_at: Date;
+
   @ManyToOne(() => Level, (level) => level.stories)
   @JoinColumn({ name: 'level_id' })
   @Field(() => Level, { nullable: true })

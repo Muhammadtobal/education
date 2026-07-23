@@ -1,29 +1,30 @@
-import { InputType, Int, Field, Float } from "@nestjs/graphql";
+import { InputType, Field } from '@nestjs/graphql';
 import {
-  IsArray,
   IsBoolean,
-  IsDecimal,
-  IsEmail,
-  IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsNumberString,
   IsOptional,
-  IsString,
-} from "class-validator";
+} from 'class-validator';
 
 @InputType()
 export class CreatePlanCourseInput {
-
   @IsNotEmpty()
   @IsNumberString()
   @Field()
   plan_id: string;
 
-
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumberString()
-  @Field()
-  course_id: string;
+  @Field({ nullable: true })
+  course_id?: string;
 
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  content_id?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  active?: boolean;
 }

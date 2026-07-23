@@ -1,10 +1,6 @@
-import { InputType, Int, Field, Float } from '@nestjs/graphql';
+import { InputType, Field, Float } from '@nestjs/graphql';
 import {
-  IsArray,
   IsBoolean,
-  IsDecimal,
-  IsEmail,
-  IsEmpty,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -12,7 +8,9 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+
 import GraphQLJSON from 'graphql-type-json';
+import { Gender } from 'src/shared/enums/gender.enum';
 
 @InputType()
 export class CreateTeacherInput {
@@ -22,14 +20,24 @@ export class CreateTeacherInput {
   name: string;
 
   @IsNotEmpty()
-  @IsString()
-  @Field()
-  phone: string;
+  @IsEnum(Gender)
+  @Field(() => Gender)
+  gender: Gender;
 
   @IsNotEmpty()
   @IsNumberString()
   @Field()
-  vendor_id: string;
+  city_id: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Field()
+  phone: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Float, { nullable: true })
+  balance?: number;
 
   @IsOptional()
   @IsString()
@@ -47,11 +55,6 @@ export class CreateTeacherInput {
   count_review?: number;
 
   @IsOptional()
-  @IsBoolean()
-  @Field(() => Boolean, { nullable: true })
-  active?: boolean;
-
-  @IsOptional()
   @Field(() => GraphQLJSON, { nullable: true })
   device_info?: Record<string, any>;
 
@@ -60,6 +63,13 @@ export class CreateTeacherInput {
   @Field({ nullable: true })
   fcm_token?: string;
 
-  @IsEmpty()
-  refresh_token: string;
+  @IsOptional()
+  @IsString()
+  @Field({ nullable: true })
+  refresh_token?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  active?: boolean;
 }

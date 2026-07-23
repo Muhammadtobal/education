@@ -1,15 +1,9 @@
-import { InputType, Int, Field, Float } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
 import {
-  IsArray,
   IsBoolean,
-  IsDecimal,
-  IsEmail,
-  IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsNumberString,
   IsOptional,
-  IsString,
 } from 'class-validator';
 
 @InputType()
@@ -17,7 +11,7 @@ export class CreateSubscriptionInput {
   @IsNotEmpty()
   @IsNumberString()
   @Field()
-  video_id: string;
+  course_id: string;
 
   @IsNotEmpty()
   @IsNumberString()
@@ -25,7 +19,11 @@ export class CreateSubscriptionInput {
   user_id: string;
 
   @IsOptional()
+  @Field(() => Date, { nullable: true })
+  end_date?: Date;
+
+  @IsOptional()
   @IsBoolean()
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => Boolean, { nullable: true, defaultValue: true })
   active?: boolean;
 }

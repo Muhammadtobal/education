@@ -39,11 +39,6 @@ export class CreateNotificationInput {
 
   @IsOptional()
   @IsBoolean()
-  @Field({ nullable: true })
-  is_property?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   active?: boolean;
 

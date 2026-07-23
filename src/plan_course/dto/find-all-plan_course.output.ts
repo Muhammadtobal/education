@@ -1,7 +1,7 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ObjectType } from '@nestjs/graphql';
 
-import { PaginationMetadata } from "src/shared/types/pagination-metadata";
-import {PlanCourse} from "../entities/plan_course.entity";
+import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
+import { PlanCourse } from '../entities/plan_course.entity';
 
 @ObjectType()
 export class PlanCoursePaginationResultOutput {

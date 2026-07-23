@@ -1,6 +1,6 @@
-import { InputType, Field, PartialType } from "@nestjs/graphql";
-import { IsNotEmpty, IsNumberString } from "class-validator";
-import { CreateExamInput } from "./create-exam.input";
+import { InputType, Field, PartialType } from '@nestjs/graphql';
+import { IsNotEmpty, IsNumberString } from 'class-validator';
+import { CreateExamInput } from './create-exam.input';
 
 @InputType()
 export class UpdateExamInput extends PartialType(CreateExamInput) {

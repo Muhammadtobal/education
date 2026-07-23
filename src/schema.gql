@@ -81,7 +81,6 @@ type Employee {
   active: Boolean!
   city_id: String!
   device_info: JSON
-  socket_id: String
   created_at: DateTime!
   updated_at: DateTime!
   city: City
@@ -117,7 +116,6 @@ type Teacher {
   id: String!
   name: String!
   balance: Float!
-  review_count: Float!
   gender: String!
   city_id: String!
   description: String
@@ -226,7 +224,7 @@ type Exam {
   course_id: String!
   direction: Direction!
   exam_duration: Int!
-  exam_date: DateTime
+  exam_date: DateTime!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
@@ -277,7 +275,6 @@ enum DiscountType {
 
 type PlanCoupon {
   id: String!
-  value: Float!
   coupon_id: String!
   plan_id: String!
   active: Boolean!
@@ -293,6 +290,7 @@ type Plan {
   vendor_id: String!
   plan_type: PlanType!
   end_date: DateTime!
+  price: Float!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
@@ -389,6 +387,10 @@ type Story {
   title: String
   level_id: String!
   vendor_id: String!
+  active: Boolean!
+  comment: String
+  created_at: DateTime!
+  updated_at: DateTime!
   level: Level
   vendor: Vendor
 }
@@ -871,8 +873,6 @@ type Mutation {
   refreshTokenUser(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
   checkUserActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationUserCodeOutput!
   createUser(createUserInput: CreateUserInput!): CheckActivationUserCodeOutput!
-  createEmployee(createEmployeeInput: CreateEmployeeInput!): Employee!
-  updateEmployee(updateEmployeeInput: UpdateEmployeeInput!): Employee!
   assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
   unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
   createPermission(createPermissionInput: CreatePermissionInput!): Permission!
@@ -937,88 +937,110 @@ type Mutation {
 input CreateVendorInput {
   name: String!
   phone: String!
+  balance: Float
+  review_count: Float
   icon: String
-  lang: String
   img_url: String
   active: Boolean
-  device_info: JSON
 }
 
 input UpdateVendorInput {
   name: String
   phone: String
+  balance: Float
+  review_count: Float
   icon: String
-  lang: String
   img_url: String
   active: Boolean
-  device_info: JSON
   id: String!
 }
 
 input CreateTeacherInput {
   name: String!
+  gender: Gender!
+  city_id: String!
   phone: String!
-  vendor_id: String!
+  balance: Float
   description: String
   image_url: String
   count_review: Float
-  active: Boolean
   device_info: JSON
   fcm_token: String
+  refresh_token: String
+  active: Boolean
+}
+
+"""User gender (male or female)"""
+enum Gender {
+  MALE
+  FEMALE
 }
 
 input UpdateTeacherInput {
   name: String
+  gender: Gender
+  city_id: String
   phone: String
-  vendor_id: String
+  balance: Float
   description: String
   image_url: String
   count_review: Float
-  active: Boolean
   device_info: JSON
   fcm_token: String
+  refresh_token: String
+  active: Boolean
   id: String!
 }
 
 input CreateSubscriptionInput {
-  video_id: String!
+  course_id: String!
   user_id: String!
-  active: Boolean
+  end_date: DateTime
+  active: Boolean = true
 }
 
 input UpdateSubscriptionInput {
-  video_id: String
+  course_id: String
   user_id: String
-  active: Boolean
+  end_date: DateTime
+  active: Boolean = true
   id: String!
 }
 
 input CreateReviewInput {
-  video_id: String!
   user_id: String!
-  active: Boolean
+  value: Float!
+  course_id: String
+  vendor_id: String
+  teacher_id: String
   comment: String
+  active: Boolean
 }
 
 input UpdateReviewInput {
-  video_id: String
   user_id: String
-  active: Boolean
+  value: Float
+  course_id: String
+  vendor_id: String
+  teacher_id: String
   comment: String
+  active: Boolean
   id: String!
 }
 
 input CreatePaymentInput {
-  video_id: String!
+  course_id: String!
   user_id: String!
-  price: Float!
+  vendor_id: String!
+  value: Float!
   active: Boolean
 }
 
 input UpdatePaymentInput {
-  video_id: String
+  course_id: String
   user_id: String
-  price: Float
+  vendor_id: String
+  value: Float
   active: Boolean
   id: String!
 }
@@ -1049,35 +1071,6 @@ input CreateUserInput {
   fcm_token: String
   lang: String
   ads_count: Float
-}
-
-"""User gender (male or female)"""
-enum Gender {
-  MALE
-  FEMALE
-}
-
-input CreateEmployeeInput {
-  phone: String!
-  full_name: String!
-  password: String!
-  active: Boolean
-  socket_id: String
-  refresh_token: String
-  fcm_token: String
-  hmac_secret: String
-}
-
-input UpdateEmployeeInput {
-  phone: String
-  full_name: String
-  password: String
-  active: Boolean
-  socket_id: String
-  refresh_token: String
-  fcm_token: String
-  hmac_secret: String
-  id: String!
 }
 
 input AssignPermissionInput {
@@ -1113,25 +1106,27 @@ input UpdateCityInput {
 
 input CreateLevelInput {
   name: String!
+  parent_id: String
   active: Boolean
 }
 
 input UpdateLevelInput {
   name: String
+  parent_id: String
   active: Boolean
   id: String!
 }
 
 input CreateVendorLevelInput {
-  active: Boolean
   vendor_id: String!
   level_id: String!
+  active: Boolean = true
 }
 
 input UpdateVendorLevelInput {
-  active: Boolean
   vendor_id: String
   level_id: String
+  active: Boolean = true
   id: String!
 }
 
@@ -1139,7 +1134,6 @@ input CreateNotificationInput {
   title: String!
   body: String!
   filter_data: NotificationFilterDataInput
-  is_property: Boolean
   active: Boolean
   img_url: String
   link: String
@@ -1165,7 +1159,6 @@ input UpdateNotificationInput {
   title: String
   body: String
   filter_data: NotificationFilterDataInput
-  is_property: Boolean
   active: Boolean
   img_url: String
   link: String
@@ -1182,89 +1175,167 @@ input CreateEmployeeVendorInput {
   vendor_id: String!
   employee_id: String!
   level_id: String!
+  active: Boolean
 }
 
 input UpdateEmployeeVendorInput {
   vendor_id: String
   employee_id: String
   level_id: String
+  active: Boolean
   id: String!
 }
 
 input CreatePlanInput {
   name: String!
+  vendor_id: String!
+  plan_type: PlanType!
+  end_date: DateTime!
+  price: Float!
+  active: Boolean
 }
 
 input UpdatePlanInput {
   name: String
+  vendor_id: String
+  plan_type: PlanType
+  end_date: DateTime
+  price: Float
+  active: Boolean
   id: String!
 }
 
 input CreateCourseInput {
   name: String!
+  url: String!
+  description: String!
   level_id: String!
+  vendor_id: String!
   teacher_id: String!
+  teacher_share: Float
+  vendor_share: Float
+  review_count: Float
+  active: Boolean
 }
 
 input UpdateCourseInput {
   name: String
+  url: String
+  description: String
   level_id: String
+  vendor_id: String
   teacher_id: String
+  teacher_share: Float
+  vendor_share: Float
+  review_count: Float
+  active: Boolean
   id: String!
 }
 
 input CreatePlanCourseInput {
   plan_id: String!
-  course_id: String!
+  course_id: String
+  content_id: String
+  active: Boolean
 }
 
 input UpdatePlanCourseInput {
   plan_id: String
   course_id: String
+  content_id: String
+  active: Boolean
   id: String!
 }
 
 input CreateExamInput {
   name: String!
   course_id: String!
+  direction: Direction!
+  exam_date: DateTime!
+  exam_duration: Int
+  active: Boolean
 }
 
 input UpdateExamInput {
   name: String
   course_id: String
+  direction: Direction
+  exam_date: DateTime
+  exam_duration: Int
+  active: Boolean
   id: String!
 }
 
 input CreateQuestionInput {
-  name: String!
+  question_text: String!
   exam_id: String!
+  direction: Direction!
+  hint_text: String
+  parent_id: String
+  active: Boolean
 }
 
 input UpdateQuestionInput {
-  name: String
+  question_text: String
   exam_id: String
+  direction: Direction
+  hint_text: String
+  parent_id: String
+  active: Boolean
   id: String!
 }
 
 input CreateAnswerInput {
   name: String!
   question_id: String!
+  answer_text: String!
+  direction: Direction!
+  is_true: Boolean!
+  hint_text: String
+  active: Boolean = true
 }
 
 input UpdateAnswerInput {
   name: String
   question_id: String
+  answer_text: String
+  direction: Direction
+  is_true: Boolean
+  hint_text: String
+  active: Boolean = true
   id: String!
 }
 
 input CreateDiscussionInput {
   teacher_id: String!
+  course_id: String!
   user_id: String!
+  description: String!
+  title: String
+  url: String
+  status: DiscussionStatus = OPEN
+  parent_id: String
+  active: Boolean
+}
+
+"""Discussion status"""
+enum DiscussionStatus {
+  OPEN
+  RESOLVED
+  REJECTED
+  CLOSED
 }
 
 input UpdateDiscussionInput {
   teacher_id: String
+  course_id: String
   user_id: String
+  description: String
+  title: String
+  url: String
+  status: DiscussionStatus = OPEN
+  parent_id: String
+  active: Boolean
   id: String!
 }
 
@@ -1319,36 +1390,42 @@ input CheckActivationCouponInput {
 }
 
 input CreatePlanCouponInput {
-  value: Float!
   coupon_id: String!
   plan_id: String!
+  active: Boolean
 }
 
 input UpdatePlanCouponInput {
-  value: Float
   coupon_id: String
   plan_id: String
+  active: Boolean
   id: String!
 }
 
 input CreateStoryInput {
-  url: String!
-  level_id: String
-  vendor_id: String
+  level_id: String!
+  vendor_id: String!
+  url: String
+  title: String
 }
 
 input UpdateStoryInput {
-  url: String
   level_id: String
   vendor_id: String
+  url: String
+  title: String
   id: String!
 }
 
 input CreateLoginHistoryInput {
   user_id: String!
+  device_info: JSON
+  active: Boolean
 }
 
 input UpdateLoginHistoryInput {
   user_id: String
+  device_info: JSON
+  active: Boolean
   id: String!
 }

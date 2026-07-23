@@ -39,6 +39,14 @@ export class Plan {
   @Field(() => Date)
   end_date: Date;
 
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  @Field(() => Float)
+  price: number;
+
   @Column('boolean', { default: true })
   @Field(() => Boolean)
   active: boolean;

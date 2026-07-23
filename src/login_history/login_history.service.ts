@@ -1,25 +1,24 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { paginate } from "nestjs-typeorm-paginate";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { paginate } from 'nestjs-typeorm-paginate';
 import {
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
   Repository,
-} from "typeorm";
+} from 'typeorm';
 
-import { CreateLoginHistoryInput } from "./dto/create-login_history.input";
-import { UpdateLoginHistoryInput } from "./dto/update-login_history.input";
-import { LoginHistory } from "./entities/login_history.entity";
-import { FindAllLoginHistoryInput } from "./dto/find-all-login_history.input";
-
+import { CreateLoginHistoryInput } from './dto/create-login_history.input';
+import { UpdateLoginHistoryInput } from './dto/update-login_history.input';
+import { LoginHistory } from './entities/login_history.entity';
+import { FindAllLoginHistoryInput } from './dto/find-all-login_history.input';
 
 import {
   generateQueryConditions,
   generateQuerySorts,
   customPaginate,
-} from "src/shared/helpers";
-import { PaginationMetadata } from "src/shared/types/pagination-metadata";
+} from 'src/shared/helpers';
+import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
 
 @Injectable()
 export class LoginHistoryService {
@@ -28,21 +27,28 @@ export class LoginHistoryService {
     private readonly loginHistoryRepository: Repository<LoginHistory>,
   ) {}
   public create(createLoginHistoryInput: CreateLoginHistoryInput) {
-    const loginHistory = this.loginHistoryRepository.create(createLoginHistoryInput);
+    const loginHistory = this.loginHistoryRepository.create(
+      createLoginHistoryInput,
+    );
     return this.loginHistoryRepository.save(loginHistory);
   }
 
   public findAll(filter: FindAllLoginHistoryInput) {
     const query = this.loginHistoryRepository
-      .createQueryBuilder("loginHistory")
-      .where("true");
-    generateQuerySorts<LoginHistory>(query, filter, LoginHistory, "loginHistory");
-    generateQueryConditions<LoginHistory>(query, filter, "loginHistory");
+      .createQueryBuilder('loginHistory')
+      .where('true');
+    generateQuerySorts<LoginHistory>(
+      query,
+      filter,
+      LoginHistory,
+      'loginHistory',
+    );
+    generateQueryConditions<LoginHistory>(query, filter, 'loginHistory');
 
     return customPaginate<LoginHistory, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
-      page: filter.pagination.page
-      });
+      page: filter.pagination.page,
+    });
   }
 
   public findOne(
@@ -60,7 +66,10 @@ export class LoginHistoryService {
   }
 
   public async update(updateLoginHistoryInput: UpdateLoginHistoryInput) {
-    await this.loginHistoryRepository.update({ id: updateLoginHistoryInput.id }, updateLoginHistoryInput);
+    await this.loginHistoryRepository.update(
+      { id: updateLoginHistoryInput.id },
+      updateLoginHistoryInput,
+    );
     return this.findOne({ id: updateLoginHistoryInput.id });
   }
 

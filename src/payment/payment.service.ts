@@ -1,25 +1,24 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { paginate } from "nestjs-typeorm-paginate";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { paginate } from 'nestjs-typeorm-paginate';
 import {
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
   Repository,
-} from "typeorm";
+} from 'typeorm';
 
-import { CreatePaymentInput } from "./dto/create-payment.input";
-import { UpdatePaymentInput } from "./dto/update-payment.input";
-import { Payment } from "./entities/payment.entity";
-import { FindAllPaymentInput } from "./dto/find-all-payment.input";
-
+import { CreatePaymentInput } from './dto/create-payment.input';
+import { UpdatePaymentInput } from './dto/update-payment.input';
+import { Payment } from './entities/payment.entity';
+import { FindAllPaymentInput } from './dto/find-all-payment.input';
 
 import {
   generateQueryConditions,
   generateQuerySorts,
   customPaginate,
-} from "src/shared/helpers";
-import { PaginationMetadata } from "src/shared/types/pagination-metadata";
+} from 'src/shared/helpers';
+import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
 
 @Injectable()
 export class PaymentService {
@@ -34,15 +33,15 @@ export class PaymentService {
 
   public findAll(filter: FindAllPaymentInput) {
     const query = this.paymentRepository
-      .createQueryBuilder("payment")
-      .where("true");
-    generateQuerySorts<Payment>(query, filter, Payment, "payment");
-    generateQueryConditions<Payment>(query, filter, "payment");
+      .createQueryBuilder('payment')
+      .where('true');
+    generateQuerySorts<Payment>(query, filter, Payment, 'payment');
+    generateQueryConditions<Payment>(query, filter, 'payment');
 
     return customPaginate<Payment, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
-      page: filter.pagination.page
-      });
+      page: filter.pagination.page,
+    });
   }
 
   public findOne(
@@ -60,7 +59,10 @@ export class PaymentService {
   }
 
   public async update(updatePaymentInput: UpdatePaymentInput) {
-    await this.paymentRepository.update({ id: updatePaymentInput.id }, updatePaymentInput);
+    await this.paymentRepository.update(
+      { id: updatePaymentInput.id },
+      updatePaymentInput,
+    );
     return this.findOne({ id: updatePaymentInput.id });
   }
 

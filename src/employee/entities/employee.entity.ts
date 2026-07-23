@@ -53,10 +53,6 @@ export class Employee {
   @Column('varchar', { length: 255, nullable: true })
   refresh_token?: string;
 
-  @Column('varchar', { length: 255, nullable: true })
-  @Field({ nullable: true })
-  socket_id?: string;
-
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
   @Field()
   created_at: Date;

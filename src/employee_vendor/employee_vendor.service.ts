@@ -1,25 +1,24 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { paginate } from "nestjs-typeorm-paginate";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { paginate } from 'nestjs-typeorm-paginate';
 import {
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
   Repository,
-} from "typeorm";
+} from 'typeorm';
 
-import { CreateEmployeeVendorInput } from "./dto/create-employee_vendor.input";
-import { UpdateEmployeeVendorInput } from "./dto/update-employee_vendor.input";
-import { EmployeeVendor } from "./entities/employee_vendor.entity";
-import { FindAllEmployeeVendorInput } from "./dto/find-all-employee_vendor.input";
-
+import { CreateEmployeeVendorInput } from './dto/create-employee_vendor.input';
+import { UpdateEmployeeVendorInput } from './dto/update-employee_vendor.input';
+import { EmployeeVendor } from './entities/employee_vendor.entity';
+import { FindAllEmployeeVendorInput } from './dto/find-all-employee_vendor.input';
 
 import {
   generateQueryConditions,
   generateQuerySorts,
   customPaginate,
-} from "src/shared/helpers";
-import { PaginationMetadata } from "src/shared/types/pagination-metadata";
+} from 'src/shared/helpers';
+import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
 
 @Injectable()
 export class EmployeeVendorService {
@@ -28,21 +27,28 @@ export class EmployeeVendorService {
     private readonly employeeVendorRepository: Repository<EmployeeVendor>,
   ) {}
   public create(createEmployeeVendorInput: CreateEmployeeVendorInput) {
-    const employeeVendor = this.employeeVendorRepository.create(createEmployeeVendorInput);
+    const employeeVendor = this.employeeVendorRepository.create(
+      createEmployeeVendorInput,
+    );
     return this.employeeVendorRepository.save(employeeVendor);
   }
 
   public findAll(filter: FindAllEmployeeVendorInput) {
     const query = this.employeeVendorRepository
-      .createQueryBuilder("employeeVendor")
-      .where("true");
-    generateQuerySorts<EmployeeVendor>(query, filter, EmployeeVendor, "employeeVendor");
-    generateQueryConditions<EmployeeVendor>(query, filter, "employeeVendor");
+      .createQueryBuilder('employeeVendor')
+      .where('true');
+    generateQuerySorts<EmployeeVendor>(
+      query,
+      filter,
+      EmployeeVendor,
+      'employeeVendor',
+    );
+    generateQueryConditions<EmployeeVendor>(query, filter, 'employeeVendor');
 
     return customPaginate<EmployeeVendor, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
-      page: filter.pagination.page
-      });
+      page: filter.pagination.page,
+    });
   }
 
   public findOne(
@@ -60,7 +66,10 @@ export class EmployeeVendorService {
   }
 
   public async update(updateEmployeeVendorInput: UpdateEmployeeVendorInput) {
-    await this.employeeVendorRepository.update({ id: updateEmployeeVendorInput.id }, updateEmployeeVendorInput);
+    await this.employeeVendorRepository.update(
+      { id: updateEmployeeVendorInput.id },
+      updateEmployeeVendorInput,
+    );
     return this.findOne({ id: updateEmployeeVendorInput.id });
   }
 
