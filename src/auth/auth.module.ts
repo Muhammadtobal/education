@@ -1,6 +1,6 @@
 import { JwtAuthEmployeeGuard } from './guards/jwt-auth-employee.guard';
 import { JwtUserStrategy } from './strategies/jwt-user.strategy';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { JwtModule } from '@nestjs/jwt';
@@ -13,9 +13,9 @@ import { TeacherModule } from 'src/teacher/teacher.module';
 @Module({
   imports: [
     JwtModule.register({ signOptions: { expiresIn: '1h' } }),
-    UserModule,
+    forwardRef(() => UserModule),
     EmployeeModule,
-    TeacherModule,
+    forwardRef(() => TeacherModule),
   ],
   exports: [AuthService],
   providers: [

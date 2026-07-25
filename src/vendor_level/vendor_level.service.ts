@@ -35,10 +35,10 @@ export class VendorLevelService {
 
   public findAll(filter: FindAllVendorLevelInput) {
     const query = this.vendorLevelRepository
-      .createQueryBuilder('vendorLevel')
+      .createQueryBuilder('vendor_level')
       .where('true');
-    generateQuerySorts<VendorLevel>(query, filter, VendorLevel, 'vendorLevel');
-    generateQueryConditions<VendorLevel>(query, filter, 'vendorLevel');
+    generateQuerySorts<VendorLevel>(query, filter, VendorLevel, 'vendor_level');
+    generateQueryConditions<VendorLevel>(query, filter, 'vendor_level');
 
     return customPaginate<VendorLevel, PaginationMetadata>(query, {
       limit: filter.pagination.limit,

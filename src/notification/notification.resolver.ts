@@ -21,6 +21,11 @@ import { getEmpId } from 'src/shared/helpers';
 import { GqlContext } from 'src/shared/types/context';
 import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
+import { ScheduledNotification } from './entities/scheduled_notification.entity';
+import { CreateScheduledNotificationInput } from './dto/create-scheduled_notification.input';
+import { ScheduledNotificationPaginationResultOutput } from './dto/find-all-scheduled_notification.output';
+import { FindAllScheduledNotificationInput } from './dto/find-all-scheduled_notification.input';
+import { UpdateScheduledNotificationInput } from './dto/update-secheduled_notification.input';
 @Resolver(() => Notification)
 export class NotificationResolver {
   constructor(
@@ -128,6 +133,130 @@ export class NotificationResolver {
   public sendNotification(
     @Args('sendNotification')
     data: CreateNotificationInput,
+  ) {
+    return this.notificationService.sendNotificationToUser(data);
+  }
+
+  @Mutation(() => ScheduledNotification)
+  @UseGuards(JwtAuthEmployeeGuard)
+  @Permissions(Operation.CREATE + ScheduledNotification.name)
+  public async createScheduledNotification(
+    @Args('createScheduledNotificationInput')
+    createScheduledNotificationInput: CreateScheduledNotificationInput,
+    @Context() context: GqlContext,
+  ) {
+    const countsFilter: FindOptionsWhere<User> = {};
+    let memberCount;
+
+    if (createScheduledNotificationInput.user_id) {
+      await this.notificationService.sendNotificationToUser({
+        ...createScheduledNotificationInput,
+      });
+    }
+
+    if (createScheduledNotificationInput.filter_data?.city?.id)
+      countsFilter.city_id =
+        createScheduledNotificationInput.filter_data.city.id;
+
+    if (createScheduledNotificationInput.filter_data?.is_user)
+      memberCount = await this.userService.count(countsFilter);
+
+    if (
+      stringSchema.safeParse(
+        createScheduledNotificationInput.filter_data?.city?.id,
+      ).success
+    ) {
+      const city = await this.cityService.findOne({
+        id: createScheduledNotificationInput.filter_data?.city?.id,
+      });
+
+      if (!city)
+        throw new HttpException(
+          ErrorMessages.NOT_FOUND_USER,
+          HttpStatus.NOT_FOUND,
+        );
+
+      if (createScheduledNotificationInput.filter_data)
+        createScheduledNotificationInput.filter_data.city = { ...city };
+    }
+
+    const scheduledNotification = this.notificationService.create({
+      ...createScheduledNotificationInput,
+      receivers_count: memberCount,
+      global: true,
+      employee_id: getEmpId(context.req.user),
+    });
+
+    if (
+      booleanSchema.safeParse(createScheduledNotificationInput.approved)
+        .success &&
+      createScheduledNotificationInput.approved
+    ) {
+      if (createScheduledNotificationInput.filter_data?.is_user === true)
+        this.notificationService.sendToUserCriteria(
+          createScheduledNotificationInput,
+        );
+    }
+
+    return scheduledNotification;
+  }
+
+  @Query(() => ScheduledNotificationPaginationResultOutput, {
+    name: 'scheduled_notifications',
+  })
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + ScheduledNotification.name)
+  public findAllScheduledNotification(
+    @Args('filter')
+    filter: FindAllScheduledNotificationInput,
+  ) {
+    return this.notificationService.findAll(filter);
+  }
+
+  @Query(() => ScheduledNotification, {
+    name: 'scheduled_notification',
+  })
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + ScheduledNotification.name)
+  public findOneScheduledNotification(@Args('id') id: string) {
+    return this.notificationService.findOne(
+      { id },
+      {
+        relations: {
+          employee: true,
+          user: true,
+        },
+      },
+    );
+  }
+
+  @Mutation(() => ScheduledNotification)
+  @UseGuards(JwtAuthEmployeeGuard)
+  @Permissions(Operation.UPDATE + ScheduledNotification.name)
+  public updateScheduledNotification(
+    @Args('updateScheduledNotificationInput')
+    updateScheduledNotificationInput: UpdateScheduledNotificationInput,
+  ) {
+    return this.notificationService.update(updateScheduledNotificationInput);
+  }
+
+  @Mutation(() => DoneResponseOutput)
+  @UseGuards(JwtAuthEmployeeGuard)
+  @Permissions(Operation.DELETE + ScheduledNotification.name)
+  public removeScheduledNotification(@Args('id') id: string) {
+    this.notificationService.remove(id);
+
+    return {
+      done: true,
+    };
+  }
+
+  @Mutation(() => ScheduledNotification)
+  @UseGuards(JwtAuthEmployeeGuard)
+  @Permissions(Operation.CREATE + ScheduledNotification.name)
+  public sendScheduledNotification(
+    @Args('sendScheduledNotification')
+    data: CreateScheduledNotificationInput,
   ) {
     return this.notificationService.sendNotificationToUser(data);
   }

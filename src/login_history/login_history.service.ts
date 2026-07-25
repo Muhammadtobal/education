@@ -35,15 +35,15 @@ export class LoginHistoryService {
 
   public findAll(filter: FindAllLoginHistoryInput) {
     const query = this.loginHistoryRepository
-      .createQueryBuilder('loginHistory')
+      .createQueryBuilder('login_history')
       .where('true');
     generateQuerySorts<LoginHistory>(
       query,
       filter,
       LoginHistory,
-      'loginHistory',
+      'login_history',
     );
-    generateQueryConditions<LoginHistory>(query, filter, 'loginHistory');
+    generateQueryConditions<LoginHistory>(query, filter, 'login_history');
 
     return customPaginate<LoginHistory, PaginationMetadata>(query, {
       limit: filter.pagination.limit,

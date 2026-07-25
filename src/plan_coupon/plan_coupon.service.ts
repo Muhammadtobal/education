@@ -1,25 +1,24 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { paginate } from "nestjs-typeorm-paginate";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { paginate } from 'nestjs-typeorm-paginate';
 import {
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
   Repository,
-} from "typeorm";
+} from 'typeorm';
 
-import { CreatePlanCouponInput } from "./dto/create-plan_coupon.input";
-import { UpdatePlanCouponInput } from "./dto/update-plan_coupon.input";
-import { PlanCoupon } from "./entities/plan_coupon.entity";
-import { FindAllPlanCouponInput } from "./dto/find-all-plan_coupon.input";
-
+import { CreatePlanCouponInput } from './dto/create-plan_coupon.input';
+import { UpdatePlanCouponInput } from './dto/update-plan_coupon.input';
+import { PlanCoupon } from './entities/plan_coupon.entity';
+import { FindAllPlanCouponInput } from './dto/find-all-plan_coupon.input';
 
 import {
   generateQueryConditions,
   generateQuerySorts,
   customPaginate,
-} from "src/shared/helpers";
-import { PaginationMetadata } from "src/shared/types/pagination-metadata";
+} from 'src/shared/helpers';
+import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
 
 @Injectable()
 export class PlanCouponService {
@@ -34,15 +33,15 @@ export class PlanCouponService {
 
   public findAll(filter: FindAllPlanCouponInput) {
     const query = this.planCouponRepository
-      .createQueryBuilder("planCoupon")
-      .where("true");
-    generateQuerySorts<PlanCoupon>(query, filter, PlanCoupon, "planCoupon");
-    generateQueryConditions<PlanCoupon>(query, filter, "planCoupon");
+      .createQueryBuilder('plan_coupon')
+      .where('true');
+    generateQuerySorts<PlanCoupon>(query, filter, PlanCoupon, 'plan_coupon');
+    generateQueryConditions<PlanCoupon>(query, filter, 'plan_coupon');
 
     return customPaginate<PlanCoupon, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
-      page: filter.pagination.page
-      });
+      page: filter.pagination.page,
+    });
   }
 
   public findOne(
@@ -60,7 +59,10 @@ export class PlanCouponService {
   }
 
   public async update(updatePlanCouponInput: UpdatePlanCouponInput) {
-    await this.planCouponRepository.update({ id: updatePlanCouponInput.id }, updatePlanCouponInput);
+    await this.planCouponRepository.update(
+      { id: updatePlanCouponInput.id },
+      updatePlanCouponInput,
+    );
     return this.findOne({ id: updatePlanCouponInput.id });
   }
 

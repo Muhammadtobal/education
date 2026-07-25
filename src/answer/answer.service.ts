@@ -19,12 +19,18 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
+import { AnswerUser } from './entities/answer-user.entity';
+import { CreateAnswerUserInput } from './dto/create-answer-user.input';
+import { FindAllAnswerUserInput } from './dto/find-all-answer-user.input';
+import { UpdateAnswerUserInput } from './dto/update-answer-user.input';
 
 @Injectable()
 export class AnswerService {
   constructor(
     @InjectRepository(Answer)
     private readonly answerRepository: Repository<Answer>,
+    @InjectRepository(AnswerUser)
+    private readonly answerUserRepository: Repository<AnswerUser>,
   ) {}
   public create(createAnswerInput: CreateAnswerInput) {
     const answer = this.answerRepository.create(createAnswerInput);
@@ -68,5 +74,55 @@ export class AnswerService {
 
   public remove(id: string) {
     this.answerRepository.delete(id);
+  }
+
+  public createAnswerUser(createAnswerUserInput: CreateAnswerUserInput) {
+    const answerUser = this.answerUserRepository.create(createAnswerUserInput);
+
+    return this.answerUserRepository.save(answerUser);
+  }
+
+  public findAllAnswerUser(filter: FindAllAnswerUserInput) {
+    const query = this.answerUserRepository
+      .createQueryBuilder('answer_user')
+      .where('true');
+
+    generateQuerySorts<AnswerUser>(query, filter, AnswerUser, 'answer_user');
+
+    generateQueryConditions<AnswerUser>(query, filter, 'answer_user');
+
+    return customPaginate<AnswerUser, PaginationMetadata>(query, {
+      limit: filter.pagination.limit,
+      page: filter.pagination.page,
+    });
+  }
+
+  public findOneAnswerUser(
+    answerUserOptions: FindOptionsWhere<AnswerUser>,
+    options?: {
+      selected?: FindOptionsSelect<AnswerUser>;
+      relations?: FindOptionsRelations<AnswerUser>;
+    },
+  ) {
+    return this.answerUserRepository.findOne({
+      select: options?.selected,
+      relations: options?.relations,
+      where: answerUserOptions,
+    });
+  }
+
+  public async updateAnswerUser(updateAnswerUserInput: UpdateAnswerUserInput) {
+    await this.answerUserRepository.update(
+      { id: updateAnswerUserInput.id },
+      updateAnswerUserInput,
+    );
+
+    return this.findOneAnswerUser({
+      id: updateAnswerUserInput.id,
+    });
+  }
+
+  public removeAnswerUser(id: string) {
+    this.answerUserRepository.delete(id);
   }
 }

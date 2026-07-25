@@ -33,10 +33,10 @@ export class PlanCourseService {
 
   public findAll(filter: FindAllPlanCourseInput) {
     const query = this.planCourseRepository
-      .createQueryBuilder('planCourse')
+      .createQueryBuilder('plan_course')
       .where('true');
-    generateQuerySorts<PlanCourse>(query, filter, PlanCourse, 'planCourse');
-    generateQueryConditions<PlanCourse>(query, filter, 'planCourse');
+    generateQuerySorts<PlanCourse>(query, filter, PlanCourse, 'plan_course');
+    generateQueryConditions<PlanCourse>(query, filter, 'plan_course');
 
     return customPaginate<PlanCourse, PaginationMetadata>(query, {
       limit: filter.pagination.limit,

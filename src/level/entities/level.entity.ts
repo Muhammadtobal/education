@@ -45,9 +45,6 @@ export class Level {
   @Field(() => Date)
   updated_at: Date;
 
-  @OneToMany(() => EmployeeVendor, (employee_vendor) => employee_vendor.level)
-  employee_vendors: EmployeeVendor[];
-
   @ManyToOne(() => Level, (level) => level.children, {
     nullable: true,
   })

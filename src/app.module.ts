@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -34,6 +34,9 @@ import { CouponModule } from './coupon/coupon.module';
 import { PlanCouponModule } from './plan_coupon/plan_coupon.module';
 import { StoryModule } from './story/story.module';
 import { LoginHistoryModule } from './login_history/login_history.module';
+import { ConstantModule } from './constant/constant.module';
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -105,6 +108,10 @@ import { LoginHistoryModule } from './login_history/login_history.module';
     PlanCouponModule,
     StoryModule,
     LoginHistoryModule,
+    ConstantModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
+  exports: [AppService],
 })
 export class AppModule {}

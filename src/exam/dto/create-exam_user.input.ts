@@ -1,22 +1,28 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, Float } from '@nestjs/graphql';
 import {
   IsBoolean,
   IsNotEmpty,
   IsNumberString,
   IsOptional,
+  IsNumber,
 } from 'class-validator';
 
 @InputType()
-export class CreateEmployeeVendorInput {
+export class CreateExamUserInput {
   @IsNotEmpty()
   @IsNumberString()
   @Field()
-  vendor_id: string;
+  exam_id: string;
 
   @IsNotEmpty()
   @IsNumberString()
   @Field()
-  employee_id: string;
+  user_id: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Float, { nullable: true })
+  mark?: number;
 
   @IsOptional()
   @IsBoolean()

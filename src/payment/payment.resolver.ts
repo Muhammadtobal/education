@@ -1,13 +1,19 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+
 import { PaymentService } from './payment.service';
 import { Payment } from './entities/payment.entity';
+
 import { CreatePaymentInput } from './dto/create-payment.input';
 import { UpdatePaymentInput } from './dto/update-payment.input';
 import { PaymentPaginationResultOutput } from './dto/find-all-payment.output';
 import { FindAllPaymentInput } from './dto/find-all-payment.input';
+
 import { DoneResponseOutput } from 'src/shared/types/done-output';
-import { UseGuards } from '@nestjs/common';
+
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
+import { Permissions } from 'src/shared/decorators/permissions.decorator';
+import { Operation } from 'src/shared/enums/operation.enum';
 
 @Resolver(() => Payment)
 export class PaymentResolver {
@@ -15,6 +21,7 @@ export class PaymentResolver {
 
   @Mutation(() => Payment)
   @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.CREATE + Payment.name)
   public createPayment(
     @Args('createPaymentInput') createPaymentInput: CreatePaymentInput,
   ) {
@@ -23,18 +30,21 @@ export class PaymentResolver {
 
   @Query(() => PaymentPaginationResultOutput, { name: 'payments' })
   @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Payment.name)
   public findAll(@Args('filter') filter: FindAllPaymentInput) {
     return this.paymentService.findAll(filter);
   }
 
   @Query(() => Payment, { name: 'payment' })
   @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Payment.name)
   public findOne(@Args('id') id: string) {
     return this.paymentService.findOne({ id });
   }
 
   @Mutation(() => Payment)
   @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.UPDATE + Payment.name)
   public updatePayment(
     @Args('updatePaymentInput') updatePaymentInput: UpdatePaymentInput,
   ) {
@@ -43,8 +53,12 @@ export class PaymentResolver {
 
   @Mutation(() => DoneResponseOutput)
   @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.DELETE + Payment.name)
   public removePayment(@Args('id') id: string) {
     this.paymentService.remove(id);
-    return { done: true };
+
+    return {
+      done: true,
+    };
   }
 }

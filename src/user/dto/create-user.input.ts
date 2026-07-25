@@ -37,6 +37,11 @@ export class CreateUserInput {
   @Field()
   city_id: string;
 
+  @IsNotEmpty()
+  @IsNumberString()
+  @Field()
+  level_id: string;
+
   @IsOptional()
   @IsString()
   @Field({ nullable: true })

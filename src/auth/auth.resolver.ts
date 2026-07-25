@@ -327,7 +327,7 @@ export class AuthResolver {
 
     const accessToken = await this.authService.generateJwtToken(
       { userId: user.id },
-      process.env.User_JWT_KEY as string,
+      process.env.USER_JWT_KEY as string,
     );
 
     return { access_token: accessToken, expires_in: 15 * 60 };
@@ -362,7 +362,7 @@ export class AuthResolver {
 
     const accessToken = await this.authService.generateJwtToken(
       { userId: user.id },
-      process.env.User_JWT_KEY as string,
+      process.env.USER_JWT_KEY as string,
     );
 
     const refreshToken = await this.authService.generateRefreshToken();

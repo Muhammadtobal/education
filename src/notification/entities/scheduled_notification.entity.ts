@@ -63,7 +63,6 @@ export class ScheduledNotification {
   @Column('bigint', { nullable: true })
   @Field({ nullable: true })
   vendor_id: string;
-
   @Column('simple-json')
   @Field(() => GraphQLJSON)
   filter_data: {
@@ -74,6 +73,17 @@ export class ScheduledNotification {
   @Field({ nullable: true })
   employee_id: string;
 
+  @Column('boolean', { default: false })
+  @Field()
+  global: boolean;
+
+  @Column('boolean', { default: false })
+  @Field()
+  approved: boolean;
+
+  @Column('int', { width: 8, default: 1 })
+  @Field(() => Int)
+  receivers_count: number;
   @ManyToOne(() => User, (user) => user.scheduled_notifications)
   @JoinColumn({ name: 'user_id' })
   @Field(() => User, { nullable: true })

@@ -18,34 +18,62 @@ import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
 import { ResetMyPasswordInput } from './dto/reset-my-password.input';
 import { ErrorMessages } from 'src/shared/error-messages.object';
+import { CheckActivationEmployeeCodeOutput } from 'src/auth/dto/check-activation-employee-code.output';
+import { UserService } from 'src/user/user.service';
 @Resolver(() => Employee)
 export class EmployeeResolver {
   constructor(
     private readonly employeeService: EmployeeService,
     private readonly authService: AuthService,
+    private readonly userService: UserService,
   ) {}
 
-  // @Mutation(() => Employee)
-  // @UseGuards(JwtAuthEmployeeGuard)
-  // @Permissions(Operation.CREATE + Employee.name)
-  // public async createEmployee(
-  //   @Args('createEmployeeInput') createEmployeeInput: CreateEmployeeInput,
-  // ) {
-  //   createEmployeeInput.password = await bcrypt.hash(
-  //     createEmployeeInput.password,
-  //     10,
-  //   );
+  @Mutation(() => CheckActivationEmployeeCodeOutput)
+  public async createEmployee(
+    @Args('createEmployeeInput')
+    createEmployeeInput: CreateEmployeeInput,
+  ) {
+    const oldEmployee = await this.employeeService.findOne({
+      phone: createEmployeeInput.phone,
+    });
 
-  //   const refreshToken = await this.authService.generateRefreshToken();
+    if (oldEmployee)
+      throw new HttpException(
+        ErrorMessages.USER_EXISTS_CONFLICT,
+        HttpStatus.CONFLICT,
+      );
 
-  //   const employee = await this.employeeService.create({
-  //     ...createEmployeeInput,
-  //     refresh_token: refreshToken,
-  //   });
+    const activationCode = await this.userService.findOneActivationCode({
+      phone: createEmployeeInput.phone,
+    });
 
-  //   return this.employeeService.findOne({ id: employee.id });
-  // }
+    if (!activationCode || activationCode.code !== 'passed')
+      throw new HttpException(
+        ErrorMessages.ACTIVATION_CODE_UNAUTHORIZED,
+        HttpStatus.CONFLICT,
+      );
 
+    const refreshToken = await this.authService.generateRefreshToken();
+
+    const employee = await this.employeeService.create({
+      ...createEmployeeInput,
+      refresh_token: refreshToken,
+    });
+
+    const accessToken = await this.authService.generateJwtToken(
+      { employeeId: employee.id },
+      process.env.EMPLOYEE_JWT_KEY as string,
+    );
+
+    this.userService.removeActivationCode(activationCode.id);
+
+    return {
+      employee: { ...employee },
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: 15 * 60,
+    };
+  }
   @Query(() => EmployeePaginationResultOutput, { name: 'employees' })
   @UseGuards(JwtAuthEmployeeGuard)
   @Permissions(Operation.GET + Employee.name)

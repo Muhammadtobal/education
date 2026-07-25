@@ -24,15 +24,14 @@ export class CityResolver {
   }
 
   @Query(() => CityPaginationResultOutput, { name: 'cities' })
-  @UseGuards(JwtAuthEmployeeGuard)
+  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + City.name)
   public findAll(@Args('filter') filter: FindAllCityInput) {
     return this.cityService.findAll(filter);
   }
 
   @Query(() => City, { name: 'city' })
-  @UseGuards(JwtAuthEmployeeGuard)
-  @UseGuards(JwtAuthEmployeeGuard)
+  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + City.name)
   public findOne(@Args('id') id: string) {
     return this.cityService.findOne({ id });

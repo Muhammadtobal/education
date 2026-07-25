@@ -6,20 +6,67 @@ import { UpdateTeacherInput } from './dto/update-teacher.input';
 import { TeacherPaginationResultOutput } from './dto/find-all-teacher.output';
 import { FindAllTeacherInput } from './dto/find-all-teacher.input';
 import { DoneResponseOutput } from 'src/shared/types/done-output';
-import { UseGuards } from '@nestjs/common';
+import { HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
+import { CheckActivationTeacherCodeOutput } from 'src/auth/dto/check-activation-teacher-code.output';
+import { ErrorMessages } from 'src/shared/error-messages.object';
+import { AuthService } from 'src/auth/auth.service';
+import { UserService } from 'src/user/user.service';
 
 @Resolver(() => Teacher)
 export class TeacherResolver {
-  constructor(private readonly teacherService: TeacherService) {}
+  constructor(
+    private readonly teacherService: TeacherService,
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
-  @Mutation(() => Teacher)
-  @UseGuards(JwtAuthEmployeeGuard)
-  public createTeacher(
-    @Args('createTeacherInput') createTeacherInput: CreateTeacherInput,
+  @Mutation(() => CheckActivationTeacherCodeOutput)
+  public async createTeacher(
+    @Args('createTeacherInput')
+    createTeacherInput: CreateTeacherInput,
   ) {
-    return this.teacherService.create(createTeacherInput);
+    const oldTeacher = await this.teacherService.findOne({
+      phone: createTeacherInput.phone,
+    });
+
+    if (oldTeacher)
+      throw new HttpException(
+        ErrorMessages.USER_EXISTS_CONFLICT,
+        HttpStatus.CONFLICT,
+      );
+
+    const activationCode = await this.userService.findOneActivationCode({
+      phone: createTeacherInput.phone,
+    });
+
+    if (!activationCode || activationCode.code !== 'passed')
+      throw new HttpException(
+        ErrorMessages.ACTIVATION_CODE_UNAUTHORIZED,
+        HttpStatus.CONFLICT,
+      );
+
+    const refreshToken = await this.authService.generateRefreshToken();
+
+    const teacher = await this.teacherService.create({
+      ...createTeacherInput,
+      refresh_token: refreshToken,
+    });
+
+    const accessToken = await this.authService.generateJwtToken(
+      { teacherId: teacher.id },
+      process.env.TEACHER_JWT_KEY as string,
+    );
+
+    this.userService.removeActivationCode(activationCode.id);
+
+    return {
+      teacher: { ...teacher },
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: 15 * 60,
+    };
   }
 
   @Query(() => TeacherPaginationResultOutput, { name: 'teachers' })

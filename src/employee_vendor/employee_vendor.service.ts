@@ -35,15 +35,15 @@ export class EmployeeVendorService {
 
   public findAll(filter: FindAllEmployeeVendorInput) {
     const query = this.employeeVendorRepository
-      .createQueryBuilder('employeeVendor')
+      .createQueryBuilder('employee_vendor')
       .where('true');
     generateQuerySorts<EmployeeVendor>(
       query,
       filter,
       EmployeeVendor,
-      'employeeVendor',
+      'employee_vendor',
     );
-    generateQueryConditions<EmployeeVendor>(query, filter, 'employeeVendor');
+    generateQueryConditions<EmployeeVendor>(query, filter, 'employee_vendor');
 
     return customPaginate<EmployeeVendor, PaginationMetadata>(query, {
       limit: filter.pagination.limit,

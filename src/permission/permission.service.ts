@@ -21,6 +21,7 @@ import {
   metaTransformer,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
+import { PermissionsStore } from 'src/shared/permission.object';
 
 @Injectable()
 export class PermissionService {
@@ -74,20 +75,20 @@ export class PermissionService {
     this.permissionRepository.delete({ id });
   }
 
-  // public async syncPermissions() {
-  //   const existingPermissions = await this.permissionRepository.find({
-  //     select: ['name'],
-  //   });
+  public async syncPermissions() {
+    const existingPermissions = await this.permissionRepository.find({
+      select: ['name'],
+    });
 
-  //   const existingKeys = new Set(existingPermissions.map((perm) => perm.name));
+    const existingKeys = new Set(existingPermissions.map((perm) => perm.name));
 
-  //   const newPermissions = Object.entries(PermissionsStore)
-  //     .filter(([, value]) => !existingKeys.has(value as string))
-  //     .map(([, value]) => ({ name: value }));
+    const newPermissions = Object.entries(PermissionsStore)
+      .filter(([, value]) => !existingKeys.has(value as string))
+      .map(([, value]) => ({ name: value }));
 
-  //   if (newPermissions.length > 0) {
-  //     await this.permissionRepository.insert(newPermissions as Permission[]);
-  //     console.log(`Added ${newPermissions.length} new permissions.`);
-  //   } else console.log('All permissions are already synced.');
-  // }
+    if (newPermissions.length > 0) {
+      await this.permissionRepository.insert(newPermissions as Permission[]);
+      console.log(`Added ${newPermissions.length} new permissions.`);
+    } else console.log('All permissions are already synced.');
+  }
 }

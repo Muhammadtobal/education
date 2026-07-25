@@ -29,10 +29,6 @@ export class EmployeeVendor {
   @Field()
   employee_id: string;
 
-  @Column('bigint')
-  @Field()
-  level_id: string;
-
   @Column('boolean', { default: true })
   @Field(() => Boolean)
   active: boolean;
@@ -58,9 +54,4 @@ export class EmployeeVendor {
   @JoinColumn({ name: 'employee_id' })
   @Field(() => Employee, { nullable: true })
   employee?: Employee;
-
-  @ManyToOne(() => Level, (level) => level.employee_vendors)
-  @JoinColumn({ name: 'level_id' })
-  @Field(() => Level, { nullable: true })
-  level?: Level;
 }

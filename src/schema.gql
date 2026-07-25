@@ -20,13 +20,11 @@ type EmployeeVendor {
   id: String!
   vendor_id: String!
   employee_id: String!
-  level_id: String!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
   vendor: Vendor
   employee: Employee
-  level: Level
 }
 
 type Permission {
@@ -72,6 +70,34 @@ type Notification {
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+type ScheduledNotification {
+  id: String!
+  title: String!
+  body: String!
+  active: Boolean!
+  link: String
+  count: Int!
+  scheduled_notification_type: ScheduledNotificationType!
+  img_url: String
+  user_id: String
+  created_at: DateTime!
+  vendor_id: String
+  filter_data: JSON!
+  employee_id: String
+  global: Boolean!
+  approved: Boolean!
+  receivers_count: Int!
+  user: User
+  employee: Employee
+}
+
+"""Scheduled notification type (daily, weekly, or monthly)"""
+enum ScheduledNotificationType {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
 
 type Employee {
   id: String!
@@ -184,6 +210,21 @@ type UserCoupon {
   coupon: Coupon
 }
 
+type AnswerUser {
+  id: String!
+  user_id: String!
+  question_id: String!
+  exam_id: String!
+  answer_id: String!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  user: User!
+  exam: Exam!
+  question: Question!
+  answer: Answer!
+}
+
 type Answer {
   id: String!
   answer_text: String!
@@ -229,6 +270,18 @@ type Exam {
   created_at: DateTime!
   updated_at: DateTime!
   course: Course
+}
+
+type ExamUser {
+  id: String!
+  exam_id: String!
+  user_id: String!
+  mark: Float
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  exam: Exam!
+  user: User!
 }
 
 type User {
@@ -429,19 +482,23 @@ type TeacherPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
-type SubscriptionPaginationResultOutput {
-  items: [Subscription!]!
+type CheckActivationTeacherCodeOutput {
+  teacher: Teacher
+  access_token: String
+  refresh_token: String
+  expires_in: Int
+}
+
+type UserPaginationResultOutput {
+  items: [User!]!
   meta: PaginationMetadata!
 }
 
-type ReviewPaginationResultOutput {
-  items: [Review!]!
-  meta: PaginationMetadata!
-}
-
-type PaymentPaginationResultOutput {
-  items: [Payment!]!
-  meta: PaginationMetadata!
+type CheckActivationUserCodeOutput {
+  user: User
+  access_token: String
+  refresh_token: String
+  expires_in: Int
 }
 
 type RefreshTokenOutput {
@@ -454,30 +511,11 @@ type SendActivationCodeOutput {
   code: String
 }
 
-type CheckActivationTeacherCodeOutput {
-  teacher: Teacher
-  access_token: String
-  refresh_token: String
-  expires_in: Int
-}
-
-type CheckActivationUserCodeOutput {
-  user: User
-  access_token: String
-  refresh_token: String
-  expires_in: Int
-}
-
 type CheckActivationEmployeeCodeOutput {
   employee: Employee
   access_token: String
   refresh_token: String
   expires_in: Int
-}
-
-type UserPaginationResultOutput {
-  items: [User!]!
-  meta: PaginationMetadata!
 }
 
 type EmployeePaginationResultOutput {
@@ -487,6 +525,21 @@ type EmployeePaginationResultOutput {
 
 type PermissionPaginationResultOutput {
   items: [Permission!]!
+  meta: PaginationMetadata!
+}
+
+type SubscriptionPaginationResultOutput {
+  items: [Subscription!]!
+  meta: PaginationMetadata!
+}
+
+type ReviewPaginationResultOutput {
+  items: [Review!]!
+  meta: PaginationMetadata!
+}
+
+type PaymentPaginationResultOutput {
+  items: [Payment!]!
   meta: PaginationMetadata!
 }
 
@@ -530,6 +583,11 @@ type ExamPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type ExamUserPaginationResultOutput {
+  items: [ExamUser!]!
+  meta: PaginationMetadata!
+}
+
 type QuestionPaginationResultOutput {
   items: [Question!]!
   meta: PaginationMetadata!
@@ -537,6 +595,11 @@ type QuestionPaginationResultOutput {
 
 type AnswerPaginationResultOutput {
   items: [Answer!]!
+  meta: PaginationMetadata!
+}
+
+type AnswerUserPaginationResultOutput {
+  items: [AnswerUser!]!
   meta: PaginationMetadata!
 }
 
@@ -552,6 +615,11 @@ type ContentPaginationResultOutput {
 
 type NotificationPaginationResultOutput {
   items: [Notification!]!
+  meta: PaginationMetadata!
+}
+
+type ScheduledNotificationPaginationResultOutput {
+  items: [ScheduledNotification!]!
   meta: PaginationMetadata!
 }
 
@@ -575,17 +643,18 @@ type LoginHistoryPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type Constant {
+  id: String!
+  key: String!
+  value: JSON!
+  expose: Boolean!
+}
+
 type Query {
   vendors(filter: FindAllVendorInput!): VendorPaginationResultOutput!
   vendor(id: String!): Vendor!
   teachers(filter: FindAllTeacherInput!): TeacherPaginationResultOutput!
   teacher(id: String!): Teacher!
-  subscriptions(filter: FindAllSubscriptionInput!): SubscriptionPaginationResultOutput!
-  subscription(id: String!): Subscription!
-  reviews(filter: FindAllReviewInput!): ReviewPaginationResultOutput!
-  review(id: String!): Review!
-  payments(filter: FindAllPaymentInput!): PaymentPaginationResultOutput!
-  payment(id: String!): Payment!
   users(filter: FindAllUserInput!): UserPaginationResultOutput!
   user(id: String!): User!
   employees(filter: FindAllEmployeeInput!): EmployeePaginationResultOutput!
@@ -593,40 +662,54 @@ type Query {
   myEmployeeProfile: Employee
   permissions(filter: FindAllPermissionInput!): PermissionPaginationResultOutput!
   permission(id: String!): Permission!
+  subscriptions(filter: FindAllSubscriptionInput!): SubscriptionPaginationResultOutput!
+  subscription(id: String!): Subscription!
+  reviews(filter: FindAllReviewInput!): ReviewPaginationResultOutput!
+  review(id: String!): Review!
+  payments(filter: FindAllPaymentInput!): PaymentPaginationResultOutput!
+  payment(id: String!): Payment!
   cities(filter: FindAllCityInput!): CityPaginationResultOutput!
   city(id: String!): City!
   levels(filter: FindAllLevelInput!): LevelPaginationResultOutput!
   level(id: String!): Level!
-  vendorLevels(filter: FindAllVendorLevelInput!): VendorLevelPaginationResultOutput!
-  vendorLevel(id: String!): VendorLevel!
+  vendor_levels(filter: FindAllVendorLevelInput!): VendorLevelPaginationResultOutput!
+  vendor_level(id: String!): VendorLevel!
   notifications(filter: FindAllNotificationInput!): NotificationPaginationResultOutput!
   notification(id: String!): Notification!
-  employeeVendors(filter: FindAllEmployeeVendorInput!): EmployeeVendorPaginationResultOutput!
-  employeeVendor(id: String!): EmployeeVendor!
+  scheduled_notifications(filter: FindAllScheduledNotificationInput!): ScheduledNotificationPaginationResultOutput!
+  scheduled_notification(id: String!): ScheduledNotification!
+  employee_vendors(filter: FindAllEmployeeVendorInput!): EmployeeVendorPaginationResultOutput!
+  employee_vendor(id: String!): EmployeeVendor!
   plans(filter: FindAllPlanInput!): PlanPaginationResultOutput!
   plan(id: String!): Plan!
   courses(filter: FindAllCourseInput!): CoursePaginationResultOutput!
   course(id: String!): Course!
-  planCourses(filter: FindAllPlanCourseInput!): PlanCoursePaginationResultOutput!
-  planCourse(id: String!): PlanCourse!
+  plan_courses(filter: FindAllPlanCourseInput!): PlanCoursePaginationResultOutput!
+  plan_course(id: String!): PlanCourse!
   exams(filter: FindAllExamInput!): ExamPaginationResultOutput!
   exam(id: String!): Exam!
+  exam_users(filter: FindAllExamUserInput!): ExamUserPaginationResultOutput!
+  examUser(id: String!): ExamUser!
   questions(filter: FindAllQuestionInput!): QuestionPaginationResultOutput!
   question(id: String!): Question!
   answers(filter: FindAllAnswerInput!): AnswerPaginationResultOutput!
   answer(id: String!): Answer!
+  answer_users(filter: FindAllAnswerUserInput!): AnswerUserPaginationResultOutput!
+  answer_user(id: String!): AnswerUser!
   discussions(filter: FindAllDiscussionInput!): DiscussionPaginationResultOutput!
   discussion(id: String!): Discussion!
   contents(filter: FindAllContentInput!): ContentPaginationResultOutput!
   content(id: String!): Content!
   coupons(filter: FindAllCouponInput!): CouponPaginationResultOutput!
   coupon(id: String!): Coupon!
-  planCoupons(filter: FindAllPlanCouponInput!): PlanCouponPaginationResultOutput!
-  planCoupon(id: String!): PlanCoupon!
-  storys(filter: FindAllStoryInput!): StoryPaginationResultOutput!
+  plan_coupons(filter: FindAllPlanCouponInput!): PlanCouponPaginationResultOutput!
+  plan_coupon(id: String!): PlanCoupon!
+  stories(filter: FindAllStoryInput!): StoryPaginationResultOutput!
   story(id: String!): Story!
   loginHistorys(filter: FindAllLoginHistoryInput!): LoginHistoryPaginationResultOutput!
   loginHistory(id: String!): LoginHistory!
+  constants: [Constant!]!
+  constantByKey(key: String!): Constant!
 }
 
 input FindAllVendorInput {
@@ -659,26 +742,6 @@ input FindAllTeacherInput {
   image_url: MatchInput
   count_review: JSON
   vendor_id: JSON
-}
-
-input FindAllSubscriptionInput {
-  pagination: PaginationInput!
-  sort: SortInput
-  active: Boolean
-  video_id: JSON
-}
-
-input FindAllReviewInput {
-  pagination: PaginationInput!
-  sort: SortInput
-  active: Boolean
-  video_id: JSON
-}
-
-input FindAllPaymentInput {
-  pagination: PaginationInput!
-  sort: SortInput
-  video_id: JSON
 }
 
 input FindAllUserInput {
@@ -715,6 +778,26 @@ input FindAllPermissionInput {
   sort: SortInput
 }
 
+input FindAllSubscriptionInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  active: Boolean
+  video_id: JSON
+}
+
+input FindAllReviewInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  active: Boolean
+  video_id: JSON
+}
+
+input FindAllPaymentInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  video_id: JSON
+}
+
 input FindAllCityInput {
   name: MatchInput
   active: Boolean
@@ -745,6 +828,16 @@ input FindAllNotificationInput {
   active: Boolean
   user_id: JSON
   employee_id: JSON
+  vendor_id: JSON
+  pagination: PaginationInput!
+  sort: SortInput
+}
+
+input FindAllScheduledNotificationInput {
+  title: MatchInput
+  body: Boolean
+  created_at: JSON
+  active: Boolean
   vendor_id: JSON
   pagination: PaginationInput!
   sort: SortInput
@@ -786,6 +879,13 @@ input FindAllExamInput {
   course_id: JSON
 }
 
+input FindAllExamUserInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  exam_id: JSON
+  user_id: JSON
+}
+
 input FindAllQuestionInput {
   pagination: PaginationInput!
   sort: SortInput
@@ -794,6 +894,13 @@ input FindAllQuestionInput {
 }
 
 input FindAllAnswerInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  name: MatchInput
+  question_id: JSON
+}
+
+input FindAllAnswerUserInput {
   pagination: PaginationInput!
   sort: SortInput
   name: MatchInput
@@ -853,9 +960,23 @@ type Mutation {
   createVendor(createVendorInput: CreateVendorInput!): Vendor!
   updateVendor(updateVendorInput: UpdateVendorInput!): Vendor!
   removeVendor(id: String!): DoneResponseOutput!
-  createTeacher(createTeacherInput: CreateTeacherInput!): Teacher!
+  createTeacher(createTeacherInput: CreateTeacherInput!): CheckActivationTeacherCodeOutput!
   updateTeacher(updateTeacherInput: UpdateTeacherInput!): Teacher!
   removeTeacher(id: String!): DoneResponseOutput!
+  createUser(createUserInput: CreateUserInput!): CheckActivationUserCodeOutput!
+  refreshTokenEmployee(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
+  checkEmployeeActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationEmployeeCodeOutput!
+  sendActivationCode(sendActivationCodeInput: SendActivationCodeInput!): SendActivationCodeOutput!
+  refreshTokenTeacher(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
+  checkTeacherActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationTeacherCodeOutput!
+  refreshTokenUser(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
+  checkUserActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationUserCodeOutput!
+  createEmployee(createEmployeeInput: CreateEmployeeInput!): CheckActivationEmployeeCodeOutput!
+  assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
+  unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
+  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
+  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
+  removePermission(id: String!): DoneResponseOutput!
   createSubscription(createSubscriptionInput: CreateSubscriptionInput!): Subscription!
   updateSubscription(updateSubscriptionInput: UpdateSubscriptionInput!): Subscription!
   removeSubscription(id: String!): DoneResponseOutput!
@@ -865,19 +986,6 @@ type Mutation {
   createPayment(createPaymentInput: CreatePaymentInput!): Payment!
   updatePayment(updatePaymentInput: UpdatePaymentInput!): Payment!
   removePayment(id: String!): DoneResponseOutput!
-  refreshTokenEmployee(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
-  checkEmployeeActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationEmployeeCodeOutput!
-  sendActivationCode(sendActivationCodeInput: SendActivationCodeInput!): SendActivationCodeOutput!
-  refreshTokenTeacher(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
-  checkTeacherActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationTeacherCodeOutput!
-  refreshTokenUser(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
-  checkUserActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationUserCodeOutput!
-  createUser(createUserInput: CreateUserInput!): CheckActivationUserCodeOutput!
-  assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
-  unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
-  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
-  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
-  removePermission(id: String!): DoneResponseOutput!
   createCity(createCityInput: CreateCityInput!): City!
   updateCity(updateCityInput: UpdateCityInput!): City!
   removeCity(id: String!): DoneResponseOutput!
@@ -891,6 +999,10 @@ type Mutation {
   updateNotification(updateNotificationInput: UpdateNotificationInput!): Notification!
   removeNotification(id: String!): DoneResponseOutput!
   sendNotification(sendNotification: CreateNotificationInput!): Notification!
+  createScheduledNotification(createScheduledNotificationInput: CreateScheduledNotificationInput!): ScheduledNotification!
+  updateScheduledNotification(updateScheduledNotificationInput: UpdateScheduledNotificationInput!): ScheduledNotification!
+  removeScheduledNotification(id: String!): DoneResponseOutput!
+  sendScheduledNotification(sendScheduledNotification: CreateScheduledNotificationInput!): ScheduledNotification!
   createEmployeeVendor(createEmployeeVendorInput: CreateEmployeeVendorInput!): EmployeeVendor!
   updateEmployeeVendor(updateEmployeeVendorInput: UpdateEmployeeVendorInput!): EmployeeVendor!
   removeEmployeeVendor(id: String!): DoneResponseOutput!
@@ -906,12 +1018,18 @@ type Mutation {
   createExam(createExamInput: CreateExamInput!): Exam!
   updateExam(updateExamInput: UpdateExamInput!): Exam!
   removeExam(id: String!): DoneResponseOutput!
+  createExamUser(createExamUserInput: CreateExamUserInput!): ExamUser!
+  updateExamUser(updateExamUserInput: UpdateExamUserInput!): ExamUser!
+  removeExamUser(id: String!): DoneResponseOutput!
   createQuestion(createQuestionInput: CreateQuestionInput!): Question!
   updateQuestion(updateQuestionInput: UpdateQuestionInput!): Question!
   removeQuestion(id: String!): DoneResponseOutput!
   createAnswer(createAnswerInput: CreateAnswerInput!): Answer!
   updateAnswer(updateAnswerInput: UpdateAnswerInput!): Answer!
   removeAnswer(id: String!): DoneResponseOutput!
+  createAnswerUser(createAnswerUserInput: CreateAnswerUserInput!): AnswerUser!
+  updateAnswerUser(updateAnswerUserInput: UpdateAnswerUserInput!): AnswerUser!
+  removeAnswerUser(id: String!): DoneResponseOutput!
   createDiscussion(createDiscussionInput: CreateDiscussionInput!): Discussion!
   updateDiscussion(updateDiscussionInput: UpdateDiscussionInput!): Discussion!
   removeDiscussion(id: String!): DoneResponseOutput!
@@ -932,6 +1050,9 @@ type Mutation {
   createLoginHistory(createLoginHistoryInput: CreateLoginHistoryInput!): LoginHistory!
   updateLoginHistory(updateLoginHistoryInput: UpdateLoginHistoryInput!): LoginHistory!
   removeLoginHistory(id: String!): DoneResponseOutput!
+  createConstant(createConstantInput: CreateConstantInput!): Constant!
+  updateConstant(updateConstantInput: UpdateConstantInput!): Constant!
+  removeConstant(id: String!): DoneResponseOutput!
 }
 
 input CreateVendorInput {
@@ -992,6 +1113,66 @@ input UpdateTeacherInput {
   id: String!
 }
 
+input CreateUserInput {
+  full_name: String!
+  phone: String!
+  gender: Gender!
+  city_id: String!
+  level_id: String!
+  img_url: String
+  device_info: JSON
+  active: Boolean
+  fcm_token: String
+  lang: String
+  ads_count: Float
+}
+
+input RefreshTokenInput {
+  refresh_token: String!
+}
+
+input CheckActivationCodeInput {
+  phone: String!
+  code: String!
+  fcm_token: String
+}
+
+input SendActivationCodeInput {
+  phone: String!
+  autofill_code: String
+}
+
+input CreateEmployeeInput {
+  phone: String!
+  gender: Gender!
+  full_name: String!
+  city_id: String!
+  active: Boolean = true
+  device_info: JSON
+  fcm_token: String
+  refresh_token: String
+}
+
+input AssignPermissionInput {
+  permission_id: String!
+  employee_id: String!
+}
+
+input CreatePermissionInput {
+  name: String!
+  description: String
+  translation: String
+  active: Boolean
+}
+
+input UpdatePermissionInput {
+  name: String
+  description: String
+  translation: String
+  active: Boolean
+  id: String!
+}
+
 input CreateSubscriptionInput {
   course_id: String!
   user_id: String!
@@ -1041,54 +1222,6 @@ input UpdatePaymentInput {
   user_id: String
   vendor_id: String
   value: Float
-  active: Boolean
-  id: String!
-}
-
-input RefreshTokenInput {
-  refresh_token: String!
-}
-
-input CheckActivationCodeInput {
-  phone: String!
-  code: String!
-  fcm_token: String
-}
-
-input SendActivationCodeInput {
-  phone: String!
-  autofill_code: String
-}
-
-input CreateUserInput {
-  full_name: String!
-  phone: String!
-  gender: Gender!
-  city_id: String!
-  img_url: String
-  device_info: JSON
-  active: Boolean
-  fcm_token: String
-  lang: String
-  ads_count: Float
-}
-
-input AssignPermissionInput {
-  permission_id: String!
-  employee_id: String!
-}
-
-input CreatePermissionInput {
-  name: String!
-  description: String
-  translation: String
-  active: Boolean
-}
-
-input UpdatePermissionInput {
-  name: String
-  description: String
-  translation: String
   active: Boolean
   id: String!
 }
@@ -1171,17 +1304,46 @@ input UpdateNotificationInput {
   id: String!
 }
 
+input CreateScheduledNotificationInput {
+  title: String!
+  body: String!
+  count: Int!
+  scheduled_notification_type: ScheduledNotificationType!
+  active: Boolean
+  link: String
+  img_url: String
+  user_id: String
+  vendor_id: String
+  employee_id: String
+  filter_data: NotificationFilterDataInput
+  approved: Boolean
+}
+
+input UpdateScheduledNotificationInput {
+  title: String
+  body: String
+  count: Int
+  scheduled_notification_type: ScheduledNotificationType
+  active: Boolean
+  link: String
+  img_url: String
+  user_id: String
+  vendor_id: String
+  employee_id: String
+  filter_data: NotificationFilterDataInput
+  approved: Boolean
+  id: String!
+}
+
 input CreateEmployeeVendorInput {
   vendor_id: String!
   employee_id: String!
-  level_id: String!
   active: Boolean
 }
 
 input UpdateEmployeeVendorInput {
   vendor_id: String
   employee_id: String
-  level_id: String
   active: Boolean
   id: String!
 }
@@ -1266,6 +1428,21 @@ input UpdateExamInput {
   id: String!
 }
 
+input CreateExamUserInput {
+  exam_id: String!
+  user_id: String!
+  mark: Float
+  active: Boolean
+}
+
+input UpdateExamUserInput {
+  exam_id: String
+  user_id: String
+  mark: Float
+  active: Boolean
+  id: String!
+}
+
 input CreateQuestionInput {
   question_text: String!
   exam_id: String!
@@ -1303,6 +1480,21 @@ input UpdateAnswerInput {
   is_true: Boolean
   hint_text: String
   active: Boolean = true
+  id: String!
+}
+
+input CreateAnswerUserInput {
+  exam_id: String!
+  answer_id: String!
+  question_id: String!
+  active: Boolean
+}
+
+input UpdateAnswerUserInput {
+  exam_id: String
+  answer_id: String
+  question_id: String
+  active: Boolean
   id: String!
 }
 
@@ -1428,4 +1620,14 @@ input UpdateLoginHistoryInput {
   device_info: JSON
   active: Boolean
   id: String!
+}
+
+input CreateConstantInput {
+  key: String!
+  value: JSON!
+}
+
+input UpdateConstantInput {
+  key: String!
+  value: JSON
 }
