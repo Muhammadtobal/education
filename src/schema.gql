@@ -188,7 +188,7 @@ type Payment {
   vendor: Vendor
 }
 
-type Subscription {
+type UserSubscription {
   id: String!
   course_id: String!
   user_id: String!
@@ -529,7 +529,7 @@ type PermissionPaginationResultOutput {
 }
 
 type SubscriptionPaginationResultOutput {
-  items: [Subscription!]!
+  items: [UserSubscription!]!
   meta: PaginationMetadata!
 }
 
@@ -663,7 +663,7 @@ type Query {
   permissions(filter: FindAllPermissionInput!): PermissionPaginationResultOutput!
   permission(id: String!): Permission!
   subscriptions(filter: FindAllSubscriptionInput!): SubscriptionPaginationResultOutput!
-  subscription(id: String!): Subscription!
+  subscription(id: String!): UserSubscription!
   reviews(filter: FindAllReviewInput!): ReviewPaginationResultOutput!
   review(id: String!): Review!
   payments(filter: FindAllPaymentInput!): PaymentPaginationResultOutput!
@@ -977,8 +977,8 @@ type Mutation {
   createPermission(createPermissionInput: CreatePermissionInput!): Permission!
   updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
   removePermission(id: String!): DoneResponseOutput!
-  createSubscription(createSubscriptionInput: CreateSubscriptionInput!): Subscription!
-  updateSubscription(updateSubscriptionInput: UpdateSubscriptionInput!): Subscription!
+  createSubscription(createSubscriptionInput: CreateSubscriptionInput!): UserSubscription!
+  updateSubscription(updateSubscriptionInput: UpdateSubscriptionInput!): UserSubscription!
   removeSubscription(id: String!): DoneResponseOutput!
   createReview(createReviewInput: CreateReviewInput!): Review!
   updateReview(updateReviewInput: UpdateReviewInput!): Review!

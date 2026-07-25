@@ -12,7 +12,7 @@ import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 import { User } from 'src/user/entities/user.entity';
 import { Course } from 'src/course/entities/course.entity';
 
-@ObjectType()
+@ObjectType('UserSubscription')
 @Entity()
 export class Subscription {
   @PrimaryGeneratedColumn({ type: 'bigint' })
