@@ -18,7 +18,7 @@ import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.dec
 import { IsSingleNumberOrRange } from 'src/shared/decorators/is-single-number-or-range.decorator';
 
 @InputType()
-export class FindAllLevelInput {
+export class FindAllCourseTeacherInput {
   @IsNotEmpty()
   @IsObject()
   @Type(() => PaginationInput)
@@ -33,18 +33,13 @@ export class FindAllLevelInput {
 
   @IsOptional()
   @IsObject()
-  @Type(() => MatchInput)
-  @Field(() => MatchInput, { nullable: true })
-  name?: MatchInput;
-
-  @IsOptional()
-  @IsBoolean()
-  @Field(() => Boolean, { nullable: true })
-  active?: boolean;
+  @IsSingleIdOrList()
+  @Field(() => GraphQLJSON, { nullable: true })
+  course_id?: SingleIdInput | ListOfIdsInput;
 
   @IsOptional()
   @IsObject()
   @IsSingleIdOrList()
   @Field(() => GraphQLJSON, { nullable: true })
-  parent_id?: SingleIdInput | ListOfIdsInput;
+  teacher_id?: SingleIdInput | ListOfIdsInput;
 }

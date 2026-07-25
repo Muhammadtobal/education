@@ -40,6 +40,7 @@ export class AnswerService {
   public findAll(filter: FindAllAnswerInput) {
     const query = this.answerRepository
       .createQueryBuilder('answer')
+      .leftJoinAndSelect('answer.question', 'question')
       .where('true');
     generateQuerySorts<Answer>(query, filter, Answer, 'answer');
     generateQueryConditions<Answer>(query, filter, 'answer');
@@ -85,6 +86,12 @@ export class AnswerService {
   public findAllAnswerUser(filter: FindAllAnswerUserInput) {
     const query = this.answerUserRepository
       .createQueryBuilder('answer_user')
+      .leftJoinAndSelect('answer_user.answer', 'answer')
+      .leftJoinAndSelect('answer_user.exam', 'exam')
+      .leftJoinAndSelect('answer_user.user', 'user')
+
+      .leftJoinAndSelect('answer_user.question', 'question')
+
       .where('true');
 
     generateQuerySorts<AnswerUser>(query, filter, AnswerUser, 'answer_user');

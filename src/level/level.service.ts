@@ -34,6 +34,7 @@ export class LevelService {
   public findAll(filter: FindAllLevelInput) {
     const query = this.levelRepository
       .createQueryBuilder('level')
+      .leftJoinAndSelect('level.parent', 'parent')
       .where('true');
     generateQuerySorts<Level>(query, filter, Level, 'level');
     generateQueryConditions<Level>(query, filter, 'level');

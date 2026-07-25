@@ -33,9 +33,21 @@ export class FindAllAnswerUserInput {
 
   @IsOptional()
   @IsObject()
-  @Type(() => MatchInput)
-  @Field(() => MatchInput, { nullable: true })
-  name?: MatchInput;
+  @IsSingleIdOrList()
+  @Field(() => GraphQLJSON, { nullable: true })
+  user_id?: SingleIdInput | ListOfIdsInput;
+
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  @Field(() => GraphQLJSON, { nullable: true })
+  exam_id?: SingleIdInput | ListOfIdsInput;
+
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  @Field(() => GraphQLJSON, { nullable: true })
+  answer_id?: SingleIdInput | ListOfIdsInput;
 
   @IsOptional()
   @IsObject()

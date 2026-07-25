@@ -19,6 +19,7 @@ import { Review } from 'src/review/entities/review.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { Discussion } from 'src/discussion/entities/discussion.entity';
+import { CourseTeacher } from './course_teacher.entity';
 
 @ObjectType()
 @Entity()
@@ -42,14 +43,6 @@ export class Course {
   @Column('bigint')
   @Field()
   level_id: string;
-
-  @Column('bigint')
-  @Field()
-  vendor_id: string;
-
-  @Column('bigint')
-  @Field()
-  teacher_id: string;
 
   @Column({
     type: 'float',
@@ -88,11 +81,6 @@ export class Course {
   @Field(() => Date)
   updated_at: Date;
 
-  @ManyToOne(() => Teacher, (teacher) => teacher.courses)
-  @JoinColumn({ name: 'teacher_id' })
-  @Field(() => Teacher, { nullable: true })
-  teacher?: Teacher;
-
   @ManyToOne(() => Vendor, (vendor) => vendor.courses)
   @JoinColumn({ name: 'vendor_id' })
   @Field(() => Vendor, { nullable: true })
@@ -120,6 +108,9 @@ export class Course {
 
   @OneToMany(() => Payment, (payment) => payment.course)
   payments: Payment[];
+
+  @OneToMany(() => CourseTeacher, (course_teacher) => course_teacher.course)
+  course_teachers: CourseTeacher[];
 
   @OneToMany(() => Discussion, (discussion) => discussion.course)
   discussions: Discussion[];

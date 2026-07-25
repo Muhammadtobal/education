@@ -1,25 +1,24 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { paginate } from "nestjs-typeorm-paginate";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { paginate } from 'nestjs-typeorm-paginate';
 import {
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
   Repository,
-} from "typeorm";
+} from 'typeorm';
 
-import { CreateQuestionInput } from "./dto/create-question.input";
-import { UpdateQuestionInput } from "./dto/update-question.input";
-import { Question } from "./entities/question.entity";
-import { FindAllQuestionInput } from "./dto/find-all-question.input";
-
+import { CreateQuestionInput } from './dto/create-question.input';
+import { UpdateQuestionInput } from './dto/update-question.input';
+import { Question } from './entities/question.entity';
+import { FindAllQuestionInput } from './dto/find-all-question.input';
 
 import {
   generateQueryConditions,
   generateQuerySorts,
   customPaginate,
-} from "src/shared/helpers";
-import { PaginationMetadata } from "src/shared/types/pagination-metadata";
+} from 'src/shared/helpers';
+import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
 
 @Injectable()
 export class QuestionService {
@@ -34,15 +33,17 @@ export class QuestionService {
 
   public findAll(filter: FindAllQuestionInput) {
     const query = this.questionRepository
-      .createQueryBuilder("question")
-      .where("true");
-    generateQuerySorts<Question>(query, filter, Question, "question");
-    generateQueryConditions<Question>(query, filter, "question");
+      .createQueryBuilder('question')
+      .leftJoinAndSelect('question.exam', 'exam')
+      .leftJoinAndSelect('question.parent', 'parent')
+      .where('true');
+    generateQuerySorts<Question>(query, filter, Question, 'question');
+    generateQueryConditions<Question>(query, filter, 'question');
 
     return customPaginate<Question, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
-      page: filter.pagination.page
-      });
+      page: filter.pagination.page,
+    });
   }
 
   public findOne(
@@ -60,7 +61,10 @@ export class QuestionService {
   }
 
   public async update(updateQuestionInput: UpdateQuestionInput) {
-    await this.questionRepository.update({ id: updateQuestionInput.id }, updateQuestionInput);
+    await this.questionRepository.update(
+      { id: updateQuestionInput.id },
+      updateQuestionInput,
+    );
     return this.findOne({ id: updateQuestionInput.id });
   }
 

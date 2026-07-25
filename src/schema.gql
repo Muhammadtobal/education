@@ -125,7 +125,6 @@ type Review {
   id: String!
   user_id: String!
   course_id: String
-  vendor_id: String
   teacher_id: String
   value: Float!
   active: Boolean!
@@ -133,9 +132,20 @@ type Review {
   created_at: DateTime!
   updated_at: DateTime!
   course: Course
-  vendor: Vendor
   teacher: Teacher
   user: User
+}
+
+type CourseTeacher {
+  id: String!
+  teacher_id: String!
+  course_id: String!
+  teacher_share: Float!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  teacher: Teacher
+  course: Course
 }
 
 type Teacher {
@@ -399,15 +409,12 @@ type Course {
   url: String!
   description: String!
   level_id: String!
-  vendor_id: String!
-  teacher_id: String!
   teacher_share: Float!
   vendor_share: Float!
   review_count: Float!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
-  teacher: Teacher
   vendor: Vendor
   level: Level
 }
@@ -573,6 +580,11 @@ type CoursePaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type CourseTeacherPaginationResultOutput {
+  items: [Course!]!
+  meta: PaginationMetadata!
+}
+
 type PlanCoursePaginationResultOutput {
   items: [PlanCourse!]!
   meta: PaginationMetadata!
@@ -684,6 +696,8 @@ type Query {
   plan(id: String!): Plan!
   courses(filter: FindAllCourseInput!): CoursePaginationResultOutput!
   course(id: String!): Course!
+  course_teachers(filter: FindAllCourseTeacherInput!): CourseTeacherPaginationResultOutput!
+  course_teacher(id: String!): CourseTeacher!
   plan_courses(filter: FindAllPlanCourseInput!): PlanCoursePaginationResultOutput!
   plan_course(id: String!): PlanCourse!
   exams(filter: FindAllExamInput!): ExamPaginationResultOutput!
@@ -782,20 +796,25 @@ input FindAllSubscriptionInput {
   pagination: PaginationInput!
   sort: SortInput
   active: Boolean
-  video_id: JSON
+  course_id: JSON
+  user_id: JSON
 }
 
 input FindAllReviewInput {
   pagination: PaginationInput!
   sort: SortInput
   active: Boolean
-  video_id: JSON
+  teacher_id: JSON
+  user_id: JSON
+  course_id: JSON
 }
 
 input FindAllPaymentInput {
   pagination: PaginationInput!
   sort: SortInput
-  video_id: JSON
+  vendor_id: JSON
+  user_id: JSON
+  course_id: JSON
 }
 
 input FindAllCityInput {
@@ -811,6 +830,7 @@ input FindAllLevelInput {
   sort: SortInput
   name: MatchInput
   active: Boolean
+  parent_id: JSON
 }
 
 input FindAllVendorLevelInput {
@@ -848,13 +868,12 @@ input FindAllEmployeeVendorInput {
   sort: SortInput
   vendor_id: JSON
   employee_id: JSON
-  level_id: JSON
 }
 
 input FindAllPlanInput {
   pagination: PaginationInput!
   sort: SortInput
-  name: MatchInput
+  vendor_id: JSON
 }
 
 input FindAllCourseInput {
@@ -862,6 +881,12 @@ input FindAllCourseInput {
   sort: SortInput
   name: MatchInput
   level_id: JSON
+}
+
+input FindAllCourseTeacherInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  course_id: JSON
   teacher_id: JSON
 }
 
@@ -870,6 +895,7 @@ input FindAllPlanCourseInput {
   sort: SortInput
   plan_id: JSON
   course_id: JSON
+  content_id: JSON
 }
 
 input FindAllExamInput {
@@ -891,6 +917,7 @@ input FindAllQuestionInput {
   sort: SortInput
   name: MatchInput
   exam_id: JSON
+  parent_id: JSON
 }
 
 input FindAllAnswerInput {
@@ -903,7 +930,9 @@ input FindAllAnswerInput {
 input FindAllAnswerUserInput {
   pagination: PaginationInput!
   sort: SortInput
-  name: MatchInput
+  user_id: JSON
+  exam_id: JSON
+  answer_id: JSON
   question_id: JSON
 }
 
@@ -912,6 +941,7 @@ input FindAllDiscussionInput {
   sort: SortInput
   teacher_id: JSON
   user_id: JSON
+  course_id: JSON
 }
 
 input FindAllContentInput {
@@ -1012,6 +1042,9 @@ type Mutation {
   createCourse(createCourseInput: CreateCourseInput!): Course!
   updateCourse(updateCourseInput: UpdateCourseInput!): Course!
   removeCourse(id: String!): DoneResponseOutput!
+  createCourseTeacher(createCourseTeacherInput: CreateCourseTeacherInput!): CourseTeacher!
+  updateCourseTeacher(updateCourseTeacherInput: UpdateCourseTeacherInput!): CourseTeacher!
+  removeCourseTeacher(id: String!): DoneResponseOutput!
   createPlanCourse(createPlanCourseInput: CreatePlanCourseInput!): PlanCourse!
   updatePlanCourse(updatePlanCourseInput: UpdatePlanCourseInput!): PlanCourse!
   removePlanCourse(id: String!): DoneResponseOutput!
@@ -1390,6 +1423,21 @@ input UpdateCourseInput {
   teacher_share: Float
   vendor_share: Float
   review_count: Float
+  active: Boolean
+  id: String!
+}
+
+input CreateCourseTeacherInput {
+  teacher_id: String!
+  course_id: String!
+  teacher_share: Float
+  active: Boolean
+}
+
+input UpdateCourseTeacherInput {
+  teacher_id: String
+  course_id: String
+  teacher_share: Float
   active: Boolean
   id: String!
 }

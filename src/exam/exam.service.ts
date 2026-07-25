@@ -39,7 +39,10 @@ export class ExamService {
   }
 
   public findAll(filter: FindAllExamInput) {
-    const query = this.examRepository.createQueryBuilder('exam').where('true');
+    const query = this.examRepository
+      .createQueryBuilder('exam')
+      .leftJoinAndSelect('exam.course', 'course')
+      .where('true');
     generateQuerySorts<Exam>(query, filter, Exam, 'exam');
     generateQueryConditions<Exam>(query, filter, 'exam');
 
@@ -84,6 +87,9 @@ export class ExamService {
   public findAllExamUser(filter: FindAllExamUserInput) {
     const query = this.examUserRepository
       .createQueryBuilder('exam_user')
+      .leftJoinAndSelect('exam_user.exam', 'exam')
+      .leftJoinAndSelect('exam_user.user', 'user')
+
       .where('true');
 
     generateQuerySorts<ExamUser>(query, filter, ExamUser, 'exam_user');

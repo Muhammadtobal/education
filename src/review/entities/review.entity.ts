@@ -31,10 +31,6 @@ export class Review {
 
   @Column('bigint', { nullable: true })
   @Field({ nullable: true })
-  vendor_id?: string;
-
-  @Column('bigint', { nullable: true })
-  @Field({ nullable: true })
   teacher_id?: string;
 
   @Column({
@@ -68,11 +64,6 @@ export class Review {
   @JoinColumn({ name: 'course_id' })
   @Field(() => Course, { nullable: true })
   course?: Course;
-
-  @ManyToOne(() => Vendor, (vendor) => vendor.reviews)
-  @JoinColumn({ name: 'vendor_id' })
-  @Field(() => Vendor, { nullable: true })
-  vendor?: Vendor;
 
   @ManyToOne(() => Teacher, (teacher) => teacher.reviews)
   @JoinColumn({ name: 'teacher_id' })

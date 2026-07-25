@@ -33,7 +33,7 @@ export class FindAllPlanInput {
 
   @IsOptional()
   @IsObject()
-  @Type(() => MatchInput)
-  @Field(() => MatchInput, { nullable: true })
-  name?: MatchInput;
+  @IsSingleIdOrList()
+  @Field(() => GraphQLJSON, { nullable: true })
+  vendor_id?: SingleIdInput | ListOfIdsInput;
 }

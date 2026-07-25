@@ -42,4 +42,10 @@ export class FindAllQuestionInput {
   @IsSingleIdOrList()
   @Field(() => GraphQLJSON, { nullable: true })
   exam_id?: SingleIdInput | ListOfIdsInput;
+
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  @Field(() => GraphQLJSON, { nullable: true })
+  parent_id?: SingleIdInput | ListOfIdsInput;
 }

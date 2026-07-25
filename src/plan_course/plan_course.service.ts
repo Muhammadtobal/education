@@ -34,6 +34,9 @@ export class PlanCourseService {
   public findAll(filter: FindAllPlanCourseInput) {
     const query = this.planCourseRepository
       .createQueryBuilder('plan_course')
+      .leftJoinAndSelect('plan_course.plan', 'plan')
+      .leftJoinAndSelect('plan_course.course', 'course')
+      .leftJoinAndSelect('plan_course.content', 'content')
       .where('true');
     generateQuerySorts<PlanCourse>(query, filter, PlanCourse, 'plan_course');
     generateQueryConditions<PlanCourse>(query, filter, 'plan_course');

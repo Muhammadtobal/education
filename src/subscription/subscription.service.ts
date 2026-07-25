@@ -36,7 +36,7 @@ export class SubscriptionService {
     const query = this.subscriptionRepository
       .createQueryBuilder('subscription')
       .leftJoinAndSelect('subscription.user', 'user')
-      .leftJoinAndSelect('subscription.video', 'video')
+      .leftJoinAndSelect('subscription.course', 'course')
       .where('true');
     generateQuerySorts<Subscription>(
       query,

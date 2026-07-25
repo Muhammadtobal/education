@@ -35,7 +35,8 @@ export class ReviewService {
     const query = this.reviewRepository
       .createQueryBuilder('review')
       .leftJoinAndSelect('review.user', 'user')
-      .leftJoinAndSelect('review.video', 'video')
+      .leftJoinAndSelect('review.teacher', 'teacher')
+      .leftJoinAndSelect('review.course', 'course')
       .where('true');
     generateQuerySorts<Review>(query, filter, Review, 'review');
     generateQueryConditions<Review>(query, filter, 'review');

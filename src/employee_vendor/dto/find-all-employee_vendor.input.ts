@@ -42,10 +42,4 @@ export class FindAllEmployeeVendorInput {
   @IsSingleIdOrList()
   @Field(() => GraphQLJSON, { nullable: true })
   employee_id?: SingleIdInput | ListOfIdsInput;
-
-  @IsOptional()
-  @IsObject()
-  @IsSingleIdOrList()
-  @Field(() => GraphQLJSON, { nullable: true })
-  level_id?: SingleIdInput | ListOfIdsInput;
 }

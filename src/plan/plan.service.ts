@@ -32,7 +32,10 @@ export class PlanService {
   }
 
   public findAll(filter: FindAllPlanInput) {
-    const query = this.planRepository.createQueryBuilder('plan').where('true');
+    const query = this.planRepository
+      .createQueryBuilder('plan')
+      .leftJoinAndSelect('plan.vendor', 'vendor')
+      .where('true');
     generateQuerySorts<Plan>(query, filter, Plan, 'plan');
     generateQueryConditions<Plan>(query, filter, 'plan');
 

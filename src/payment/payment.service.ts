@@ -34,6 +34,9 @@ export class PaymentService {
   public findAll(filter: FindAllPaymentInput) {
     const query = this.paymentRepository
       .createQueryBuilder('payment')
+      .leftJoinAndSelect('payment.user', 'user')
+      .leftJoinAndSelect('payment.vendor', 'vendor')
+      .leftJoinAndSelect('payment.course', 'course')
       .where('true');
     generateQuerySorts<Payment>(query, filter, Payment, 'payment');
     generateQueryConditions<Payment>(query, filter, 'payment');

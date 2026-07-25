@@ -34,6 +34,8 @@ export class PlanCouponService {
   public findAll(filter: FindAllPlanCouponInput) {
     const query = this.planCouponRepository
       .createQueryBuilder('plan_coupon')
+      .leftJoinAndSelect('plan_coupon.plan', 'plan')
+      .leftJoinAndSelect('plan_coupon.coupon', 'coupon')
       .where('true');
     generateQuerySorts<PlanCoupon>(query, filter, PlanCoupon, 'plan_coupon');
     generateQueryConditions<PlanCoupon>(query, filter, 'plan_coupon');

@@ -14,6 +14,11 @@ import { DoneResponseOutput } from 'src/shared/types/done-output';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
+import { CourseTeacher } from './entities/course_teacher.entity';
+import { CreateCourseTeacherInput } from './dto/create-course_teacher.input';
+import { CourseTeacherPaginationResultOutput } from './dto/find-all-course_teacher.output';
+import { FindAllCourseTeacherInput } from './dto/find-all-course_teacher.input';
+import { UpdateCourseTeacherInput } from './dto/update-course_teacher.input';
 
 @Resolver(() => Course)
 export class CourseResolver {
@@ -56,6 +61,56 @@ export class CourseResolver {
   @Permissions(Operation.DELETE + Course.name)
   public removeCourse(@Args('id') id: string) {
     this.courseService.remove(id);
+
+    return {
+      done: true,
+    };
+  }
+
+  @Mutation(() => CourseTeacher)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.CREATE + CourseTeacher.name)
+  createCourseTeacher(
+    @Args('createCourseTeacherInput')
+    createCourseTeacherInput: CreateCourseTeacherInput,
+  ) {
+    return this.courseService.createCourseTeacher(createCourseTeacherInput);
+  }
+
+  @Query(() => CourseTeacherPaginationResultOutput, {
+    name: 'course_teachers',
+  })
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + CourseTeacher.name)
+  findAllCourseTeacher(
+    @Args('filter')
+    filter: FindAllCourseTeacherInput,
+  ) {
+    return this.courseService.findAllCourseTeacher(filter);
+  }
+
+  @Query(() => CourseTeacher, { name: 'course_teacher' })
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + CourseTeacher.name)
+  findOneCourseTeacher(@Args('id') id: string) {
+    return this.courseService.findOne({ id });
+  }
+
+  @Mutation(() => CourseTeacher)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.UPDATE + CourseTeacher.name)
+  updateCourseTeacher(
+    @Args('updateCourseTeacherInput')
+    updateCourseTeacherInput: UpdateCourseTeacherInput,
+  ) {
+    return this.courseService.updateCourseTeacher(updateCourseTeacherInput);
+  }
+
+  @Mutation(() => DoneResponseOutput)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.DELETE + CourseTeacher.name)
+  removeCourseTeacher(@Args('id') id: string) {
+    this.courseService.removeCourseTeacher(id);
 
     return {
       done: true,

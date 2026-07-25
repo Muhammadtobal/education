@@ -88,9 +88,6 @@ export class Vendor {
   @OneToMany(() => TeacherVendor, (teacher_vendor) => teacher_vendor.vendor)
   teacher_vendors: TeacherVendor[];
 
-  @OneToMany(() => Review, (review) => review.vendor)
-  reviews: Review[];
-
   @OneToMany(() => Story, (story) => story.vendor)
   stories: Story[];
 

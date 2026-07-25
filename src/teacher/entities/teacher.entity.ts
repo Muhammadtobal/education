@@ -17,6 +17,7 @@ import { City } from 'src/city/entities/city.entity';
 import { TeacherVendor } from './teacher-vedor.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Gender } from 'src/shared/enums/gender.enum';
+import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
 
 @ObjectType()
 @Entity()
@@ -92,8 +93,8 @@ export class Teacher {
   @Field(() => City, { nullable: true })
   city?: City;
 
-  @OneToMany(() => Course, (course) => course.teacher)
-  courses: Course[];
+  @OneToMany(() => CourseTeacher, (course_teacher) => course_teacher.teacher)
+  course_teachers: CourseTeacher[];
 
   @OneToMany(() => Discussion, (discussion) => discussion.teacher)
   discussions: Discussion[];

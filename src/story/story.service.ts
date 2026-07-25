@@ -1,25 +1,24 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { paginate } from "nestjs-typeorm-paginate";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { paginate } from 'nestjs-typeorm-paginate';
 import {
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
   Repository,
-} from "typeorm";
+} from 'typeorm';
 
-import { CreateStoryInput } from "./dto/create-story.input";
-import { UpdateStoryInput } from "./dto/update-story.input";
-import { Story } from "./entities/story.entity";
-import { FindAllStoryInput } from "./dto/find-all-story.input";
-
+import { CreateStoryInput } from './dto/create-story.input';
+import { UpdateStoryInput } from './dto/update-story.input';
+import { Story } from './entities/story.entity';
+import { FindAllStoryInput } from './dto/find-all-story.input';
 
 import {
   generateQueryConditions,
   generateQuerySorts,
   customPaginate,
-} from "src/shared/helpers";
-import { PaginationMetadata } from "src/shared/types/pagination-metadata";
+} from 'src/shared/helpers';
+import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
 
 @Injectable()
 export class StoryService {
@@ -34,15 +33,17 @@ export class StoryService {
 
   public findAll(filter: FindAllStoryInput) {
     const query = this.storyRepository
-      .createQueryBuilder("story")
-      .where("true");
-    generateQuerySorts<Story>(query, filter, Story, "story");
-    generateQueryConditions<Story>(query, filter, "story");
+      .createQueryBuilder('story')
+      .leftJoinAndSelect('story.vendor', 'vendor')
+      .leftJoinAndSelect('story.level', 'level')
+      .where('true');
+    generateQuerySorts<Story>(query, filter, Story, 'story');
+    generateQueryConditions<Story>(query, filter, 'story');
 
     return customPaginate<Story, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
-      page: filter.pagination.page
-      });
+      page: filter.pagination.page,
+    });
   }
 
   public findOne(
@@ -60,7 +61,10 @@ export class StoryService {
   }
 
   public async update(updateStoryInput: UpdateStoryInput) {
-    await this.storyRepository.update({ id: updateStoryInput.id }, updateStoryInput);
+    await this.storyRepository.update(
+      { id: updateStoryInput.id },
+      updateStoryInput,
+    );
     return this.findOne({ id: updateStoryInput.id });
   }
 

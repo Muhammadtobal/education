@@ -36,6 +36,8 @@ export class EmployeeVendorService {
   public findAll(filter: FindAllEmployeeVendorInput) {
     const query = this.employeeVendorRepository
       .createQueryBuilder('employee_vendor')
+      .leftJoinAndSelect('employee_vendor.vendor', 'vendor')
+      .leftJoinAndSelect('employee_vendor.vendor', 'employee')
       .where('true');
     generateQuerySorts<EmployeeVendor>(
       query,

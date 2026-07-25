@@ -42,4 +42,10 @@ export class FindAllPlanCourseInput {
   @IsSingleIdOrList()
   @Field(() => GraphQLJSON, { nullable: true })
   course_id?: SingleIdInput | ListOfIdsInput;
+
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  @Field(() => GraphQLJSON, { nullable: true })
+  content_id?: SingleIdInput | ListOfIdsInput;
 }

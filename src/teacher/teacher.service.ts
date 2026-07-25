@@ -33,7 +33,7 @@ export class TeacherService {
   public findAll(filter: FindAllTeacherInput) {
     const query = this.teacherRepository
       .createQueryBuilder('teacher')
-      .leftJoinAndSelect('teacher.vendor', 'vendor')
+      .leftJoinAndSelect('teacher.city', 'city')
 
       .where('true');
     generateQuerySorts<Teacher>(query, filter, Teacher, 'teacher');
