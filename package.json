@@ -91,5 +91,9 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "overrides": {
+    "brace-expansion": "^5.0.8",
+    "ws": "^8.18.0"
   }
 }
