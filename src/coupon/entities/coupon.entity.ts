@@ -21,7 +21,7 @@ export class Coupon {
   @Field()
   id: string;
 
-  @Column({ type: 'text', unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true })
   @Field()
   code: string;
 
