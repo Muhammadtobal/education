@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { BadRequestException, UseGuards } from '@nestjs/common';
 
 import { PaymentService } from './payment.service';
 import { Payment } from './entities/payment.entity';
@@ -14,6 +14,7 @@ import { DoneResponseOutput } from 'src/shared/types/done-output';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
+import { PaymentValidationError } from 'src/shared/helpers';
 
 @Resolver(() => Payment)
 export class PaymentResolver {
@@ -22,10 +23,21 @@ export class PaymentResolver {
   @Mutation(() => Payment)
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.CREATE + Payment.name)
-  public createPayment(
+  public async createPayment(
     @Args('createPaymentInput') createPaymentInput: CreatePaymentInput,
   ) {
-    return this.paymentService.create(createPaymentInput);
+    try {
+      return await this.paymentService.create(createPaymentInput);
+    } catch (error) {
+      if (error instanceof PaymentValidationError) {
+        throw new BadRequestException({
+          message: error.message,
+          code: error.code,
+        });
+      }
+
+      throw error;
+    }
   }
 
   @Query(() => PaymentPaginationResultOutput, { name: 'payments' })

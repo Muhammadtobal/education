@@ -10,8 +10,6 @@ import {
 
 @InputType()
 export class CreateReviewInput {
-  // Required Fields
-
   @IsNotEmpty()
   @IsNumberString()
   @Field()
@@ -26,11 +24,6 @@ export class CreateReviewInput {
   @IsNumberString()
   @Field({ nullable: true })
   course_id?: string;
-
-  @IsOptional()
-  @IsNumberString()
-  @Field({ nullable: true })
-  vendor_id?: string;
 
   @IsOptional()
   @IsNumberString()

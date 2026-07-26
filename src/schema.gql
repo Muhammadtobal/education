@@ -121,6 +121,17 @@ type City {
   updated_at: DateTime!
 }
 
+type TeacherVendor {
+  id: String!
+  teacher_id: String!
+  vendor_id: String!
+  active: Boolean!
+  created_at: DateTime!
+  updated_at: DateTime!
+  teacher: Teacher!
+  vendor: Vendor!
+}
+
 type Review {
   id: String!
   user_id: String!
@@ -158,7 +169,7 @@ type Teacher {
   phone: String!
   device_info: JSON
   image_url: String
-  count_review: Float
+  rating: Float
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
@@ -167,9 +178,10 @@ type Teacher {
 
 type Discussion {
   id: String!
-  teacher_id: String!
+  teacher_id: String
   course_id: String!
-  user_id: String!
+  user_id: String
+  employee_id: String
   title: String
   description: String!
   url: String
@@ -178,6 +190,7 @@ type Discussion {
   created_at: DateTime!
   updated_at: DateTime!
   teacher: Teacher
+  employee: Employee
   user: User
   course: Course
   parent: Discussion
@@ -186,27 +199,27 @@ type Discussion {
 
 type Payment {
   id: String!
-  course_id: String!
-  user_id: String!
+  subscription_id: String!
   vendor_id: String!
   value: Float!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
-  course: Course
-  user: User
+  subscription: UserSubscription
   vendor: Vendor
 }
 
 type UserSubscription {
   id: String!
-  course_id: String!
+  course_id: String
+  content_id: String
   user_id: String!
   end_date: DateTime
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
   course: Course
+  content: Content
   user: User
 }
 
@@ -352,8 +365,9 @@ type Plan {
   name: String!
   vendor_id: String!
   plan_type: PlanType!
-  end_date: DateTime!
+  end_date: DateTime
   price: Float!
+  days: Float
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
@@ -409,9 +423,9 @@ type Course {
   url: String!
   description: String!
   level_id: String!
-  teacher_share: Float!
+  vendor_id: String!
   vendor_share: Float!
-  review_count: Float!
+  rating: Float!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
@@ -496,6 +510,11 @@ type CheckActivationTeacherCodeOutput {
   expires_in: Int
 }
 
+type TeacherVendorPaginationResultOutput {
+  items: [TeacherVendor!]!
+  meta: PaginationMetadata!
+}
+
 type UserPaginationResultOutput {
   items: [User!]!
   meta: PaginationMetadata!
@@ -545,6 +564,16 @@ type ReviewPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type CoursePaginationResultOutput {
+  items: [Course!]!
+  meta: PaginationMetadata!
+}
+
+type CourseTeacherPaginationResultOutput {
+  items: [Course!]!
+  meta: PaginationMetadata!
+}
+
 type PaymentPaginationResultOutput {
   items: [Payment!]!
   meta: PaginationMetadata!
@@ -572,16 +601,6 @@ type EmployeeVendorPaginationResultOutput {
 
 type PlanPaginationResultOutput {
   items: [Plan!]!
-  meta: PaginationMetadata!
-}
-
-type CoursePaginationResultOutput {
-  items: [Course!]!
-  meta: PaginationMetadata!
-}
-
-type CourseTeacherPaginationResultOutput {
-  items: [Course!]!
   meta: PaginationMetadata!
 }
 
@@ -667,6 +686,8 @@ type Query {
   vendor(id: String!): Vendor!
   teachers(filter: FindAllTeacherInput!): TeacherPaginationResultOutput!
   teacher(id: String!): Teacher!
+  teacher_vendors(filter: FindAllTeacherVendorInput!): TeacherVendorPaginationResultOutput!
+  teacher_vendor(id: String!): TeacherVendor!
   users(filter: FindAllUserInput!): UserPaginationResultOutput!
   user(id: String!): User!
   employees(filter: FindAllEmployeeInput!): EmployeePaginationResultOutput!
@@ -678,6 +699,10 @@ type Query {
   subscription(id: String!): UserSubscription!
   reviews(filter: FindAllReviewInput!): ReviewPaginationResultOutput!
   review(id: String!): Review!
+  courses(filter: FindAllCourseInput!): CoursePaginationResultOutput!
+  course(id: String!): Course!
+  course_teachers(filter: FindAllCourseTeacherInput!): CourseTeacherPaginationResultOutput!
+  course_teacher(id: String!): CourseTeacher!
   payments(filter: FindAllPaymentInput!): PaymentPaginationResultOutput!
   payment(id: String!): Payment!
   cities(filter: FindAllCityInput!): CityPaginationResultOutput!
@@ -694,10 +719,6 @@ type Query {
   employee_vendor(id: String!): EmployeeVendor!
   plans(filter: FindAllPlanInput!): PlanPaginationResultOutput!
   plan(id: String!): Plan!
-  courses(filter: FindAllCourseInput!): CoursePaginationResultOutput!
-  course(id: String!): Course!
-  course_teachers(filter: FindAllCourseTeacherInput!): CourseTeacherPaginationResultOutput!
-  course_teacher(id: String!): CourseTeacher!
   plan_courses(filter: FindAllPlanCourseInput!): PlanCoursePaginationResultOutput!
   plan_course(id: String!): PlanCourse!
   exams(filter: FindAllExamInput!): ExamPaginationResultOutput!
@@ -758,6 +779,12 @@ input FindAllTeacherInput {
   vendor_id: JSON
 }
 
+input FindAllTeacherVendorInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  vendor_id: JSON
+}
+
 input FindAllUserInput {
   id: JSON
   full_name: MatchInput
@@ -807,6 +834,20 @@ input FindAllReviewInput {
   teacher_id: JSON
   user_id: JSON
   course_id: JSON
+}
+
+input FindAllCourseInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  name: MatchInput
+  level_id: JSON
+}
+
+input FindAllCourseTeacherInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  course_id: JSON
+  teacher_id: JSON
 }
 
 input FindAllPaymentInput {
@@ -874,20 +915,6 @@ input FindAllPlanInput {
   pagination: PaginationInput!
   sort: SortInput
   vendor_id: JSON
-}
-
-input FindAllCourseInput {
-  pagination: PaginationInput!
-  sort: SortInput
-  name: MatchInput
-  level_id: JSON
-}
-
-input FindAllCourseTeacherInput {
-  pagination: PaginationInput!
-  sort: SortInput
-  course_id: JSON
-  teacher_id: JSON
 }
 
 input FindAllPlanCourseInput {
@@ -993,6 +1020,9 @@ type Mutation {
   createTeacher(createTeacherInput: CreateTeacherInput!): CheckActivationTeacherCodeOutput!
   updateTeacher(updateTeacherInput: UpdateTeacherInput!): Teacher!
   removeTeacher(id: String!): DoneResponseOutput!
+  createTeacherVendor(createTeacherVendorInput: CreateTeacherVendorInput!): TeacherVendor!
+  updateTeacherVendor(updateTeacherVendorInput: UpdateTeacherVendorInput!): TeacherVendor!
+  removeTeacherVendor(id: String!): DoneResponseOutput!
   createUser(createUserInput: CreateUserInput!): CheckActivationUserCodeOutput!
   refreshTokenEmployee(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
   checkEmployeeActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationEmployeeCodeOutput!
@@ -1013,6 +1043,12 @@ type Mutation {
   createReview(createReviewInput: CreateReviewInput!): Review!
   updateReview(updateReviewInput: UpdateReviewInput!): Review!
   removeReview(id: String!): DoneResponseOutput!
+  createCourse(createCourseInput: CreateCourseInput!): Course!
+  updateCourse(updateCourseInput: UpdateCourseInput!): Course!
+  removeCourse(id: String!): DoneResponseOutput!
+  createCourseTeacher(createCourseTeacherInput: CreateCourseTeacherInput!): CourseTeacher!
+  updateCourseTeacher(updateCourseTeacherInput: UpdateCourseTeacherInput!): CourseTeacher!
+  removeCourseTeacher(id: String!): DoneResponseOutput!
   createPayment(createPaymentInput: CreatePaymentInput!): Payment!
   updatePayment(updatePaymentInput: UpdatePaymentInput!): Payment!
   removePayment(id: String!): DoneResponseOutput!
@@ -1039,12 +1075,6 @@ type Mutation {
   createPlan(createPlanInput: CreatePlanInput!): Plan!
   updatePlan(updatePlanInput: UpdatePlanInput!): Plan!
   removePlan(id: String!): DoneResponseOutput!
-  createCourse(createCourseInput: CreateCourseInput!): Course!
-  updateCourse(updateCourseInput: UpdateCourseInput!): Course!
-  removeCourse(id: String!): DoneResponseOutput!
-  createCourseTeacher(createCourseTeacherInput: CreateCourseTeacherInput!): CourseTeacher!
-  updateCourseTeacher(updateCourseTeacherInput: UpdateCourseTeacherInput!): CourseTeacher!
-  removeCourseTeacher(id: String!): DoneResponseOutput!
   createPlanCourse(createPlanCourseInput: CreatePlanCourseInput!): PlanCourse!
   updatePlanCourse(updatePlanCourseInput: UpdatePlanCourseInput!): PlanCourse!
   removePlanCourse(id: String!): DoneResponseOutput!
@@ -1117,7 +1147,7 @@ input CreateTeacherInput {
   balance: Float
   description: String
   image_url: String
-  count_review: Float
+  rating: Float
   device_info: JSON
   fcm_token: String
   refresh_token: String
@@ -1138,10 +1168,23 @@ input UpdateTeacherInput {
   balance: Float
   description: String
   image_url: String
-  count_review: Float
+  rating: Float
   device_info: JSON
   fcm_token: String
   refresh_token: String
+  active: Boolean
+  id: String!
+}
+
+input CreateTeacherVendorInput {
+  teacher_id: String!
+  vendor_id: String!
+  active: Boolean
+}
+
+input UpdateTeacherVendorInput {
+  teacher_id: String
+  vendor_id: String
   active: Boolean
   id: String!
 }
@@ -1207,16 +1250,18 @@ input UpdatePermissionInput {
 }
 
 input CreateSubscriptionInput {
-  course_id: String!
   user_id: String!
   end_date: DateTime
+  course_id: String
+  content_id: String
   active: Boolean = true
 }
 
 input UpdateSubscriptionInput {
-  course_id: String
   user_id: String
   end_date: DateTime
+  course_id: String
+  content_id: String
   active: Boolean = true
   id: String!
 }
@@ -1225,7 +1270,6 @@ input CreateReviewInput {
   user_id: String!
   value: Float!
   course_id: String
-  vendor_id: String
   teacher_id: String
   comment: String
   active: Boolean
@@ -1235,25 +1279,72 @@ input UpdateReviewInput {
   user_id: String
   value: Float
   course_id: String
-  vendor_id: String
   teacher_id: String
   comment: String
   active: Boolean
   id: String!
 }
 
-input CreatePaymentInput {
+input CreateCourseInput {
+  name: String!
+  url: String!
+  description: String!
+  level_id: String!
+  vendor_id: String!
+  teacher_id: String!
+  teacher_share: Float
+  vendor_share: Float
+  rating: Float
+  active: Boolean
+}
+
+input UpdateCourseInput {
+  name: String
+  url: String
+  description: String
+  level_id: String
+  vendor_id: String
+  teacher_id: String
+  teacher_share: Float
+  vendor_share: Float
+  rating: Float
+  active: Boolean
+  id: String!
+}
+
+input CreateCourseTeacherInput {
+  teacher_id: String!
   course_id: String!
+  teacher_share: Float
+  active: Boolean
+}
+
+input UpdateCourseTeacherInput {
+  teacher_id: String
+  course_id: String
+  teacher_share: Float
+  active: Boolean
+  id: String!
+}
+
+input CreatePaymentInput {
   user_id: String!
   vendor_id: String!
-  value: Float!
+  plan_id: String!
+  teacher_id: String!
+  course_id: String
+  content_id: String
+  value: Float
   active: Boolean
 }
 
 input UpdatePaymentInput {
-  course_id: String
   user_id: String
   vendor_id: String
+  plan_id: String
+  teacher_id: String
+  course_id: String
+  content_id: String
   value: Float
   active: Boolean
   id: String!
@@ -1385,7 +1476,8 @@ input CreatePlanInput {
   name: String!
   vendor_id: String!
   plan_type: PlanType!
-  end_date: DateTime!
+  end_date: DateTime
+  days: Int
   price: Float!
   active: Boolean
 }
@@ -1395,49 +1487,8 @@ input UpdatePlanInput {
   vendor_id: String
   plan_type: PlanType
   end_date: DateTime
+  days: Int
   price: Float
-  active: Boolean
-  id: String!
-}
-
-input CreateCourseInput {
-  name: String!
-  url: String!
-  description: String!
-  level_id: String!
-  vendor_id: String!
-  teacher_id: String!
-  teacher_share: Float
-  vendor_share: Float
-  review_count: Float
-  active: Boolean
-}
-
-input UpdateCourseInput {
-  name: String
-  url: String
-  description: String
-  level_id: String
-  vendor_id: String
-  teacher_id: String
-  teacher_share: Float
-  vendor_share: Float
-  review_count: Float
-  active: Boolean
-  id: String!
-}
-
-input CreateCourseTeacherInput {
-  teacher_id: String!
-  course_id: String!
-  teacher_share: Float
-  active: Boolean
-}
-
-input UpdateCourseTeacherInput {
-  teacher_id: String
-  course_id: String
-  teacher_share: Float
   active: Boolean
   id: String!
 }
@@ -1547,14 +1598,15 @@ input UpdateAnswerUserInput {
 }
 
 input CreateDiscussionInput {
-  teacher_id: String!
   course_id: String!
-  user_id: String!
   description: String!
   title: String
   url: String
   status: DiscussionStatus = OPEN
   parent_id: String
+  user_id: String
+  employee_id: String
+  teacher_id: String
   active: Boolean
 }
 
@@ -1567,14 +1619,15 @@ enum DiscussionStatus {
 }
 
 input UpdateDiscussionInput {
-  teacher_id: String
   course_id: String
-  user_id: String
   description: String
   title: String
   url: String
   status: DiscussionStatus = OPEN
   parent_id: String
+  user_id: String
+  employee_id: String
+  teacher_id: String
   active: Boolean
   id: String!
 }

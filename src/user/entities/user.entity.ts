@@ -93,9 +93,6 @@ export class User {
   @Field(() => Level, { nullable: true })
   level?: Level;
 
-  @OneToMany(() => Payment, (payment) => payment.user)
-  payments: Payment[];
-
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
 

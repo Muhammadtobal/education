@@ -15,6 +15,7 @@ import { City } from 'src/city/entities/city.entity';
 import GraphQLJSON from 'graphql-type-json';
 import { ScheduledNotification } from 'src/notification/entities/scheduled_notification.entity';
 import { Gender } from 'src/shared/enums/gender.enum';
+import { Discussion } from 'src/discussion/entities/discussion.entity';
 
 @Entity()
 @ObjectType()
@@ -86,4 +87,7 @@ export class Employee {
     (scheduled_notification) => scheduled_notification.employee,
   )
   scheduled_notifications: ScheduledNotification[];
+
+  @OneToMany(() => Discussion, (discussion) => discussion.employee)
+  discussions: Discussion[];
 }

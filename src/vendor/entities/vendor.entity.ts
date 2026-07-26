@@ -15,7 +15,7 @@ import GraphQLJSON from 'graphql-type-json';
 import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 import { Plan } from 'src/plan/entities/plan.entity';
 import { Course } from 'src/course/entities/course.entity';
-import { TeacherVendor } from 'src/teacher/entities/teacher-vedor.entity';
+import { TeacherVendor } from 'src/teacher/entities/teacher-vendor.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 

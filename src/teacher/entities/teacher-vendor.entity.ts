@@ -13,9 +13,9 @@ import { Vendor } from 'src/vendor/entities/vendor.entity';
 @ObjectType()
 @Entity()
 export class TeacherVendor {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' })
   @Field()
-  id: number;
+  id: string;
 
   @Column({ type: 'bigint' })
   @Field()

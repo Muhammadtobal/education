@@ -11,16 +11,21 @@ export class CreateSubscriptionInput {
   @IsNotEmpty()
   @IsNumberString()
   @Field()
-  course_id: string;
-
-  @IsNotEmpty()
-  @IsNumberString()
-  @Field()
   user_id: string;
 
   @IsOptional()
   @Field(() => Date, { nullable: true })
   end_date?: Date;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  course_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  content_id?: string;
 
   @IsOptional()
   @IsBoolean()

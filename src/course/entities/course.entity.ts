@@ -44,12 +44,9 @@ export class Course {
   @Field()
   level_id: string;
 
-  @Column({
-    type: 'float',
-    default: 0,
-  })
-  @Field(() => Float)
-  teacher_share: number;
+  @Column('bigint')
+  @Field()
+  vendor_id: string;
 
   @Column({
     type: 'float',
@@ -63,7 +60,7 @@ export class Course {
     default: 0,
   })
   @Field(() => Float)
-  review_count: number;
+  rating: number;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
@@ -105,9 +102,6 @@ export class Course {
 
   @OneToMany(() => Review, (review) => review.course)
   reviews: Review[];
-
-  @OneToMany(() => Payment, (payment) => payment.course)
-  payments: Payment[];
 
   @OneToMany(() => CourseTeacher, (course_teacher) => course_teacher.course)
   course_teachers: CourseTeacher[];

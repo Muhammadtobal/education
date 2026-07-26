@@ -13,6 +13,7 @@ import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 import { Course } from 'src/course/entities/course.entity';
 import { ContentType } from 'src/shared/enums/content_type.enum';
 import { PlanCourse } from 'src/plan_course/entities/plan_course.entity';
+import { Subscription } from 'src/subscription/entities/subscription.entity';
 
 @ObjectType()
 @Entity()
@@ -82,4 +83,7 @@ export class Content {
 
   @OneToMany(() => PlanCourse, (plan_course) => plan_course.course)
   plan_courses: PlanCourse[];
+
+  @OneToMany(() => Subscription, (subscription) => subscription.course)
+  subscriptions: Subscription[];
 }

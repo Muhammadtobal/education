@@ -392,3 +392,10 @@ export function getAllowedFields(
 
   return result;
 }
+
+export class PaymentValidationError {
+  constructor(
+    public message: string,
+    public code: string,
+  ) {}
+}

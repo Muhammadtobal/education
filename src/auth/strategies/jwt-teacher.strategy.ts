@@ -5,13 +5,13 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 @Injectable()
 export class JwtTeacherStrategy extends PassportStrategy(
   Strategy,
-  'jwt-vendor',
+  'jwt-teacher',
 ) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: `${process.env.VENDOR_JWT_KEY}`,
+      secretOrKey: `${process.env.TEACHER_JWT_KEY}`,
     });
   }
 

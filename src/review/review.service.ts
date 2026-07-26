@@ -19,16 +19,31 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
+import { TeacherService } from 'src/teacher/teacher.service';
+import { CourseService } from 'src/course/course.service';
 
 @Injectable()
 export class ReviewService {
   constructor(
     @InjectRepository(Review)
     private readonly reviewRepository: Repository<Review>,
+    private readonly teacherService: TeacherService,
+    private readonly courseService: CourseService,
   ) {}
-  public create(createReviewInput: CreateReviewInput) {
-    const review = this.reviewRepository.create(createReviewInput);
-    return this.reviewRepository.save(review);
+  public async create(createReviewInput: CreateReviewInput) {
+    const review = await this.reviewRepository.save(
+      this.reviewRepository.create(createReviewInput),
+    );
+
+    if (createReviewInput.teacher_id) {
+      await this.updateTeacherRating(createReviewInput.teacher_id);
+    }
+
+    if (createReviewInput.course_id) {
+      await this.updateCourseRating(createReviewInput.course_id);
+    }
+
+    return review;
   }
 
   public findAll(filter: FindAllReviewInput) {
@@ -71,5 +86,77 @@ export class ReviewService {
 
   public remove(id: string) {
     this.reviewRepository.delete(id);
+  }
+
+  private async updateTeacherRating(teacherId: string) {
+    const limit = 100;
+
+    let page = 1;
+    let lastPage = false;
+
+    let totalRating = 0;
+    let totalReviews = 0;
+
+    while (!lastPage) {
+      const reviews = await this.findAll({
+        teacher_id: { value: teacherId },
+        pagination: {
+          page,
+          limit,
+        },
+      });
+
+      for (const review of reviews.items) {
+        totalRating += review.value;
+        totalReviews++;
+      }
+
+      if (reviews.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    await this.teacherService.update({
+      id: teacherId,
+      rating: totalReviews ? totalRating / totalReviews : 0,
+    });
+  }
+
+  private async updateCourseRating(courseId: string) {
+    const limit = 100;
+
+    let page = 1;
+    let lastPage = false;
+
+    let totalRating = 0;
+    let totalReviews = 0;
+
+    while (!lastPage) {
+      const reviews = await this.findAll({
+        course_id: { value: courseId },
+        pagination: {
+          page,
+          limit,
+        },
+      });
+
+      for (const review of reviews.items) {
+        totalRating += review.value;
+        totalReviews++;
+      }
+
+      if (reviews.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    await this.courseService.update({
+      id: courseId,
+      rating: totalReviews ? totalRating / totalReviews : 0,
+    });
   }
 }

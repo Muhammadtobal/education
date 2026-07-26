@@ -13,6 +13,7 @@ import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { User } from 'src/user/entities/user.entity';
 import { DiscussionStatus } from 'src/shared/enums/discussion_status.enum';
 import { Course } from 'src/course/entities/course.entity';
+import { Employee } from 'src/employee/entities/employee.entity';
 
 @ObjectType()
 @Entity()
@@ -21,17 +22,21 @@ export class Discussion {
   @Field()
   id: string;
 
-  @Column('bigint')
-  @Field()
-  teacher_id: string;
+  @Column('bigint', { nullable: true })
+  @Field({ nullable: true })
+  teacher_id?: string;
 
   @Column('bigint')
   @Field()
   course_id: string;
 
-  @Column('bigint')
-  @Field()
-  user_id: string;
+  @Column('bigint', { nullable: true })
+  @Field({ nullable: true })
+  user_id?: string;
+
+  @Column('bigint', { nullable: true })
+  @Field({ nullable: true })
+  employee_id?: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   @Field({ nullable: true })
@@ -76,6 +81,11 @@ export class Discussion {
   @JoinColumn({ name: 'teacher_id' })
   @Field(() => Teacher, { nullable: true })
   teacher?: Teacher;
+
+  @ManyToOne(() => Employee, (employee) => employee.discussions)
+  @JoinColumn({ name: 'employee_id' })
+  @Field(() => Employee, { nullable: true })
+  employee?: Employee;
 
   @ManyToOne(() => User, (user) => user.discussions)
   @JoinColumn({ name: 'user_id' })

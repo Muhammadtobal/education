@@ -52,7 +52,7 @@ export class CreateTeacherInput {
   @IsOptional()
   @IsNumber()
   @Field(() => Float, { nullable: true })
-  count_review?: number;
+  rating?: number;
 
   @IsOptional()
   @Field(() => GraphQLJSON, { nullable: true })

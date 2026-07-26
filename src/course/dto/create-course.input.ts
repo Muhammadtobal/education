@@ -53,7 +53,7 @@ export class CreateCourseInput {
   @IsOptional()
   @IsNumber()
   @Field(() => Float, { nullable: true })
-  review_count?: number;
+  rating?: number;
 
   @IsOptional()
   @IsBoolean()

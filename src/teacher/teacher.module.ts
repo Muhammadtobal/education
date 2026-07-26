@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Teacher } from './entities/teacher.entity';
 import { TeacherService } from './teacher.service';
 import { TeacherResolver } from './teacher.resolver';
-import { TeacherVendor } from './entities/teacher-vedor.entity';
+import { TeacherVendor } from './entities/teacher-vendor.entity';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 

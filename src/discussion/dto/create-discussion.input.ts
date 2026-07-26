@@ -12,29 +12,15 @@ import { DiscussionStatus } from 'src/shared/enums/discussion_status.enum';
 
 @InputType()
 export class CreateDiscussionInput {
-  // Required Fields
-
-  @IsNotEmpty()
-  @IsNumberString()
-  @Field()
-  teacher_id: string;
-
   @IsNotEmpty()
   @IsNumberString()
   @Field()
   course_id: string;
 
   @IsNotEmpty()
-  @IsNumberString()
-  @Field()
-  user_id: string;
-
-  @IsNotEmpty()
   @IsString()
   @Field()
   description: string;
-
-  // Optional Fields
 
   @IsOptional()
   @IsString()
@@ -58,6 +44,21 @@ export class CreateDiscussionInput {
   @IsNumberString()
   @Field({ nullable: true })
   parent_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  user_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  employee_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  teacher_id?: string;
 
   @IsOptional()
   @IsBoolean()

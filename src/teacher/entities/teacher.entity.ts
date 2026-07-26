@@ -14,7 +14,7 @@ import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 
 import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { City } from 'src/city/entities/city.entity';
-import { TeacherVendor } from './teacher-vedor.entity';
+import { TeacherVendor } from './teacher-vendor.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Gender } from 'src/shared/enums/gender.enum';
 import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
@@ -70,7 +70,7 @@ export class Teacher {
 
   @Column({ type: 'double', nullable: true })
   @Field(() => Float, { nullable: true })
-  count_review: number;
+  rating?: number;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)

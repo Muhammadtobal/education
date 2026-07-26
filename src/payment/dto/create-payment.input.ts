@@ -12,11 +12,6 @@ export class CreatePaymentInput {
   @IsNotEmpty()
   @IsNumberString()
   @Field()
-  course_id: string;
-
-  @IsNotEmpty()
-  @IsNumberString()
-  @Field()
   user_id: string;
 
   @IsNotEmpty()
@@ -25,9 +20,29 @@ export class CreatePaymentInput {
   vendor_id: string;
 
   @IsNotEmpty()
+  @IsNumberString()
+  @Field()
+  plan_id: string;
+
+  @IsNotEmpty()
+  @IsNumberString()
+  @Field()
+  teacher_id: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  course_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  content_id?: string;
+
+  @IsOptional()
   @IsNumber()
-  @Field(() => Float)
-  value: number;
+  @Field(() => Float, { nullable: true })
+  value?: number;
 
   @IsOptional()
   @IsBoolean()

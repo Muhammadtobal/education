@@ -13,6 +13,13 @@ import { CheckActivationTeacherCodeOutput } from 'src/auth/dto/check-activation-
 import { ErrorMessages } from 'src/shared/error-messages.object';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
+import { Permissions } from 'src/shared/decorators/permissions.decorator';
+import { Operation } from 'src/shared/enums/operation.enum';
+import { TeacherVendor } from './entities/teacher-vendor.entity';
+import { CreateTeacherVendorInput } from './dto/create-teacher_vendor.input';
+import { TeacherVendorPaginationResultOutput } from './dto/find-all-teacher_vendor.output';
+import { FindAllTeacherVendorInput } from './dto/find-all-teacher_vendor.input';
+import { UpdateTeacherVendorInput } from './dto/update-teacher_vendor.input';
 
 @Resolver(() => Teacher)
 export class TeacherResolver {
@@ -71,18 +78,21 @@ export class TeacherResolver {
 
   @Query(() => TeacherPaginationResultOutput, { name: 'teachers' })
   @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + Teacher.name)
   public findAll(@Args('filter') filter: FindAllTeacherInput) {
     return this.teacherService.findAll(filter);
   }
 
   @Query(() => Teacher, { name: 'teacher' })
   @UseGuards(JwtAuthEmployeeGuard)
+  @Permissions(Operation.GET + Teacher.name)
   public findOne(@Args('id') id: string) {
     return this.teacherService.findOne({ id });
   }
 
   @Mutation(() => Teacher)
   @UseGuards(JwtAuthEmployeeGuard)
+  @Permissions(Operation.UPDATE + Teacher.name)
   public updateTeacher(
     @Args('updateTeacherInput') updateTeacherInput: UpdateTeacherInput,
   ) {
@@ -91,8 +101,60 @@ export class TeacherResolver {
 
   @Mutation(() => DoneResponseOutput)
   @UseGuards(JwtAuthEmployeeGuard)
+  @Permissions(Operation.DELETE + Teacher.name)
   public removeTeacher(@Args('id') id: string) {
     this.teacherService.remove(id);
     return { done: true };
+  }
+
+  @Mutation(() => TeacherVendor)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.CREATE + TeacherVendor.name)
+  public createTeacherVendor(
+    @Args('createTeacherVendorInput')
+    createTeacherVendorInput: CreateTeacherVendorInput,
+  ) {
+    return this.teacherService.createTeacherVendor(createTeacherVendorInput);
+  }
+
+  @Query(() => TeacherVendorPaginationResultOutput, {
+    name: 'teacher_vendors',
+  })
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + TeacherVendor.name)
+  public findAllTeacherVendor(
+    @Args('filter') filter: FindAllTeacherVendorInput,
+  ) {
+    return this.teacherService.findAllTeacherVendor(filter);
+  }
+
+  @Query(() => TeacherVendor, {
+    name: 'teacher_vendor',
+  })
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + TeacherVendor.name)
+  public findOneTeacherVendor(@Args('id') id: string) {
+    return this.teacherService.findOneTeacherVendor({ id });
+  }
+
+  @Mutation(() => TeacherVendor)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.UPDATE + TeacherVendor.name)
+  public updateTeacherVendor(
+    @Args('updateTeacherVendorInput')
+    updateTeacherVendorInput: UpdateTeacherVendorInput,
+  ) {
+    return this.teacherService.updateTeacherVendor(updateTeacherVendorInput);
+  }
+
+  @Mutation(() => DoneResponseOutput)
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.DELETE + TeacherVendor.name)
+  public removeTeacherVendor(@Args('id') id: string) {
+    this.teacherService.removeTeacherVendor(id);
+
+    return {
+      done: true,
+    };
   }
 }

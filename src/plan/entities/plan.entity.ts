@@ -35,9 +35,9 @@ export class Plan {
   @Field(() => PlanType)
   plan_type: PlanType;
 
-  @Column({ type: 'timestamp' })
-  @Field(() => Date)
-  end_date: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  @Field(() => Date, { nullable: true })
+  end_date?: Date;
 
   @Column('decimal', {
     precision: 10,
@@ -46,6 +46,13 @@ export class Plan {
   })
   @Field(() => Float)
   price: number;
+
+  @Column({
+    type: 'int',
+    nullable: true,
+  })
+  @Field(() => Float, { nullable: true })
+  days?: number;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)

@@ -1,7 +1,8 @@
-import { InputType, Field, Float } from '@nestjs/graphql';
+import { InputType, Field, Float, Int } from '@nestjs/graphql';
 import {
   IsBoolean,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
@@ -28,9 +29,14 @@ export class CreatePlanInput {
   @Field(() => PlanType)
   plan_type: PlanType;
 
-  @IsNotEmpty()
-  @Field(() => Date)
-  end_date: Date;
+  @IsOptional()
+  @Field(() => Date, { nullable: true })
+  end_date?: Date;
+
+  @IsOptional()
+  @IsInt()
+  @Field(() => Int, { nullable: true })
+  days?: number;
 
   @IsNotEmpty()
   @IsNumber()

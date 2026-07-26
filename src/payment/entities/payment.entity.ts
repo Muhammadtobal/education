@@ -12,6 +12,7 @@ import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 import { User } from 'src/user/entities/user.entity';
 import { Course } from 'src/course/entities/course.entity';
 import { Vendor } from 'src/vendor/entities/vendor.entity';
+import { Subscription } from 'src/subscription/entities/subscription.entity';
 
 @ObjectType()
 @Entity()
@@ -22,11 +23,7 @@ export class Payment {
 
   @Column('bigint')
   @Field()
-  course_id: string;
-
-  @Column('bigint')
-  @Field()
-  user_id: string;
+  subscription_id: string;
 
   @Column('bigint')
   @Field()
@@ -56,15 +53,10 @@ export class Payment {
   @Field(() => Date)
   updated_at: Date;
 
-  @ManyToOne(() => Course, (course) => course.payments)
-  @JoinColumn({ name: 'course_id' })
-  @Field(() => Course, { nullable: true })
-  course?: Course;
-
-  @ManyToOne(() => User, (user) => user.payments)
-  @JoinColumn({ name: 'user_id' })
-  @Field(() => User, { nullable: true })
-  user?: User;
+  @ManyToOne(() => Subscription, (subscription) => subscription.payments)
+  @JoinColumn({ name: 'subscription_id' })
+  @Field(() => Subscription, { nullable: true })
+  subscription?: Subscription;
 
   @ManyToOne(() => Vendor, (vendor) => vendor.payments)
   @JoinColumn({ name: 'vendor_id' })

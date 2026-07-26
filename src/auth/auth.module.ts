@@ -9,6 +9,7 @@ import { VendorModule } from 'src/vendor/vendor.module';
 import { EmployeeModule } from 'src/employee/employee.module';
 import { JwtEmployeeStrategy } from './strategies/jwt-employee.strategy';
 import { TeacherModule } from 'src/teacher/teacher.module';
+import { JwtTeacherStrategy } from './strategies/jwt-teacher.strategy';
 
 @Module({
   imports: [
@@ -21,9 +22,10 @@ import { TeacherModule } from 'src/teacher/teacher.module';
   providers: [
     AuthService,
     AuthResolver,
-    JwtAuthEmployeeGuard,
+
     JwtUserStrategy,
     JwtEmployeeStrategy,
+    JwtTeacherStrategy,
   ],
 })
 export class AuthModule {}
