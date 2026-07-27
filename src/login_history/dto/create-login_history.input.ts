@@ -15,6 +15,11 @@ export class CreateLoginHistoryInput {
   @Field()
   user_id: string;
 
+  @IsNotEmpty()
+  @IsOptional()
+  @Field()
+  device_key: string;
+
   @IsOptional()
   @Field(() => GraphQLJSON, { nullable: true })
   device_info?: Record<string, any>;

@@ -10,12 +10,14 @@ import { EmployeeModule } from 'src/employee/employee.module';
 import { JwtEmployeeStrategy } from './strategies/jwt-employee.strategy';
 import { TeacherModule } from 'src/teacher/teacher.module';
 import { JwtTeacherStrategy } from './strategies/jwt-teacher.strategy';
+import { LoginHistoryModule } from 'src/login_history/login_history.module';
 
 @Module({
   imports: [
     JwtModule.register({ signOptions: { expiresIn: '1h' } }),
     forwardRef(() => UserModule),
     EmployeeModule,
+    LoginHistoryModule,
     forwardRef(() => TeacherModule),
   ],
   exports: [AuthService],

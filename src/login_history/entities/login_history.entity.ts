@@ -23,6 +23,10 @@ export class LoginHistory {
   @Field()
   user_id: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  @Field()
+  device_key: string;
+
   @Column('simple-json', { nullable: true })
   device_info: Record<string, any>;
 

@@ -13,6 +13,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Course } from 'src/course/entities/course.entity';
 import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
+import { Teacher } from 'src/teacher/entities/teacher.entity';
 
 @ObjectType()
 @Entity()
@@ -24,6 +25,10 @@ export class Payment {
   @Column('bigint')
   @Field()
   subscription_id: string;
+
+  @Column('bigint', { nullable: true })
+  @Field()
+  teacher_id?: string;
 
   @Column('bigint')
   @Field()
@@ -52,6 +57,10 @@ export class Payment {
   })
   @Field(() => Date)
   updated_at: Date;
+
+  @ManyToOne(() => Teacher, (teacher) => teacher.payments)
+  @JoinColumn({ name: 'teacher_id' })
+  teacher?: Teacher;
 
   @ManyToOne(() => Subscription, (subscription) => subscription.payments)
   @JoinColumn({ name: 'subscription_id' })

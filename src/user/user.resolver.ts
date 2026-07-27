@@ -20,11 +20,13 @@ import { booleanSchema } from 'src/shared/types/zod-schemas';
 import { UpdateMeUserInput } from './dto/update-me-user.inputs';
 import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 import { CheckActivationUserCodeOutput } from 'src/auth/dto/check-activation-user-code.output';
+import { LoginHistoryService } from 'src/login_history/login_history.service';
 @Resolver(() => User)
 export class UserResolver {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly loginHistoryService: LoginHistoryService,
   ) {}
 
   @Mutation(() => CheckActivationUserCodeOutput)
@@ -62,6 +64,17 @@ export class UserResolver {
       process.env.USER_JWT_KEY as string,
     );
     this.userService.removeActivationCode(activationCode.id);
+    if (createUserInput.device_info) {
+      const device = createUserInput.device_info;
+
+      const deviceKey = `${device.Platform}-${device.Brand}-${device.Model}-${device.Device}`;
+
+      await this.loginHistoryService.create({
+        user_id: user.id,
+        device_info: createUserInput.device_info,
+        device_key: deviceKey,
+      });
+    }
     return {
       user: { ...user },
       access_token: accessToken,

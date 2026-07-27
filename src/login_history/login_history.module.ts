@@ -6,6 +6,7 @@ import { LoginHistoryResolver } from './login_history.resolver';
 
 @Module({
   imports: [TypeOrmModule.forFeature([LoginHistory])],
+  exports: [LoginHistoryService],
   providers: [LoginHistoryService, LoginHistoryResolver],
 })
 export class LoginHistoryModule {}

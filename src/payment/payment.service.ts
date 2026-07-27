@@ -140,6 +140,8 @@ export class PaymentService {
       const payment = queryRunner.manager.create(Payment, {
         subscription_id: subscription.id,
         vendor_id: createPaymentInput.vendor_id,
+        teacher_id: createPaymentInput.teacher_id,
+
         value: price,
         active: true,
       });

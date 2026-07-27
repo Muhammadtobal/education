@@ -76,4 +76,40 @@ export class LoginHistoryService {
   public remove(id: string) {
     this.loginHistoryRepository.delete(id);
   }
+
+  public async hasFrequentDeviceChanges(
+    userId: string,
+    currentDeviceKey: string,
+  ): Promise<boolean> {
+    const logins = await this.loginHistoryRepository.find({
+      where: {
+        user_id: userId,
+      },
+      order: {
+        created_at: 'DESC',
+      },
+      take: 2,
+    });
+
+    // إذا لا يوجد سجلين سابقين فلا يمكن تكوين 3 أجهزة
+    if (logins.length < 2) {
+      return false;
+    }
+
+    const newest = Date.now();
+    const oldest = new Date(logins[1].created_at).getTime();
+
+    const diffDays = (newest - oldest) / (1000 * 60 * 60 * 24);
+
+    if (diffDays > 2) {
+      return false;
+    }
+
+    const devices = new Set([
+      currentDeviceKey,
+      ...logins.map((x) => x.device_key),
+    ]);
+
+    return devices.size >= 3;
+  }
 }

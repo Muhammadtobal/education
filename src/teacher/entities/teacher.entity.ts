@@ -18,6 +18,7 @@ import { TeacherVendor } from './teacher-vendor.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Gender } from 'src/shared/enums/gender.enum';
 import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
+import { Payment } from 'src/payment/entities/payment.entity';
 
 @ObjectType()
 @Entity()
@@ -104,4 +105,7 @@ export class Teacher {
 
   @OneToMany(() => Review, (review) => review.teacher)
   reviews: Review[];
+
+  @OneToMany(() => Payment, (payment) => payment.teacher)
+  payments: Payment[];
 }

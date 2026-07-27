@@ -1,5 +1,5 @@
-import { InputType, Field } from "@nestjs/graphql";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { InputType, Field } from '@nestjs/graphql';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 @InputType()
 export class SendActivationCodeInput {
@@ -8,7 +8,7 @@ export class SendActivationCodeInput {
   @Field()
   phone: string;
 
-  @IsOptional() 
+  @IsOptional()
   @IsString()
   @Field({ nullable: true })
   autofill_code?: string;

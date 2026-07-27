@@ -53,6 +53,10 @@ export class Content {
   @Field(() => Boolean)
   active: boolean;
 
+  @Column('boolean')
+  @Field(() => Boolean)
+  is_free: boolean;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Field(() => Date)
   created_at: Date;

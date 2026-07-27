@@ -21,6 +21,7 @@ export const ErrorMessages = {
 
   NOT_ALLOWED: 'العملية غير مصرح بها',
 
+  DEVICE_CHANGED_MULTIPLE_TIMES: 'تم تغيير الجهاز عدة مرات خلال آخر يومين',
   COUPON_NOT_FOUND: '{"ar":"الكوبون غير موجود","en":"Coupon not found"}',
 
   COUPON_NOT_ACTIVE_YET: (date: string) =>

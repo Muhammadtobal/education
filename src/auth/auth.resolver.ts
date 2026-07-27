@@ -28,6 +28,7 @@ import {
 import { EmployeeService } from 'src/employee/employee.service';
 import { TeacherService } from 'src/teacher/teacher.service';
 import { CheckActivationEmployeeCodeOutput } from './dto/check-activation-employee-code.output';
+import { LoginHistoryService } from 'src/login_history/login_history.service';
 
 @Resolver()
 export class AuthResolver {
@@ -36,6 +37,7 @@ export class AuthResolver {
     private readonly employeeService: EmployeeService,
     private readonly userService: UserService,
     private readonly teacherService: TeacherService,
+    private readonly loginHistoryService: LoginHistoryService,
   ) {}
   @Mutation(() => RefreshTokenOutput)
   public async refreshTokenEmployee(
@@ -360,6 +362,27 @@ export class AuthResolver {
 
     if (!user) return {};
 
+    let deviceKey: string | null = null;
+
+    if (checkActivationCodeInput.device_info) {
+      const device = checkActivationCodeInput.device_info;
+
+      deviceKey = `${device.Platform}-${device.Brand}-${device.Model}-${device.Device}`;
+
+      const hasFrequentDeviceChanges =
+        await this.loginHistoryService.hasFrequentDeviceChanges(
+          user.id,
+          deviceKey,
+        );
+
+      if (hasFrequentDeviceChanges) {
+        throw new HttpException(
+          ErrorMessages.DEVICE_CHANGED_MULTIPLE_TIMES,
+          HttpStatus.FORBIDDEN,
+        );
+      }
+    }
+
     const accessToken = await this.authService.generateJwtToken(
       { userId: user.id },
       process.env.USER_JWT_KEY as string,
@@ -374,7 +397,13 @@ export class AuthResolver {
     });
 
     await this.userService.removeActivationCode(activationCode.id);
-
+    if (deviceKey) {
+      await this.loginHistoryService.create({
+        user_id: user.id,
+        device_info: checkActivationCodeInput.device_info,
+        device_key: deviceKey,
+      });
+    }
     return {
       user: user,
       access_token: accessToken,

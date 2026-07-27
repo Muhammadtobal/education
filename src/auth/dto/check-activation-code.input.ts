@@ -1,5 +1,6 @@
-import { InputType, Field } from "@nestjs/graphql";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { InputType, Field } from '@nestjs/graphql';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import GraphQLJSON from 'graphql-type-json';
 
 @InputType()
 export class CheckActivationCodeInput {
@@ -17,4 +18,8 @@ export class CheckActivationCodeInput {
   @IsString()
   @Field({ nullable: true })
   fcm_token?: string;
+
+  @IsOptional()
+  @Field(() => GraphQLJSON, { nullable: true })
+  device_info?: Record<string, any>;
 }
