@@ -24,6 +24,7 @@ import { CreateUserCouponInput } from './dto/create-user_coupon.input';
 import { UserCoupon } from './entities/user_coupon.entity';
 import { CheckActivationCouponInput } from './dto/check-activation-coupon.input';
 import { ErrorMessages } from 'src/shared/error-messages.object';
+import { PlanCouponService } from 'src/plan_coupon/plan_coupon.service';
 
 @Injectable()
 export class CouponService {
@@ -33,6 +34,7 @@ export class CouponService {
 
     @InjectRepository(UserCoupon)
     private readonly userCouponRepository: Repository<UserCoupon>,
+    private readonly planCouponService: PlanCouponService,
     private readonly dataSource: DataSource,
   ) {}
   public create(createCouponInput: CreateCouponInput) {
@@ -43,7 +45,6 @@ export class CouponService {
   public findAll(filter: FindAllCouponInput) {
     const query = this.couponRepository
       .createQueryBuilder('coupon')
-      .leftJoinAndSelect('coupon.store', 'store')
       .where('true');
     generateQuerySorts<Coupon>(query, filter, Coupon, 'coupon');
     generateQueryConditions<Coupon>(query, filter, 'coupon');
@@ -171,7 +172,18 @@ export class CouponService {
         );
       }
     }
+    const planCoupon = await this.planCouponService.findOne({
+      coupon_id: loadedCoupon.id,
+      plan_id: checkActivationCouponInput.plan_id,
+      active: true,
+    });
 
+    if (!planCoupon) {
+      throw new HttpException(
+        ErrorMessages.COUPON_NOT_ALLOWED_FOR_THIS_PLAN,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     return loadedCoupon;
   }
 }

@@ -24,10 +24,10 @@ export class CreatePaymentInput {
   @Field()
   plan_id: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumberString()
-  @Field({ nullable: true })
-  teacher_id?: string;
+  @Field()
+  teacher_id: string;
 
   @IsOptional()
   @IsNumberString()

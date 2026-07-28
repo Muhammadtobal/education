@@ -146,59 +146,47 @@ export class NotificationResolver {
     @Context() context: GqlContext,
   ) {
     const countsFilter: FindOptionsWhere<User> = {};
-    let memberCount;
+    let memberCount = 0;
 
-    if (createScheduledNotificationInput.user_id) {
-      await this.notificationService.sendNotificationToUser({
-        ...createScheduledNotificationInput,
-      });
-    }
-
-    if (createScheduledNotificationInput.filter_data?.city?.id)
+    if (createScheduledNotificationInput.filter_data?.city?.id) {
       countsFilter.city_id =
         createScheduledNotificationInput.filter_data.city.id;
+    }
 
-    if (createScheduledNotificationInput.filter_data?.is_user)
+    if (createScheduledNotificationInput.filter_data?.is_user) {
       memberCount = await this.userService.count(countsFilter);
+    }
 
-    if (
-      stringSchema.safeParse(
-        createScheduledNotificationInput.filter_data?.city?.id,
-      ).success
-    ) {
+    const cityId = createScheduledNotificationInput.filter_data?.city?.id;
+
+    if (stringSchema.safeParse(cityId).success) {
       const city = await this.cityService.findOne({
-        id: createScheduledNotificationInput.filter_data?.city?.id,
+        id: cityId,
       });
 
-      if (!city)
+      if (!city) {
         throw new HttpException(
           ErrorMessages.NOT_FOUND_USER,
           HttpStatus.NOT_FOUND,
         );
+      }
 
-      if (createScheduledNotificationInput.filter_data)
-        createScheduledNotificationInput.filter_data.city = { ...city };
+      if (createScheduledNotificationInput.filter_data) {
+        createScheduledNotificationInput.filter_data = {
+          ...createScheduledNotificationInput.filter_data,
+          city,
+        };
+      }
     }
 
-    const scheduledNotification = this.notificationService.create({
-      ...createScheduledNotificationInput,
-      receivers_count: memberCount,
-      global: true,
-      employee_id: getEmpId(context.req.user),
-    });
-
-    if (
-      booleanSchema.safeParse(createScheduledNotificationInput.approved)
-        .success &&
-      createScheduledNotificationInput.approved
-    ) {
-      if (createScheduledNotificationInput.filter_data?.is_user === true)
-        this.notificationService.sendToUserCriteria(
-          createScheduledNotificationInput,
-        );
-    }
-
-    return scheduledNotification;
+    return this.notificationService.createScheduledNotification(
+      createScheduledNotificationInput,
+      {
+        employee_id: getEmpId(context.req.user),
+        receivers_count: memberCount,
+        global: true,
+      },
+    );
   }
 
   @Query(() => ScheduledNotificationPaginationResultOutput, {

@@ -19,10 +19,13 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
+import { ConstantService } from 'src/constant/constant.service';
 
 @Injectable()
 export class LoginHistoryService {
   constructor(
+    private readonly constantService: ConstantService,
+
     @InjectRepository(LoginHistory)
     private readonly loginHistoryRepository: Repository<LoginHistory>,
   ) {}
@@ -81,6 +84,18 @@ export class LoginHistoryService {
     userId: string,
     currentDeviceKey: string,
   ): Promise<boolean> {
+    const maxDevicesConfig = await this.constantService.getValue(
+      'MAX_DEVICE_CHANGES_COUNT',
+    );
+
+    const periodConfig = await this.constantService.getValue(
+      'DEVICE_CHANGE_PERIOD_DAYS',
+    );
+
+    const maxDevices = Number(maxDevicesConfig?.count ?? 3);
+
+    const periodDays = Number(periodConfig?.days ?? 2);
+
     const logins = await this.loginHistoryRepository.find({
       where: {
         user_id: userId,
@@ -88,20 +103,20 @@ export class LoginHistoryService {
       order: {
         created_at: 'DESC',
       },
-      take: 2,
+      take: maxDevices,
     });
 
-    // إذا لا يوجد سجلين سابقين فلا يمكن تكوين 3 أجهزة
     if (logins.length < 2) {
       return false;
     }
 
     const newest = Date.now();
-    const oldest = new Date(logins[1].created_at).getTime();
+
+    const oldest = new Date(logins[logins.length - 1].created_at).getTime();
 
     const diffDays = (newest - oldest) / (1000 * 60 * 60 * 24);
 
-    if (diffDays > 2) {
+    if (diffDays > periodDays) {
       return false;
     }
 
@@ -110,6 +125,6 @@ export class LoginHistoryService {
       ...logins.map((x) => x.device_key),
     ]);
 
-    return devices.size >= 3;
+    return devices.size >= maxDevices;
   }
 }

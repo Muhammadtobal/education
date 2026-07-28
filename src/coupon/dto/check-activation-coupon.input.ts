@@ -1,4 +1,4 @@
-import { InputType, Int, Field, Float } from "@nestjs/graphql";
+import { InputType, Int, Field, Float } from '@nestjs/graphql';
 import {
   IsArray,
   IsBoolean,
@@ -11,8 +11,8 @@ import {
   IsNumberString,
   IsOptional,
   IsString,
-} from "class-validator";
-import { DiscountType } from "src/shared/enums/discount_type.enum";
+} from 'class-validator';
+import { DiscountType } from 'src/shared/enums/discount_type.enum';
 
 @InputType()
 export class CheckActivationCouponInput {
@@ -24,5 +24,5 @@ export class CheckActivationCouponInput {
   @IsOptional()
   @IsNumberString()
   @Field({ nullable: true })
-  store_id?: string;
+  plan_id?: string;
 }

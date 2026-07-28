@@ -1,18 +1,17 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import {
+  IsBoolean,
+  IsEmpty,
   IsEnum,
   IsInt,
   IsNotEmpty,
   IsNumberString,
+  IsObject,
   IsOptional,
   IsString,
-  IsBoolean,
-  IsEmpty,
-  IsObject,
 } from 'class-validator';
 
-import GraphQLJSON from 'graphql-type-json';
 import { City } from 'src/city/entities/city.entity';
 import { ScheduledNotificationType } from 'src/shared/enums/scheduled_notification.enum';
 import { NotificationFilterDataInput } from 'src/shared/types/graphql-input-types';
@@ -85,4 +84,13 @@ export class CreateScheduledNotificationInput {
 
   @IsEmpty()
   receivers_count?: number;
+
+  @IsEmpty()
+  executed_count?: number;
+
+  @IsEmpty()
+  next_run_at?: Date;
+
+  @IsEmpty()
+  last_run_at?: Date;
 }

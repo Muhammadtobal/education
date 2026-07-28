@@ -32,6 +32,7 @@ import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { PlanType } from 'src/shared/enums/plan_type.enum';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
+import { Content } from 'src/content/entities/content.entity';
 @Injectable()
 export class PaymentService {
   constructor(
@@ -147,6 +148,9 @@ export class PaymentService {
       });
 
       await queryRunner.manager.save(payment);
+      let vendorId: string | undefined;
+      let vendorShare = 0;
+      let teacherShare = 0;
 
       if (planCourse.course_id) {
         const course = await queryRunner.manager.findOne(Course, {
@@ -162,29 +166,8 @@ export class PaymentService {
           );
         }
 
-        if (course.vendor_share && Number(course.vendor_share) > 0) {
-          const vendor = await queryRunner.manager.findOne(Vendor, {
-            where: {
-              id: course.vendor_id,
-            },
-            lock: {
-              mode: 'pessimistic_write',
-            },
-          });
-
-          if (!vendor) {
-            throw new PaymentValidationError(
-              'Vendor not found',
-              'VENDOR_NOT_FOUND',
-            );
-          }
-
-          vendor.balance =
-            Number(vendor.balance) +
-            (price * Number(course.vendor_share)) / 100;
-
-          await queryRunner.manager.save(vendor);
-        }
+        vendorId = course.vendor_id;
+        vendorShare = Number(course.vendor_share ?? 0);
 
         if (createPaymentInput.teacher_id) {
           const courseTeacher = await queryRunner.manager.findOne(
@@ -197,34 +180,86 @@ export class PaymentService {
             },
           );
 
-          if (
-            courseTeacher &&
-            courseTeacher.teacher_share &&
-            Number(courseTeacher.teacher_share) > 0
-          ) {
-            const teacher = await queryRunner.manager.findOne(Teacher, {
-              where: {
-                id: createPaymentInput.teacher_id,
-              },
-              lock: {
-                mode: 'pessimistic_write',
-              },
-            });
-
-            if (!teacher) {
-              throw new PaymentValidationError(
-                'Teacher not found',
-                'TEACHER_NOT_FOUND',
-              );
-            }
-
-            teacher.balance =
-              Number(teacher.balance) +
-              (price * Number(courseTeacher.teacher_share)) / 100;
-
-            await queryRunner.manager.save(teacher);
-          }
+          teacherShare = Number(courseTeacher?.teacher_share ?? 0);
         }
+      } else if (planCourse.content_id) {
+        const content = await queryRunner.manager.findOne(Content, {
+          where: {
+            id: planCourse.content_id,
+          },
+          relations: {
+            course: { vendor: true },
+          },
+        });
+
+        if (!content) {
+          throw new PaymentValidationError(
+            'Content not found',
+            'CONTENT_NOT_FOUND',
+          );
+        }
+
+        vendorId = content.course?.vendor_id;
+        vendorShare = Number(content.course?.vendor_share ?? 0);
+
+        if (createPaymentInput.teacher_id) {
+          const courseTeacher = await queryRunner.manager.findOne(
+            CourseTeacher,
+            {
+              where: {
+                course_id: content.course_id,
+                teacher_id: createPaymentInput.teacher_id,
+              },
+            },
+          );
+
+          teacherShare = Number(courseTeacher?.teacher_share ?? 0);
+        }
+      }
+
+      if (vendorId && vendorShare > 0) {
+        const vendor = await queryRunner.manager.findOne(Vendor, {
+          where: {
+            id: vendorId,
+          },
+          lock: {
+            mode: 'pessimistic_write',
+          },
+        });
+
+        if (!vendor) {
+          throw new PaymentValidationError(
+            'Vendor not found',
+            'VENDOR_NOT_FOUND',
+          );
+        }
+
+        vendor.balance = Number(vendor.balance) + (price * vendorShare) / 100;
+
+        await queryRunner.manager.save(vendor);
+      }
+
+      if (createPaymentInput.teacher_id && teacherShare > 0) {
+        const teacher = await queryRunner.manager.findOne(Teacher, {
+          where: {
+            id: createPaymentInput.teacher_id,
+          },
+          lock: {
+            mode: 'pessimistic_write',
+          },
+        });
+
+        if (!teacher) {
+          throw new PaymentValidationError(
+            'Teacher not found',
+            'TEACHER_NOT_FOUND',
+          );
+        }
+
+        teacher.balance =
+          Number(teacher.balance) + (price * teacherShare) / 100;
+
+        await queryRunner.manager.save(teacher);
       }
 
       await queryRunner.commitTransaction();

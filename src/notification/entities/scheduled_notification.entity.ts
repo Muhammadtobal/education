@@ -13,6 +13,7 @@ import { City } from 'src/city/entities/city.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { User } from 'src/user/entities/user.entity';
 import { ScheduledNotificationType } from 'src/shared/enums/scheduled_notification.enum';
+import { Vendor } from 'src/vendor/entities/vendor.entity';
 
 @Entity()
 @ObjectType()
@@ -41,6 +42,18 @@ export class ScheduledNotification {
   @Field(() => Int)
   count: number;
 
+  @Column('int', { default: 0 })
+  @Field(() => Int)
+  executed_count: number;
+
+  @Column('timestamp', { nullable: true })
+  @Field({ nullable: true })
+  next_run_at?: Date;
+
+  @Column('timestamp', { nullable: true })
+  @Field({ nullable: true })
+  last_run_at?: Date;
+
   @Column({
     type: 'enum',
     enum: ScheduledNotificationType,
@@ -63,6 +76,7 @@ export class ScheduledNotification {
   @Column('bigint', { nullable: true })
   @Field({ nullable: true })
   vendor_id: string;
+
   @Column('simple-json')
   @Field(() => GraphQLJSON)
   filter_data: {
@@ -78,12 +92,13 @@ export class ScheduledNotification {
   global: boolean;
 
   @Column('boolean', { default: false })
-  @Field()
+  @Field(() => Boolean)
   approved: boolean;
 
   @Column('int', { width: 8, default: 1 })
   @Field(() => Int)
   receivers_count: number;
+
   @ManyToOne(() => User, (user) => user.scheduled_notifications)
   @JoinColumn({ name: 'user_id' })
   @Field(() => User, { nullable: true })
@@ -93,4 +108,9 @@ export class ScheduledNotification {
   @JoinColumn({ name: 'employee_id' })
   @Field(() => Employee, { nullable: true })
   employee?: Employee;
+
+  @ManyToOne(() => Vendor, (vendor) => vendor.scheduled_notifications)
+  @JoinColumn({ name: 'vendor_id' })
+  @Field(() => Vendor, { nullable: true })
+  vendor?: Vendor;
 }

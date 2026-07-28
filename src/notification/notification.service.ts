@@ -6,6 +6,7 @@ import {
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
+  LessThanOrEqual,
   Repository,
 } from 'typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
@@ -27,6 +28,10 @@ import { CreateNotificationInput } from './dto/create-notification.input';
 import { UpdateNotificationInput } from './dto/update-notification.input';
 import { FindAllNotificationInput } from './dto/find-all-notification.input';
 import { Notification } from './entities/notification.entity';
+import { ScheduledNotificationType } from 'src/shared/enums/scheduled_notification.enum';
+import { ScheduledNotification } from './entities/scheduled_notification.entity';
+import { Cron } from '@nestjs/schedule';
+import { CreateScheduledNotificationInput } from './dto/create-scheduled_notification.input';
 
 @Injectable()
 export class NotificationService {
@@ -34,6 +39,9 @@ export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
+
+    @InjectRepository(ScheduledNotification)
+    private readonly scheduledNotificationRepository: Repository<ScheduledNotification>,
     private readonly userService: UserService,
   ) {
     // if (getApps().length === 0) {
@@ -233,5 +241,97 @@ export class NotificationService {
       console.error(' Error sending notification:', error);
       return null;
     }
+  }
+  public createScheduledNotification(
+    createScheduledNotificationInput: CreateScheduledNotificationInput,
+    options: {
+      employee_id: string;
+      receivers_count: number;
+      global: boolean;
+    },
+  ) {
+    const scheduledNotification = this.scheduledNotificationRepository.create({
+      ...createScheduledNotificationInput,
+      ...options,
+      executed_count: 0,
+      next_run_at: this.calculateNextRun(
+        createScheduledNotificationInput.scheduled_notification_type,
+        new Date(),
+      ),
+    });
+
+    return this.scheduledNotificationRepository.save(scheduledNotification);
+  }
+  @Cron('* * * * *')
+  async processScheduledNotifications() {
+    const notifications = await this.scheduledNotificationRepository.find({
+      where: {
+        active: true,
+        approved: true,
+        next_run_at: LessThanOrEqual(new Date()),
+      },
+    });
+
+    for (const notification of notifications) {
+      try {
+        if (notification.executed_count >= notification.count) {
+          await this.scheduledNotificationRepository.update(notification.id, {
+            active: false,
+          });
+
+          continue;
+        }
+
+        if (notification.user_id) {
+          await this.sendNotificationToUser({
+            title: notification.title,
+            body: notification.body,
+            img_url: notification.img_url,
+            user_id: notification.user_id,
+          } as any);
+        } else {
+          await this.sendToUserCriteria({
+            title: notification.title,
+            body: notification.body,
+            img_url: notification.img_url,
+            filter_data: notification.filter_data,
+          } as any);
+        }
+
+        const executed = notification.executed_count + 1;
+
+        await this.scheduledNotificationRepository.update(notification.id, {
+          executed_count: executed,
+          last_run_at: new Date(),
+          next_run_at: this.calculateNextRun(
+            notification.scheduled_notification_type,
+            notification.next_run_at ?? new Date(),
+          ),
+          active: executed < notification.count,
+        });
+      } catch (e) {
+        console.error(`Scheduled notification ${notification.id} failed`, e);
+      }
+    }
+  }
+
+  calculateNextRun(type: ScheduledNotificationType, from: Date): Date {
+    const next = new Date(from);
+
+    switch (type) {
+      case ScheduledNotificationType.DAILY:
+        next.setDate(next.getDate() + 1);
+        break;
+
+      case ScheduledNotificationType.WEEKLY:
+        next.setDate(next.getDate() + 7);
+        break;
+
+      case ScheduledNotificationType.MONTHLY:
+        next.setMonth(next.getMonth() + 1);
+        break;
+    }
+
+    return next;
   }
 }

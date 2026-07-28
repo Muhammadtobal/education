@@ -18,6 +18,7 @@ import { Course } from 'src/course/entities/course.entity';
 import { TeacherVendor } from 'src/teacher/entities/teacher-vendor.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
+import { ScheduledNotification } from 'src/notification/entities/scheduled_notification.entity';
 
 @ObjectType()
 @Entity()
@@ -93,4 +94,10 @@ export class Vendor {
 
   @OneToMany(() => Payment, (payment) => payment.vendor)
   payments: Payment[];
+
+  @OneToMany(
+    () => ScheduledNotification,
+    (scheduled_notification) => scheduled_notification.vendor,
+  )
+  scheduled_notifications: ScheduledNotification[];
 }

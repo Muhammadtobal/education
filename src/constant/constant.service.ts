@@ -57,4 +57,13 @@ export class ConstantService {
   public async remove(id: string) {
     await this.constantRepository.delete({ id });
   }
+
+  async getValue(key: string) {
+    const constant = await this.findOne({
+      key,
+      expose: true,
+    });
+
+    return constant?.value ?? null;
+  }
 }

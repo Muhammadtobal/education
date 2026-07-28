@@ -79,6 +79,9 @@ type ScheduledNotification {
   active: Boolean!
   link: String
   count: Int!
+  executed_count: Int!
+  next_run_at: DateTime
+  last_run_at: DateTime
   scheduled_notification_type: ScheduledNotificationType!
   img_url: String
   user_id: String
@@ -91,6 +94,7 @@ type ScheduledNotification {
   receivers_count: Int!
   user: User
   employee: Employee
+  vendor: Vendor
 }
 
 """Scheduled notification type (daily, weekly, or monthly)"""
@@ -530,6 +534,13 @@ type CheckActivationUserCodeOutput {
   expires_in: Int
 }
 
+type Constant {
+  id: String!
+  key: String!
+  value: JSON!
+  expose: Boolean!
+}
+
 type RefreshTokenOutput {
   access_token: String!
   expires_in: Int!
@@ -677,13 +688,6 @@ type StoryPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
-type Constant {
-  id: String!
-  key: String!
-  value: JSON!
-  expose: Boolean!
-}
-
 type Query {
   vendors(filter: FindAllVendorInput!): VendorPaginationResultOutput!
   vendor(id: String!): Vendor!
@@ -695,11 +699,8 @@ type Query {
   user(id: String!): User!
   loginHistorys(filter: FindAllLoginHistoryInput!): LoginHistoryPaginationResultOutput!
   loginHistory(id: String!): LoginHistory!
-  employees(filter: FindAllEmployeeInput!): EmployeePaginationResultOutput!
-  employee(id: String!): Employee!
-  myEmployeeProfile: Employee
-  permissions(filter: FindAllPermissionInput!): PermissionPaginationResultOutput!
-  permission(id: String!): Permission!
+  constants: [Constant!]!
+  constantByKey(key: String!): Constant!
   subscriptions(filter: FindAllSubscriptionInput!): SubscriptionPaginationResultOutput!
   subscription(id: String!): UserSubscription!
   reviews(filter: FindAllReviewInput!): ReviewPaginationResultOutput!
@@ -710,6 +711,11 @@ type Query {
   course_teacher(id: String!): CourseTeacher!
   payments(filter: FindAllPaymentInput!): PaymentPaginationResultOutput!
   payment(id: String!): Payment!
+  employees(filter: FindAllEmployeeInput!): EmployeePaginationResultOutput!
+  employee(id: String!): Employee!
+  myEmployeeProfile: Employee
+  permissions(filter: FindAllPermissionInput!): PermissionPaginationResultOutput!
+  permission(id: String!): Permission!
   cities(filter: FindAllCityInput!): CityPaginationResultOutput!
   city(id: String!): City!
   levels(filter: FindAllLevelInput!): LevelPaginationResultOutput!
@@ -746,8 +752,6 @@ type Query {
   plan_coupon(id: String!): PlanCoupon!
   stories(filter: FindAllStoryInput!): StoryPaginationResultOutput!
   story(id: String!): Story!
-  constants: [Constant!]!
-  constantByKey(key: String!): Constant!
 }
 
 input FindAllVendorInput {
@@ -809,25 +813,6 @@ input FindAllLoginHistoryInput {
   user_id: JSON
 }
 
-input FindAllEmployeeInput {
-  username: MatchInput
-  full_name: MatchInput
-  account_type: MatchInput
-  active: Boolean
-  pagination: PaginationInput!
-  sort: SortInput
-  created_at: JSON
-}
-
-input FindAllPermissionInput {
-  name: MatchInput
-  description: MatchInput
-  active: Boolean
-  created_at: JSON
-  pagination: PaginationInput!
-  sort: SortInput
-}
-
 input FindAllSubscriptionInput {
   pagination: PaginationInput!
   sort: SortInput
@@ -865,6 +850,25 @@ input FindAllPaymentInput {
   vendor_id: JSON
   user_id: JSON
   course_id: JSON
+}
+
+input FindAllEmployeeInput {
+  username: MatchInput
+  full_name: MatchInput
+  account_type: MatchInput
+  active: Boolean
+  pagination: PaginationInput!
+  sort: SortInput
+  created_at: JSON
+}
+
+input FindAllPermissionInput {
+  name: MatchInput
+  description: MatchInput
+  active: Boolean
+  created_at: JSON
+  pagination: PaginationInput!
+  sort: SortInput
 }
 
 input FindAllCityInput {
@@ -1037,12 +1041,9 @@ type Mutation {
   createLoginHistory(createLoginHistoryInput: CreateLoginHistoryInput!): LoginHistory!
   updateLoginHistory(updateLoginHistoryInput: UpdateLoginHistoryInput!): LoginHistory!
   removeLoginHistory(id: String!): DoneResponseOutput!
-  createEmployee(createEmployeeInput: CreateEmployeeInput!): CheckActivationEmployeeCodeOutput!
-  assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
-  unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
-  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
-  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
-  removePermission(id: String!): DoneResponseOutput!
+  createConstant(createConstantInput: CreateConstantInput!): Constant!
+  updateConstant(updateConstantInput: UpdateConstantInput!): Constant!
+  removeConstant(id: String!): DoneResponseOutput!
   createSubscription(createSubscriptionInput: CreateSubscriptionInput!): UserSubscription!
   updateSubscription(updateSubscriptionInput: UpdateSubscriptionInput!): UserSubscription!
   removeSubscription(id: String!): DoneResponseOutput!
@@ -1058,6 +1059,12 @@ type Mutation {
   createPayment(createPaymentInput: CreatePaymentInput!): Payment!
   updatePayment(updatePaymentInput: UpdatePaymentInput!): Payment!
   removePayment(id: String!): DoneResponseOutput!
+  createEmployee(createEmployeeInput: CreateEmployeeInput!): CheckActivationEmployeeCodeOutput!
+  assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
+  unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
+  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
+  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
+  removePermission(id: String!): DoneResponseOutput!
   createCity(createCityInput: CreateCityInput!): City!
   updateCity(updateCityInput: UpdateCityInput!): City!
   removeCity(id: String!): DoneResponseOutput!
@@ -1116,9 +1123,6 @@ type Mutation {
   createStory(createStoryInput: CreateStoryInput!): Story!
   updateStory(updateStoryInput: UpdateStoryInput!): Story!
   removeStory(id: String!): DoneResponseOutput!
-  createConstant(createConstantInput: CreateConstantInput!): Constant!
-  updateConstant(updateConstantInput: UpdateConstantInput!): Constant!
-  removeConstant(id: String!): DoneResponseOutput!
 }
 
 input CreateVendorInput {
@@ -1237,35 +1241,14 @@ input UpdateLoginHistoryInput {
   id: String!
 }
 
-input CreateEmployeeInput {
-  phone: String!
-  gender: Gender!
-  full_name: String!
-  city_id: String!
-  active: Boolean = true
-  device_info: JSON
-  fcm_token: String
-  refresh_token: String
+input CreateConstantInput {
+  key: String!
+  value: JSON!
 }
 
-input AssignPermissionInput {
-  permission_id: String!
-  employee_id: String!
-}
-
-input CreatePermissionInput {
-  name: String!
-  description: String
-  translation: String
-  active: Boolean
-}
-
-input UpdatePermissionInput {
-  name: String
-  description: String
-  translation: String
-  active: Boolean
-  id: String!
+input UpdateConstantInput {
+  key: String!
+  value: JSON
 }
 
 input CreateSubscriptionInput {
@@ -1350,7 +1333,7 @@ input CreatePaymentInput {
   user_id: String!
   vendor_id: String!
   plan_id: String!
-  teacher_id: String
+  teacher_id: String!
   course_id: String
   content_id: String
   value: Float
@@ -1365,6 +1348,37 @@ input UpdatePaymentInput {
   course_id: String
   content_id: String
   value: Float
+  active: Boolean
+  id: String!
+}
+
+input CreateEmployeeInput {
+  phone: String!
+  gender: Gender!
+  full_name: String!
+  city_id: String!
+  active: Boolean = true
+  device_info: JSON
+  fcm_token: String
+  refresh_token: String
+}
+
+input AssignPermissionInput {
+  permission_id: String!
+  employee_id: String!
+}
+
+input CreatePermissionInput {
+  name: String!
+  description: String
+  translation: String
+  active: Boolean
+}
+
+input UpdatePermissionInput {
+  name: String
+  description: String
+  translation: String
   active: Boolean
   id: String!
 }
@@ -1673,7 +1687,6 @@ input CreateCouponInput {
   active: Boolean
   description: String
   usage_limit: Int
-  store_id: String
   max_discount: Float
   starts_at: DateTime
   expires_at: DateTime
@@ -1688,7 +1701,6 @@ input UpdateCouponInput {
   active: Boolean
   description: String
   usage_limit: Int
-  store_id: String
   max_discount: Float
   starts_at: DateTime
   expires_at: DateTime
@@ -1702,7 +1714,7 @@ input CreateUserCouponInput {
 
 input CheckActivationCouponInput {
   code: String!
-  store_id: String
+  plan_id: String
 }
 
 input CreatePlanCouponInput {
@@ -1731,14 +1743,4 @@ input UpdateStoryInput {
   url: String
   title: String
   id: String!
-}
-
-input CreateConstantInput {
-  key: String!
-  value: JSON!
-}
-
-input UpdateConstantInput {
-  key: String!
-  value: JSON
 }

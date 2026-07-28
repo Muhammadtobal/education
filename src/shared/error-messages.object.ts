@@ -21,6 +21,8 @@ export const ErrorMessages = {
 
   NOT_ALLOWED: 'العملية غير مصرح بها',
 
+  COUPON_NOT_ALLOWED_FOR_THIS_PLAN: 'غير مسموح باستخدام هذا الكوبون لهذه الخطة',
+
   DEVICE_CHANGED_MULTIPLE_TIMES: 'تم تغيير الجهاز عدة مرات خلال آخر يومين',
   COUPON_NOT_FOUND: '{"ar":"الكوبون غير موجود","en":"Coupon not found"}',
 
