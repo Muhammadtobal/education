@@ -27,6 +27,7 @@ export class CouponResolver {
   @Permissions(Operation.CREATE + Coupon.name)
   public createCoupon(
     @Args('createCouponInput') createCouponInput: CreateCouponInput,
+    @Context() context: GqlContext,
   ) {
     return this.couponService.create(createCouponInput);
   }

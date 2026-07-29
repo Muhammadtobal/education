@@ -61,7 +61,7 @@ export class EmployeeResolver {
     });
 
     const accessToken = await this.authService.generateJwtToken(
-      { employeeId: employee.id },
+      { empId: employee.id },
       process.env.EMPLOYEE_JWT_KEY as string,
     );
 

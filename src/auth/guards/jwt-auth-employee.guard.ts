@@ -32,14 +32,22 @@ export class JwtAuthEmployeeGuard extends AuthGuard('jwt-employee') {
     return super.canActivate(context);
   }
 
-  // TODO: types
   handleRequest(error: any, user: any, info: any, context: any) {
     if (error || !user) throw new UnauthorizedException();
 
-    // * info: one permission for request
+    const permission = context.requiredPermission;
 
-    if (user.permissions.find((v) => v === context.requiredPermission))
-      return user;
+    const isVendorEmployee = user.employee_vendors?.length > 0;
+
+    if (isVendorEmployee) {
+      if (user.permissions.includes(permission)) {
+        return user;
+      }
+    } else {
+      if (user.permissions.includes(permission)) {
+        return user;
+      }
+    }
 
     throw new UnauthorizedException();
   }

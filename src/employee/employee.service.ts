@@ -1,27 +1,27 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import {
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
   Repository,
-} from "typeorm";
-import { paginate } from "nestjs-typeorm-paginate";
-import { InjectRepository } from "@nestjs/typeorm";
+} from 'typeorm';
+import { paginate } from 'nestjs-typeorm-paginate';
+import { InjectRepository } from '@nestjs/typeorm';
 
-import { CreateEmployeeInput } from "./dto/create-employee.input";
-import { UpdateEmployeeInput } from "./dto/update-employee.input";
-import { Employee } from "./entities/employee.entity";
+import { CreateEmployeeInput } from './dto/create-employee.input';
+import { UpdateEmployeeInput } from './dto/update-employee.input';
+import { Employee } from './entities/employee.entity';
 import {
   customPaginate,
   generateQueryConditions,
   generateQuerySorts,
   metaTransformer,
-} from "src/shared/helpers";
-import { PaginationMetadata } from "src/shared/types/pagination-metadata";
-import { FindAllEmployeeInput } from "./dto/find-all-employee.input";
-import { PermissionService } from "src/permission/permission.service";
-import { AssignPermissionInput } from "./dto/assign-permission.inputs";
-import { EmployeePermissionService } from "src/employee_permission/employee_permission.service";
+} from 'src/shared/helpers';
+import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
+import { FindAllEmployeeInput } from './dto/find-all-employee.input';
+import { PermissionService } from 'src/permission/permission.service';
+import { AssignPermissionInput } from './dto/assign-permission.inputs';
+import { EmployeePermissionService } from 'src/employee_permission/employee_permission.service';
 
 @Injectable()
 export class EmployeeService {
@@ -38,12 +38,12 @@ export class EmployeeService {
 
   public findAll(filter: FindAllEmployeeInput) {
     const query = this.employeeRepository
-      .createQueryBuilder("employee")
+      .createQueryBuilder('employee')
 
-      .where("true");
-    generateQuerySorts<Employee>(query, filter, Employee, "employee");
+      .where('true');
+    generateQuerySorts<Employee>(query, filter, Employee, 'employee');
 
-    generateQueryConditions<Employee>(query, filter, "employee");
+    generateQueryConditions<Employee>(query, filter, 'employee');
 
     return customPaginate<Employee, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
@@ -78,49 +78,59 @@ export class EmployeeService {
   }
 
   public async assignPermission(assignPermissionInput: AssignPermissionInput) {
-    await this.permissionService.findOne({
-      id: assignPermissionInput.permission_id,
-    });
-
     const employee = await this.findOne({
       id: assignPermissionInput.employee_id,
     });
 
-    if (employee) {
-      await this.employeePermissionService.create({
-        employee_id: assignPermissionInput.employee_id,
-        permission_id: assignPermissionInput.permission_id,
-      });
-
-      return true;
+    if (!employee) {
+      return false;
     }
 
-    return false;
-  }
+    await Promise.all(
+      assignPermissionInput.permission_ids.map((permissionId) =>
+        this.permissionService.findOne({ id: permissionId }),
+      ),
+    );
 
+    await Promise.all(
+      assignPermissionInput.permission_ids.map((permissionId) =>
+        this.employeePermissionService.create({
+          employee_id: assignPermissionInput.employee_id,
+          permission_id: permissionId,
+        }),
+      ),
+    );
+
+    return true;
+  }
   public async unassignPermission(
     unassignPermissionInput: AssignPermissionInput,
   ) {
-    await this.permissionService.findOne({
-      id: unassignPermissionInput.permission_id,
-    });
-
     const employee = await this.findOne({
       id: unassignPermissionInput.employee_id,
     });
 
-    if (employee) {
-      await this.employeePermissionService.remove({
-        employee_id: unassignPermissionInput.employee_id,
-        permission_id: unassignPermissionInput.permission_id,
-      });
-
-      return true;
+    if (!employee) {
+      return false;
     }
 
-    return false;
-  }
+    await Promise.all(
+      unassignPermissionInput.permission_ids.map((permissionId) =>
+        this.permissionService.findOne({ id: permissionId }),
+      ),
+    );
 
+    await Promise.all(
+      unassignPermissionInput.permission_ids.map((permissionId) =>
+        this.employeePermissionService.remove({
+          employee_id: unassignPermissionInput.employee_id,
+          permission_id: permissionId,
+        }),
+      ),
+    );
+
+    return true;
+  }
   public findAllRaw(
     employeeOptions: FindOptionsWhere<Employee>,
     options?: {

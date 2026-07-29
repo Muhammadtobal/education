@@ -77,6 +77,7 @@ export class Employee {
     () => EmployeeVendor,
     (employee_vendor) => employee_vendor.employee,
   )
+  @Field(() => [EmployeeVendor], { nullable: true })
   employee_vendors: EmployeeVendor[];
 
   @OneToMany(() => Notification, (notification) => notification.employee)

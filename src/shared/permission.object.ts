@@ -153,6 +153,11 @@ const PermissionsStore = {
   UPDATE_COURSE_TEACHER: 'updateVendorLevel',
   DELETE_COURSE_TEACHER: 'deleteCourseTeacher',
   CREATE_COURSE_TEACHER: 'createCourseTeacher',
+
+  GET_CONSTANT: 'getConstant',
+  UPDATE_CONSTANT: 'updateConstant',
+  DELETE_CONSTANT: 'deleteConstant',
+  CREATE_CONSTANT: 'createConstant',
 } as const;
 
 type PermissionKey = keyof typeof PermissionsStore;

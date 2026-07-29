@@ -73,10 +73,17 @@ export class AuthResolver {
       }
     }
 
-    const employee = await this.employeeService.findOne({
-      id: jwtData.empId,
-      refresh_token: refreshTokenInput.refresh_token,
-    });
+    const employee = await this.employeeService.findOne(
+      {
+        id: jwtData.empId,
+        refresh_token: refreshTokenInput.refresh_token,
+      },
+      {
+        relations: {
+          employee_vendors: true,
+        },
+      },
+    );
 
     if (!employee)
       throw new HttpException(
@@ -85,10 +92,14 @@ export class AuthResolver {
       );
 
     const accessToken = await this.authService.generateJwtToken(
-      { employeeId: employee.id },
-      process.env.EMPLOYEE_JWT_KEY as string,
+      {
+        empId: employee.id,
+        employee_vendors: employee.employee_vendors.map((v) => ({
+          vendor_id: v.vendor_id,
+        })),
+      },
+      process.env.EMPLOYEE_JWT_KEY!,
     );
-
     return {
       access_token: accessToken,
       expires_in: 15 * 60,
@@ -116,17 +127,30 @@ export class AuthResolver {
       code: 'passed',
     });
 
-    const employee = await this.employeeService.findOne({
-      phone: checkActivationCodeInput.phone,
-    });
+    const employee = await this.employeeService.findOne(
+      {
+        phone: checkActivationCodeInput.phone,
+        active: true,
+      },
+      {
+        relations: {
+          employee_permissions: { permission: true },
+          employee_vendors: true,
+        },
+      },
+    );
 
     if (!employee) return {};
 
     const accessToken = await this.authService.generateJwtToken(
-      { employeeId: employee.id },
-      process.env.EMPLOYEE_JWT_KEY as string,
+      {
+        empId: employee.id,
+        employee_vendors: employee.employee_vendors.map((v) => ({
+          vendor_id: v.vendor_id,
+        })),
+      },
+      process.env.EMPLOYEE_JWT_KEY!,
     );
-
     const refreshToken = await this.authService.generateRefreshToken();
 
     await this.employeeService.update({

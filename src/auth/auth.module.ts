@@ -16,7 +16,7 @@ import { LoginHistoryModule } from 'src/login_history/login_history.module';
   imports: [
     JwtModule.register({ signOptions: { expiresIn: '1h' } }),
     forwardRef(() => UserModule),
-    EmployeeModule,
+    forwardRef(() => EmployeeModule),
     LoginHistoryModule,
     forwardRef(() => TeacherModule),
   ],

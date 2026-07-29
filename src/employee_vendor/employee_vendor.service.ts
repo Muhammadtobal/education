@@ -19,20 +19,38 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
+import { PermissionService } from 'src/permission/permission.service';
+import { EmployeeService } from 'src/employee/employee.service';
 
 @Injectable()
 export class EmployeeVendorService {
   constructor(
     @InjectRepository(EmployeeVendor)
     private readonly employeeVendorRepository: Repository<EmployeeVendor>,
+    private readonly permissionService: PermissionService,
+    private readonly employeeService: EmployeeService,
   ) {}
-  public create(createEmployeeVendorInput: CreateEmployeeVendorInput) {
+  public async create(createEmployeeVendorInput: CreateEmployeeVendorInput) {
     const employeeVendor = this.employeeVendorRepository.create(
       createEmployeeVendorInput,
     );
-    return this.employeeVendorRepository.save(employeeVendor);
-  }
 
+    const employeeVendorSaved =
+      await this.employeeVendorRepository.save(employeeVendor);
+
+    const permissions = await this.permissionService.findAll({
+      pagination: { limit: 1000, page: 1 },
+      active: true,
+      for_vendor: true,
+    });
+
+    await this.employeeService.assignPermission({
+      employee_id: createEmployeeVendorInput.employee_id,
+      permission_ids: permissions.items.map((permission) => permission.id),
+    });
+
+    return employeeVendorSaved;
+  }
   public findAll(filter: FindAllEmployeeVendorInput) {
     const query = this.employeeVendorRepository
       .createQueryBuilder('employee_vendor')

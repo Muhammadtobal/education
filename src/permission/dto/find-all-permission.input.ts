@@ -1,7 +1,7 @@
-import { InputType, Field } from "@nestjs/graphql";
-import { Type } from "class-transformer";
-import { IsOptional, IsBoolean, IsObject, IsNotEmpty } from "class-validator";
-import GraphQLJSON from "graphql-type-json";
+import { InputType, Field } from '@nestjs/graphql';
+import { Type } from 'class-transformer';
+import { IsOptional, IsBoolean, IsObject, IsNotEmpty } from 'class-validator';
+import GraphQLJSON from 'graphql-type-json';
 import {
   MatchInput,
   PaginationInput,
@@ -10,8 +10,8 @@ import {
   MinDateInput,
   MaxDateInput,
   SortInput,
-} from "src/shared/types/graphql-input-types";
-import { IsSingleDateOrRange } from "src/shared/decorators/is-single-date-or-range.decorator";
+} from 'src/shared/types/graphql-input-types';
+import { IsSingleDateOrRange } from 'src/shared/decorators/is-single-date-or-range.decorator';
 
 @InputType()
 export class FindAllPermissionInput {
@@ -31,6 +31,11 @@ export class FindAllPermissionInput {
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   active?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  for_vendor?: boolean;
 
   @IsOptional()
   @IsObject()

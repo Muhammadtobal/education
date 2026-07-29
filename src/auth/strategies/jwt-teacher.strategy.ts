@@ -16,6 +16,9 @@ export class JwtTeacherStrategy extends PassportStrategy(
   }
 
   validate(payload: any) {
-    return { teacherId: payload.teacherId };
+    return {
+      type: 'teacher',
+      ...payload,
+    };
   }
 }

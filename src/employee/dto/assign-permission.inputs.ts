@@ -1,12 +1,11 @@
-import { Field, InputType } from "@nestjs/graphql";
-import { IsNotEmpty, IsNumberString } from "class-validator";
+import { Field, InputType } from '@nestjs/graphql';
+import { IsArray, IsNotEmpty, IsNumberString } from 'class-validator';
 
 @InputType()
 export class AssignPermissionInput {
   @IsNotEmpty()
-  @IsNumberString()
-  @Field()
-  permission_id: string;
+  @Field(() => [String])
+  permission_ids: string[];
 
   @IsNotEmpty()
   @IsNumberString()

@@ -1,12 +1,13 @@
-import { Injectable } from "@nestjs/common";
-import { PassportStrategy } from "@nestjs/passport";
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { EmployeeService } from "src/employee/employee.service";
+import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { EmployeeService } from 'src/employee/employee.service';
+import { EmployeeJWTPayload } from 'src/shared/types/jwt-payload';
 
 @Injectable()
 export class JwtEmployeeStrategy extends PassportStrategy(
   Strategy,
-  "jwt-employee",
+  'jwt-employee',
 ) {
   constructor(private readonly employeeService: EmployeeService) {
     super({
@@ -17,17 +18,23 @@ export class JwtEmployeeStrategy extends PassportStrategy(
   }
 
   // TODO: type and production notice
-  async validate(payload: any) {
+  async validate(payload: EmployeeJWTPayload) {
+    console.log('JWT Payload:', payload);
+
     const employee = await this.employeeService.findOne(
       { id: payload.empId },
       { relations: { employee_permissions: { permission: true } } },
     );
 
-    if (!employee) throw new Error("Invalid token or employee not found");
+    if (!employee) {
+      throw new Error('Invalid token or employee not found');
+    }
 
     return {
       empId: payload.empId,
-      ...payload,
+      type: 'employee',
+
+      employee_vendors: payload.employee_vendors,
       permissions: employee.employee_permissions.map(
         (employeePermission) => employeePermission.permission?.name,
       ),
