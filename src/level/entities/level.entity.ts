@@ -49,11 +49,9 @@ export class Level {
     nullable: true,
   })
   @JoinColumn({ name: 'parent_id' })
-  @Field(() => Level, { nullable: true })
   parent?: Level;
 
   @OneToMany(() => Level, (level) => level.parent)
-  @Field(() => [Level], { nullable: true })
   children?: Level[];
 
   @OneToMany(() => User, (user) => user.level)

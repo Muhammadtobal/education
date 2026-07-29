@@ -460,8 +460,6 @@ type Level {
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
-  parent: Level
-  children: [Level!]
 }
 
 type Story {

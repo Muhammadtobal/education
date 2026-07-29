@@ -154,7 +154,6 @@ export class TeacherService {
 
     const students = new Set<string>();
 
-    // pagination courses
     const courseLimit = 200;
     let coursePage = 1;
     let courseLastPage = false;
@@ -172,7 +171,6 @@ export class TeacherService {
 
       totalCourses += coursesResult.items.length;
 
-      // subscriptions pagination for each course
       for (const courseTeacher of coursesResult.items) {
         const courseId = courseTeacher.course_id;
 
