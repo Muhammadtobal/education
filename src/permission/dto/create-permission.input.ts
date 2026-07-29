@@ -22,4 +22,9 @@ export class CreatePermissionInput {
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   active?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  for_vendor?: boolean;
 }

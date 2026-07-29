@@ -1376,6 +1376,7 @@ input CreatePermissionInput {
   description: String
   translation: String
   active: Boolean
+  for_vendor: Boolean
 }
 
 input UpdatePermissionInput {
@@ -1383,6 +1384,7 @@ input UpdatePermissionInput {
   description: String
   translation: String
   active: Boolean
+  for_vendor: Boolean
   id: String!
 }
 
