@@ -30,7 +30,6 @@ export class LevelResolver {
 
   @Query(() => LevelPaginationResultOutput, { name: 'levels' })
   @UseGuards(JwtAuthSharedGuard)
-  @Permissions(Operation.GET + Level.name)
   public findAll(@Args('filter') filter: FindAllLevelInput) {
     return this.levelService.findAll(filter);
   }
