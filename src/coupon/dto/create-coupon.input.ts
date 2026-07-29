@@ -31,10 +31,10 @@ export class CreateCouponInput {
   @Field(() => Int)
   used_count: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  @Field(() => Float)
-  min_order_amount: number;
+  @Field(() => Float, { nullable: true })
+  min_order_amount?: number;
 
   @IsNotEmpty()
   @IsNumber()

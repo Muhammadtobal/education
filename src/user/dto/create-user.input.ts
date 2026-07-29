@@ -66,11 +66,6 @@ export class CreateUserInput {
   @Field({ nullable: true })
   lang?: string;
 
-  @IsOptional()
-  @IsNumber()
-  @Field({ nullable: true })
-  ads_count?: number;
-
   @IsEmpty()
   refresh_token?: string;
 }

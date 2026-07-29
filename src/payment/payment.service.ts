@@ -33,6 +33,9 @@ import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { PlanType } from 'src/shared/enums/plan_type.enum';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { Content } from 'src/content/entities/content.entity';
+import { UserCoupon } from 'src/coupon/entities/user_coupon.entity';
+import { DiscountType } from 'src/shared/enums/discount_type.enum';
+import { CouponService } from 'src/coupon/coupon.service';
 @Injectable()
 export class PaymentService {
   constructor(
@@ -41,6 +44,7 @@ export class PaymentService {
 
     @InjectDataSource()
     private readonly dataSource: DataSource,
+    private readonly couponService: CouponService,
   ) {}
   public async create(createPaymentInput: CreatePaymentInput) {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -86,8 +90,57 @@ export class PaymentService {
         throw new PaymentValidationError('Plan not found', 'PLAN_NOT_FOUND');
       }
 
-      const price = Number(plan.price);
+      let price = Number(plan.price);
+      let couponId: string | undefined;
+      let couponDiscount = 0;
 
+      if (createPaymentInput.code) {
+        const coupon = await this.couponService.checkActivationCoupon(
+          {
+            code: createPaymentInput.code,
+            plan_id: createPaymentInput.plan_id,
+          },
+          createPaymentInput.user_id,
+        );
+
+        if (price < Number(coupon.min_order_amount)) {
+          throw new PaymentValidationError(
+            `Minimum amount is ${coupon.min_order_amount}`,
+            'COUPON_MIN_AMOUNT',
+          );
+        }
+
+        if (coupon.discount_type === DiscountType.PERCENTAGE) {
+          couponDiscount = price * (Number(coupon.discount_value) / 100);
+
+          if (
+            coupon.max_discount &&
+            couponDiscount > Number(coupon.max_discount)
+          ) {
+            couponDiscount = Number(coupon.max_discount);
+          }
+        } else {
+          couponDiscount = Number(coupon.discount_value);
+        }
+
+        price -= couponDiscount;
+
+        if (price < 0) {
+          price = 0;
+        }
+
+        coupon.used_count += 1;
+        await queryRunner.manager.save(coupon);
+
+        const userCoupon = queryRunner.manager.create(UserCoupon, {
+          coupon_id: coupon.id,
+          user_id: createPaymentInput.user_id,
+        });
+
+        await queryRunner.manager.save(userCoupon);
+
+        couponId = coupon.id;
+      }
       let endDate: Date | null = null;
 
       switch (plan.plan_type) {

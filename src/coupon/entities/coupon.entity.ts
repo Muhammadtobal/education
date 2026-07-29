@@ -45,9 +45,9 @@ export class Coupon {
   @Field(() => Float)
   discount_value: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
-  @Field(() => Float)
-  min_order_amount: number;
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @Field(() => Float, { nullable: true })
+  min_order_amount?: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   @Field(() => Float, { nullable: true })

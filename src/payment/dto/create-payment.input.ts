@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsNumberString,
   IsOptional,
+  IsString,
 } from 'class-validator';
 
 @InputType()
@@ -43,6 +44,11 @@ export class CreatePaymentInput {
   @IsNumber()
   @Field(() => Float, { nullable: true })
   value?: number;
+
+  @IsOptional()
+  @IsString()
+  @Field({ nullable: true })
+  code?: string;
 
   @IsOptional()
   @IsBoolean()

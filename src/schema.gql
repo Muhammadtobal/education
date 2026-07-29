@@ -340,7 +340,7 @@ type Coupon {
   usage_limit: Int
   used_count: Int!
   discount_value: Float!
-  min_order_amount: Float!
+  min_order_amount: Float
   max_discount: Float
   discount_type: DiscountType!
   active: Boolean!
@@ -606,6 +606,16 @@ type PaymentPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type CouponPaginationResultOutput {
+  items: [Coupon!]!
+  meta: PaginationMetadata!
+}
+
+type PlanCouponPaginationResultOutput {
+  items: [PlanCoupon!]!
+  meta: PaginationMetadata!
+}
+
 type CityPaginationResultOutput {
   items: [City!]!
   meta: PaginationMetadata!
@@ -681,16 +691,6 @@ type ScheduledNotificationPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
-type CouponPaginationResultOutput {
-  items: [Coupon!]!
-  meta: PaginationMetadata!
-}
-
-type PlanCouponPaginationResultOutput {
-  items: [PlanCoupon!]!
-  meta: PaginationMetadata!
-}
-
 type StoryPaginationResultOutput {
   items: [Story!]!
   meta: PaginationMetadata!
@@ -720,6 +720,10 @@ type Query {
   course_teacher(id: String!): CourseTeacher!
   payments(filter: FindAllPaymentInput!): PaymentPaginationResultOutput!
   payment(id: String!): Payment!
+  coupons(filter: FindAllCouponInput!): CouponPaginationResultOutput!
+  coupon(id: String!): Coupon!
+  plan_coupons(filter: FindAllPlanCouponInput!): PlanCouponPaginationResultOutput!
+  plan_coupon(id: String!): PlanCoupon!
   employees(filter: FindAllEmployeeInput!): EmployeePaginationResultOutput!
   employee(id: String!): Employee!
   myEmployeeProfile: Employee
@@ -755,10 +759,6 @@ type Query {
   discussion(id: String!): Discussion!
   contents(filter: FindAllContentInput!): ContentPaginationResultOutput!
   content(id: String!): Content!
-  coupons(filter: FindAllCouponInput!): CouponPaginationResultOutput!
-  coupon(id: String!): Coupon!
-  plan_coupons(filter: FindAllPlanCouponInput!): PlanCouponPaginationResultOutput!
-  plan_coupon(id: String!): PlanCoupon!
   stories(filter: FindAllStoryInput!): StoryPaginationResultOutput!
   story(id: String!): Story!
 }
@@ -859,6 +859,28 @@ input FindAllPaymentInput {
   vendor_id: JSON
   user_id: JSON
   course_id: JSON
+}
+
+input FindAllCouponInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  code: MatchInput
+  description: MatchInput
+  discount_type: MatchInput
+  usage_limit: JSON
+  used_count: JSON
+  active: Boolean
+  store_id: JSON
+  created_at: JSON
+  expires_at: JSON
+}
+
+input FindAllPlanCouponInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  value: JSON
+  coupon_id: JSON
+  plan_id: JSON
 }
 
 input FindAllEmployeeInput {
@@ -1000,28 +1022,6 @@ input FindAllContentInput {
   course_id: JSON
 }
 
-input FindAllCouponInput {
-  pagination: PaginationInput!
-  sort: SortInput
-  code: MatchInput
-  description: MatchInput
-  discount_type: MatchInput
-  usage_limit: JSON
-  used_count: JSON
-  active: Boolean
-  store_id: JSON
-  created_at: JSON
-  expires_at: JSON
-}
-
-input FindAllPlanCouponInput {
-  pagination: PaginationInput!
-  sort: SortInput
-  value: JSON
-  coupon_id: JSON
-  plan_id: JSON
-}
-
 input FindAllStoryInput {
   pagination: PaginationInput!
   sort: SortInput
@@ -1069,6 +1069,14 @@ type Mutation {
   createPayment(createPaymentInput: CreatePaymentInput!): Payment!
   updatePayment(updatePaymentInput: UpdatePaymentInput!): Payment!
   removePayment(id: String!): DoneResponseOutput!
+  createCoupon(createCouponInput: CreateCouponInput!): Coupon!
+  updateCoupon(updateCouponInput: UpdateCouponInput!): Coupon!
+  removeCoupon(id: String!): DoneResponseOutput!
+  createUserCoupon(createUserCouponInput: CreateUserCouponInput!): UserCoupon!
+  checkActivationCoupon(checkActivationCouponInput: CheckActivationCouponInput!): Coupon!
+  createPlanCoupon(createPlanCouponInput: CreatePlanCouponInput!): PlanCoupon!
+  updatePlanCoupon(updatePlanCouponInput: UpdatePlanCouponInput!): PlanCoupon!
+  removePlanCoupon(id: String!): DoneResponseOutput!
   createEmployee(createEmployeeInput: CreateEmployeeInput!): CheckActivationEmployeeCodeOutput!
   assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
   unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
@@ -1122,14 +1130,6 @@ type Mutation {
   createContent(createContentInput: CreateContentInput!): Content!
   updateContent(updateContentInput: UpdateContentInput!): Content!
   removeContent(id: String!): DoneResponseOutput!
-  createCoupon(createCouponInput: CreateCouponInput!): Coupon!
-  updateCoupon(updateCouponInput: UpdateCouponInput!): Coupon!
-  removeCoupon(id: String!): DoneResponseOutput!
-  createUserCoupon(createUserCouponInput: CreateUserCouponInput!): UserCoupon!
-  checkActivationCoupon(checkActivationCouponInput: CheckActivationCouponInput!): Coupon!
-  createPlanCoupon(createPlanCouponInput: CreatePlanCouponInput!): PlanCoupon!
-  updatePlanCoupon(updatePlanCouponInput: UpdatePlanCouponInput!): PlanCoupon!
-  removePlanCoupon(id: String!): DoneResponseOutput!
   createStory(createStoryInput: CreateStoryInput!): Story!
   updateStory(updateStoryInput: UpdateStoryInput!): Story!
   removeStory(id: String!): DoneResponseOutput!
@@ -1217,7 +1217,6 @@ input CreateUserInput {
   active: Boolean
   fcm_token: String
   lang: String
-  ads_count: Float
 }
 
 input RefreshTokenInput {
@@ -1347,6 +1346,7 @@ input CreatePaymentInput {
   course_id: String
   content_id: String
   value: Float
+  code: String
   active: Boolean
 }
 
@@ -1358,6 +1358,59 @@ input UpdatePaymentInput {
   course_id: String
   content_id: String
   value: Float
+  code: String
+  active: Boolean
+  id: String!
+}
+
+input CreateCouponInput {
+  code: String!
+  discount_type: DiscountType!
+  used_count: Int!
+  min_order_amount: Float
+  discount_value: Float!
+  active: Boolean
+  description: String
+  usage_limit: Int
+  max_discount: Float
+  starts_at: DateTime
+  expires_at: DateTime
+}
+
+input UpdateCouponInput {
+  code: String
+  discount_type: DiscountType
+  used_count: Int
+  min_order_amount: Float
+  discount_value: Float
+  active: Boolean
+  description: String
+  usage_limit: Int
+  max_discount: Float
+  starts_at: DateTime
+  expires_at: DateTime
+  id: String!
+}
+
+input CreateUserCouponInput {
+  user_id: String!
+  coupon_id: String!
+}
+
+input CheckActivationCouponInput {
+  code: String!
+  plan_id: String
+}
+
+input CreatePlanCouponInput {
+  coupon_id: String!
+  plan_id: String!
+  active: Boolean
+}
+
+input UpdatePlanCouponInput {
+  coupon_id: String
+  plan_id: String
   active: Boolean
   id: String!
 }
@@ -1686,58 +1739,6 @@ input CreateContentInput {
 input UpdateContentInput {
   course_id: String
   is_free: Boolean
-  active: Boolean
-  id: String!
-}
-
-input CreateCouponInput {
-  code: String!
-  discount_type: DiscountType!
-  used_count: Int!
-  min_order_amount: Float!
-  discount_value: Float!
-  active: Boolean
-  description: String
-  usage_limit: Int
-  max_discount: Float
-  starts_at: DateTime
-  expires_at: DateTime
-}
-
-input UpdateCouponInput {
-  code: String
-  discount_type: DiscountType
-  used_count: Int
-  min_order_amount: Float
-  discount_value: Float
-  active: Boolean
-  description: String
-  usage_limit: Int
-  max_discount: Float
-  starts_at: DateTime
-  expires_at: DateTime
-  id: String!
-}
-
-input CreateUserCouponInput {
-  user_id: String!
-  coupon_id: String!
-}
-
-input CheckActivationCouponInput {
-  code: String!
-  plan_id: String
-}
-
-input CreatePlanCouponInput {
-  coupon_id: String!
-  plan_id: String!
-  active: Boolean
-}
-
-input UpdatePlanCouponInput {
-  coupon_id: String
-  plan_id: String
   active: Boolean
   id: String!
 }
