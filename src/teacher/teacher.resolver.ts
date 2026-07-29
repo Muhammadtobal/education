@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { TeacherService } from './teacher.service';
 import { Teacher } from './entities/teacher.entity';
 import { CreateTeacherInput } from './dto/create-teacher.input';
@@ -20,6 +20,10 @@ import { CreateTeacherVendorInput } from './dto/create-teacher_vendor.input';
 import { TeacherVendorPaginationResultOutput } from './dto/find-all-teacher_vendor.output';
 import { FindAllTeacherVendorInput } from './dto/find-all-teacher_vendor.input';
 import { UpdateTeacherVendorInput } from './dto/update-teacher_vendor.input';
+import { JwtAuthTeacherGuard } from 'src/auth/guards/jwt-auth-teacher.guard';
+import { TeacherStaticsOutput } from './dto/teacher-statics.output';
+import { GqlContext } from 'src/shared/types/context';
+import { getTeacherId } from 'src/shared/helpers';
 
 @Resolver(() => Teacher)
 export class TeacherResolver {
@@ -156,5 +160,15 @@ export class TeacherResolver {
     return {
       done: true,
     };
+  }
+
+  @Mutation(() => TeacherStaticsOutput)
+  @UseGuards(JwtAuthTeacherGuard)
+  @Permissions(Operation.GET + TeacherVendor.name)
+  public teacherStatics(@Context() context: GqlContext) {
+    const user = context.req.user;
+    const teacherId = getTeacherId(user);
+
+    return this.teacherService.teacherStatics(teacherId);
   }
 }

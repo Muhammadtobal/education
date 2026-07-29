@@ -524,6 +524,13 @@ type TeacherVendorPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type TeacherStaticsOutput {
+  totalStudents: Int!
+  totalCourses: Int!
+  totalVendors: Int!
+  balance: Int!
+}
+
 type UserPaginationResultOutput {
   items: [User!]!
   meta: PaginationMetadata!
@@ -575,16 +582,6 @@ type LoginHistoryPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
-type SubscriptionPaginationResultOutput {
-  items: [UserSubscription!]!
-  meta: PaginationMetadata!
-}
-
-type ReviewPaginationResultOutput {
-  items: [Review!]!
-  meta: PaginationMetadata!
-}
-
 type CoursePaginationResultOutput {
   items: [Course!]!
   meta: PaginationMetadata!
@@ -592,6 +589,16 @@ type CoursePaginationResultOutput {
 
 type CourseTeacherPaginationResultOutput {
   items: [Course!]!
+  meta: PaginationMetadata!
+}
+
+type SubscriptionPaginationResultOutput {
+  items: [UserSubscription!]!
+  meta: PaginationMetadata!
+}
+
+type ReviewPaginationResultOutput {
+  items: [Review!]!
   meta: PaginationMetadata!
 }
 
@@ -1033,6 +1040,7 @@ type Mutation {
   createTeacherVendor(createTeacherVendorInput: CreateTeacherVendorInput!): TeacherVendor!
   updateTeacherVendor(updateTeacherVendorInput: UpdateTeacherVendorInput!): TeacherVendor!
   removeTeacherVendor(id: String!): DoneResponseOutput!
+  teacherStatics: TeacherStaticsOutput!
   createUser(createUserInput: CreateUserInput!): CheckActivationUserCodeOutput!
   refreshTokenEmployee(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
   checkEmployeeActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationEmployeeCodeOutput!

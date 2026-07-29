@@ -6,12 +6,17 @@ import { TeacherResolver } from './teacher.resolver';
 import { TeacherVendor } from './entities/teacher-vendor.entity';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
+import { CourseModule } from 'src/course/course.module';
+import { SubscriptionModule } from 'src/subscription/subscription.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Teacher, TeacherVendor]),
     forwardRef(() => UserModule),
     forwardRef(() => AuthModule),
+    CourseModule,
+    SubscriptionModule,
   ],
   exports: [TeacherService],
   providers: [TeacherService, TeacherResolver],

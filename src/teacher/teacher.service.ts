@@ -22,6 +22,9 @@ import { TeacherVendor } from './entities/teacher-vendor.entity';
 import { CreateTeacherVendorInput } from './dto/create-teacher_vendor.input';
 import { FindAllTeacherVendorInput } from './dto/find-all-teacher_vendor.input';
 import { UpdateTeacherVendorInput } from './dto/update-teacher_vendor.input';
+import { CourseService } from 'src/course/course.service';
+import { SubscriptionService } from 'src/subscription/subscription.service';
+import { paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class TeacherService {
@@ -31,6 +34,9 @@ export class TeacherService {
 
     @InjectRepository(TeacherVendor)
     private readonly teacherVendorRepository: Repository<TeacherVendor>,
+
+    private readonly courseService: CourseService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
   public create(createTeacherInput: CreateTeacherInput) {
     const teacher = this.teacherRepository.create(createTeacherInput);
@@ -140,5 +146,40 @@ export class TeacherService {
 
   public removeTeacherVendor(id: string) {
     return this.teacherVendorRepository.delete(id);
+  }
+
+  public async teacherStatics(teacherId: string) {
+    let totalCourses = 0;
+
+    const limit = 200;
+    let page = 1;
+    let lastPage = false;
+
+    while (!lastPage) {
+      const result = await this.courseService.findAllCourseTeacher({
+        teacher_id: { value: teacherId },
+        pagination: {
+          page,
+          limit,
+        },
+      });
+
+      if (!result.items.length) break;
+
+      totalCourses += result.items.length;
+
+      if (result.items.length < limit) {
+        lastPage = true;
+      } else {
+        page++;
+      }
+    }
+
+    return {
+      courses_count: totalCourses,
+      totalStudents: 0,
+      balance: 0,
+      totalVendors: 0,
+    };
   }
 }
