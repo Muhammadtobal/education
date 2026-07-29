@@ -525,10 +525,9 @@ type TeacherVendorPaginationResultOutput {
 }
 
 type TeacherStaticsOutput {
-  totalStudents: Int!
   totalCourses: Int!
-  totalVendors: Int!
-  balance: Int!
+  totalSubscriptions: Int!
+  totalStudents: Int!
 }
 
 type UserPaginationResultOutput {
@@ -704,6 +703,7 @@ type Query {
   teacher(id: String!): Teacher!
   teacher_vendors(filter: FindAllTeacherVendorInput!): TeacherVendorPaginationResultOutput!
   teacher_vendor(id: String!): TeacherVendor!
+  teacherStatics: TeacherStaticsOutput!
   users(filter: FindAllUserInput!): UserPaginationResultOutput!
   user(id: String!): User!
   loginHistorys(filter: FindAllLoginHistoryInput!): LoginHistoryPaginationResultOutput!
@@ -1040,7 +1040,6 @@ type Mutation {
   createTeacherVendor(createTeacherVendorInput: CreateTeacherVendorInput!): TeacherVendor!
   updateTeacherVendor(updateTeacherVendorInput: UpdateTeacherVendorInput!): TeacherVendor!
   removeTeacherVendor(id: String!): DoneResponseOutput!
-  teacherStatics: TeacherStaticsOutput!
   createUser(createUserInput: CreateUserInput!): CheckActivationUserCodeOutput!
   refreshTokenEmployee(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
   checkEmployeeActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationEmployeeCodeOutput!

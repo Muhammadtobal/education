@@ -150,36 +150,74 @@ export class TeacherService {
 
   public async teacherStatics(teacherId: string) {
     let totalCourses = 0;
+    let totalSubscriptions = 0;
 
-    const limit = 200;
-    let page = 1;
-    let lastPage = false;
+    const students = new Set<string>();
 
-    while (!lastPage) {
-      const result = await this.courseService.findAllCourseTeacher({
+    // pagination courses
+    const courseLimit = 200;
+    let coursePage = 1;
+    let courseLastPage = false;
+
+    while (!courseLastPage) {
+      const coursesResult = await this.courseService.findAllCourseTeacher({
         teacher_id: { value: teacherId },
         pagination: {
-          page,
-          limit,
+          page: coursePage,
+          limit: courseLimit,
         },
       });
 
-      if (!result.items.length) break;
+      if (!coursesResult.items.length) break;
 
-      totalCourses += result.items.length;
+      totalCourses += coursesResult.items.length;
 
-      if (result.items.length < limit) {
-        lastPage = true;
+      // subscriptions pagination for each course
+      for (const courseTeacher of coursesResult.items) {
+        const courseId = courseTeacher.course_id;
+
+        const subscriptionLimit = 200;
+        let subscriptionPage = 1;
+        let subscriptionLastPage = false;
+
+        while (!subscriptionLastPage) {
+          const subscriptionsResult = await this.subscriptionService.findAll({
+            course_id: {
+              value: courseId,
+            },
+            pagination: {
+              page: subscriptionPage,
+              limit: subscriptionLimit,
+            },
+          });
+
+          if (!subscriptionsResult.items.length) break;
+
+          totalSubscriptions += subscriptionsResult.items.length;
+
+          for (const subscription of subscriptionsResult.items) {
+            students.add(subscription.user_id);
+          }
+
+          if (subscriptionsResult.items.length < subscriptionLimit) {
+            subscriptionLastPage = true;
+          } else {
+            subscriptionPage++;
+          }
+        }
+      }
+
+      if (coursesResult.items.length < courseLimit) {
+        courseLastPage = true;
       } else {
-        page++;
+        coursePage++;
       }
     }
 
     return {
-      courses_count: totalCourses,
-      totalStudents: 0,
-      balance: 0,
-      totalVendors: 0,
+      totalCourses,
+      totalSubscriptions,
+      totalStudents: students.size,
     };
   }
 }

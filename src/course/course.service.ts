@@ -30,7 +30,7 @@ export class CourseService {
     @InjectRepository(Course)
     private readonly courseRepository: Repository<Course>,
 
-    @InjectRepository(Course)
+    @InjectRepository(CourseTeacher)
     private readonly courseTeacherRepository: Repository<CourseTeacher>,
   ) {}
   public create(createCourseInput: CreateCourseInput) {

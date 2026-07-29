@@ -24,7 +24,6 @@ export class CityResolver {
   }
 
   @Query(() => CityPaginationResultOutput, { name: 'cities' })
-  @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + City.name)
   public findAll(@Args('filter') filter: FindAllCityInput) {
     return this.cityService.findAll(filter);

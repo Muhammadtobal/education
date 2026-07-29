@@ -162,13 +162,13 @@ export class TeacherResolver {
     };
   }
 
-  @Mutation(() => TeacherStaticsOutput)
+  @Query(() => TeacherStaticsOutput)
   @UseGuards(JwtAuthTeacherGuard)
   @Permissions(Operation.GET + TeacherVendor.name)
   public teacherStatics(@Context() context: GqlContext) {
     const user = context.req.user;
     const teacherId = getTeacherId(user);
-
+    console.log('teacher>>', teacherId);
     return this.teacherService.teacherStatics(teacherId);
   }
 }
