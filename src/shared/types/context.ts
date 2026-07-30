@@ -4,7 +4,15 @@ interface GqlRequest {
     authorization?: string;
     'req-id'?: string;
   };
-  user: { userId: string } | { teacherId: string } | { empId: string };
+  user:
+    | { userId: string }
+    | { teacherId: string }
+    | {
+        empId: string;
+        employee_vendors: {
+          vendor_id: string;
+        }[];
+      };
   body: { query: string };
 }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
 import {
@@ -95,5 +95,18 @@ export class EmployeeVendorService {
 
   public remove(id: string) {
     this.employeeVendorRepository.delete(id);
+  }
+
+  public async validateEmployeeVendor(employee_id: string, vendor_id: string) {
+    const employeeVendor = await this.findOne({
+      employee_id,
+      vendor_id,
+    });
+
+    if (!employeeVendor) {
+      throw new HttpException('لست تابع لهذا المعهد', HttpStatus.BAD_REQUEST);
+    }
+
+    return employeeVendor;
   }
 }

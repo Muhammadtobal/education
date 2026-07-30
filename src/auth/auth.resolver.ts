@@ -380,9 +380,12 @@ export class AuthResolver {
       code: 'passed',
     });
 
-    const user = await this.userService.findOne({
-      phone: checkActivationCodeInput.phone,
-    });
+    const user = await this.userService.findOne(
+      {
+        phone: checkActivationCodeInput.phone,
+      },
+      { relations: { level: true, city: true } },
+    );
 
     if (!user) return {};
 

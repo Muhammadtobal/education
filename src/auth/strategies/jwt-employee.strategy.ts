@@ -19,8 +19,6 @@ export class JwtEmployeeStrategy extends PassportStrategy(
 
   // TODO: type and production notice
   async validate(payload: EmployeeJWTPayload) {
-    console.log('JWT Payload:', payload);
-
     const employee = await this.employeeService.findOne(
       { id: payload.empId },
       { relations: { employee_permissions: { permission: true } } },

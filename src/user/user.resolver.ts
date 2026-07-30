@@ -60,7 +60,7 @@ export class UserResolver {
     });
 
     const accessToken = await this.authService.generateJwtToken(
-      { userId: user.id },
+      { userId: user?.id },
       process.env.USER_JWT_KEY as string,
     );
     this.userService.removeActivationCode(activationCode.id);
@@ -70,7 +70,7 @@ export class UserResolver {
       const deviceKey = `${device.Platform}-${device.Brand}-${device.Model}-${device.Device}`;
 
       await this.loginHistoryService.create({
-        user_id: user.id,
+        user_id: user?.id as string,
         device_info: createUserInput.device_info,
         device_key: deviceKey,
       });

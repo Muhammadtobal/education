@@ -248,15 +248,48 @@ export function stringToHex(str: string) {
 }
 
 export function getEmpId(
-  user: { userId: string } | { empId: string } | { teacherId: string },
+  user:
+    | { userId: string }
+    | {
+        empId: string;
+        employee_vendors: {
+          vendor_id: string;
+        }[];
+      }
+    | { teacherId: string },
 ) {
   if ('empId' in user) return user.empId;
 
   return '0';
 }
 
+export function getEmpVendors(
+  user:
+    | { userId: string }
+    | { teacherId: string }
+    | {
+        empId: string;
+        employee_vendors: {
+          vendor_id: string;
+        }[];
+      },
+) {
+  if ('employee_vendors' in user) {
+    return user.employee_vendors;
+  }
+
+  return [];
+}
 export function getUserId(
-  user: { userId: string } | { empId: string } | { teacherId: string },
+  user:
+    | { userId: string }
+    | {
+        empId: string;
+        employee_vendors: {
+          vendor_id: string;
+        }[];
+      }
+    | { teacherId: string },
 ) {
   if ('userId' in user) return user.userId;
 
@@ -264,7 +297,15 @@ export function getUserId(
 }
 
 export function getTeacherId(
-  user: { userId: string } | { teacherId: string } | { empId: string },
+  user:
+    | { userId: string }
+    | { teacherId: string }
+    | {
+        empId: string;
+        employee_vendors: {
+          vendor_id: string;
+        }[];
+      },
 ) {
   if ('teacherId' in user) return user.teacherId;
   return '0';

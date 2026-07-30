@@ -1,27 +1,27 @@
-import { Injectable } from "@nestjs/common";
-import { paginate } from "nestjs-typeorm-paginate";
-import { InjectRepository } from "@nestjs/typeorm";
+import { Injectable } from '@nestjs/common';
+import { paginate } from 'nestjs-typeorm-paginate';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   FindOperator,
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
   Repository,
-} from "typeorm";
+} from 'typeorm';
 
-import { CreateUserInput } from "./dto/create-user.input";
-import { UpdateUserInput } from "./dto/update-user.input";
-import { User } from "./entities/user.entity";
-import { FindAllUserInput } from "./dto/find-all-user.input";
+import { CreateUserInput } from './dto/create-user.input';
+import { UpdateUserInput } from './dto/update-user.input';
+import { User } from './entities/user.entity';
+import { FindAllUserInput } from './dto/find-all-user.input';
 import {
   customPaginate,
   generateQueryConditions,
   generateQuerySorts,
   metaTransformer,
-} from "src/shared/helpers";
+} from 'src/shared/helpers';
 
-import { PaginationMetadata } from "src/shared/types/pagination-metadata";
-import { ActivationCode } from "./entities/activation_code.entity";
+import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
+import { ActivationCode } from './entities/activation_code.entity';
 
 @Injectable()
 export class UserService {
@@ -30,28 +30,34 @@ export class UserService {
     private readonly activationCodeRepository: Repository<ActivationCode>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
-  public create(createUserInput: CreateUserInput) {
+  public async create(createUserInput: CreateUserInput) {
     const user = this.userRepository.create(createUserInput);
-    return this.userRepository.save(user);
+    const userSaved = await this.userRepository.save(user);
+    return await this.findOne(
+      { id: userSaved.id },
+      {
+        relations: { level: true, city: true },
+      },
+    );
   }
 
   public findAll(filter: FindAllUserInput) {
-    const query = this.userRepository.createQueryBuilder("user");
+    const query = this.userRepository.createQueryBuilder('user');
     if (filter.select && filter.select?.length) {
-      const fields = filter.select.includes("id")
+      const fields = filter.select.includes('id')
         ? filter.select
-        : ["id", ...filter.select];
+        : ['id', ...filter.select];
 
       query.select(fields.map((field) => `user.${field}`));
     } else {
-      query.select("user");
-      query.leftJoinAndSelect("user.city", "city");
+      query.select('user');
+      query.leftJoinAndSelect('user.city', 'city');
     }
-    query.where("true");
+    query.where('true');
 
-    generateQuerySorts<User>(query, filter, User, "user");
+    generateQuerySorts<User>(query, filter, User, 'user');
 
-    generateQueryConditions<User>(query, filter, "user");
+    generateQueryConditions<User>(query, filter, 'user');
 
     return customPaginate<User, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
@@ -118,7 +124,7 @@ export class UserService {
   }
 
   public createActivationCode(
-    activationCode: Omit<ActivationCode, "id" | "expires_at" | "setExpiration">,
+    activationCode: Omit<ActivationCode, 'id' | 'expires_at' | 'setExpiration'>,
   ) {
     const code = this.activationCodeRepository.create(activationCode);
     return this.activationCodeRepository.save(code);

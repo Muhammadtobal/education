@@ -12,6 +12,7 @@ import { EmployeeModule } from 'src/employee/employee.module';
     PermissionModule,
     EmployeeModule,
   ],
+  exports: [EmployeeVendorService],
   providers: [EmployeeVendorService, EmployeeVendorResolver],
 })
 export class EmployeeVendorModule {}

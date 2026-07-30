@@ -456,8 +456,10 @@ type VendorLevel {
 type Level {
   id: String!
   name: String!
+  title: String!
   parent_id: String
   active: Boolean!
+  next_level: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
 }
@@ -1459,14 +1461,18 @@ input UpdateCityInput {
 
 input CreateLevelInput {
   name: String!
+  title: String!
   parent_id: String
   active: Boolean
+  next_level: Boolean
 }
 
 input UpdateLevelInput {
   name: String
+  title: String
   parent_id: String
   active: Boolean
+  next_level: Boolean
   id: String!
 }
 

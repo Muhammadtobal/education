@@ -14,6 +14,11 @@ export class CreateLevelInput {
   @Field()
   name: string;
 
+  @IsNotEmpty()
+  @IsString()
+  @Field()
+  title: string;
+
   @IsOptional()
   @IsNumberString()
   @Field({ nullable: true })
@@ -23,4 +28,9 @@ export class CreateLevelInput {
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   active?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  next_level?: boolean;
 }

@@ -1,5 +1,5 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 
 import { PlanService } from './plan.service';
 import { Plan } from './entities/plan.entity';
@@ -14,30 +14,75 @@ import { DoneResponseOutput } from 'src/shared/types/done-output';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
+import { GqlContext } from 'src/shared/types/context';
+import { getEmpId, getEmpVendors } from 'src/shared/helpers';
+import { EmployeeVendorService } from 'src/employee_vendor/employee_vendor.service';
 
 @Resolver(() => Plan)
 export class PlanResolver {
-  constructor(private readonly planService: PlanService) {}
+  constructor(
+    private readonly planService: PlanService,
+    private readonly employeeVendorService: EmployeeVendorService,
+  ) {}
 
   @Mutation(() => Plan)
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.CREATE + Plan.name)
-  public createPlan(@Args('createPlanInput') createPlanInput: CreatePlanInput) {
+  public async createPlan(
+    @Args('createPlanInput') createPlanInput: CreatePlanInput,
+    @Context() context: GqlContext,
+  ) {
+    const empId = getEmpId(context.req.user);
+    const vendors = getEmpVendors(context.req.user);
+
+    if (vendors.length > 0 && empId) {
+      await this.employeeVendorService.validateEmployeeVendor(
+        empId,
+        createPlanInput.vendor_id,
+      );
+    }
+
     return this.planService.create(createPlanInput);
   }
 
   @Query(() => PlanPaginationResultOutput, { name: 'plans' })
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Plan.name)
-  public findAll(@Args('filter') filter: FindAllPlanInput) {
+  public findAll(
+    @Args('filter') filter: FindAllPlanInput,
+    @Context() context: GqlContext,
+  ) {
+    const empId = getEmpId(context.req.user);
+    const vendors = getEmpVendors(context.req.user);
+
+    if (vendors.length > 0 && empId) {
+      return this.planService.findAll({
+        ...filter,
+        vendor_id: {
+          ids: vendors.map((vendor) => vendor.vendor_id),
+        },
+      });
+    }
     return this.planService.findAll(filter);
   }
 
   @Query(() => Plan, { name: 'plan' })
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Plan.name)
-  public findOne(@Args('id') id: string) {
-    return this.planService.findOne({ id });
+  public async findOne(@Args('id') id: string, @Context() context: GqlContext) {
+    const empId = getEmpId(context.req.user);
+    const vendors = getEmpVendors(context.req.user);
+
+    const plan = await this.planService.findOne({ id });
+
+    if (vendors.length > 0 && empId && plan) {
+      await this.employeeVendorService.validateEmployeeVendor(
+        empId,
+        plan.vendor_id,
+      );
+    }
+
+    return plan;
   }
 
   @Mutation(() => Plan)

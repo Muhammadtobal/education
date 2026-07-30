@@ -25,6 +25,10 @@ export class Level {
   @Field()
   name: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  @Field()
+  title: string;
+
   @Column({ type: 'bigint', nullable: true })
   @Field({ nullable: true })
   parent_id?: string;
@@ -32,6 +36,10 @@ export class Level {
   @Column('boolean', { default: true })
   @Field(() => Boolean)
   active: boolean;
+
+  @Column('boolean', { nullable: true })
+  @Field(() => Boolean)
+  next_level?: boolean;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Field(() => Date)
