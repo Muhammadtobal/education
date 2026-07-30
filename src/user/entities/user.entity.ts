@@ -71,6 +71,10 @@ export class User {
   @Field()
   level_id: string;
 
+  @Column({ default: false })
+  @Field(() => Boolean)
+  allow_device_change_once: boolean;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Field(() => Date)
   created_at: Date;

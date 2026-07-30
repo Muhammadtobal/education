@@ -11,6 +11,7 @@ import { JwtEmployeeStrategy } from './strategies/jwt-employee.strategy';
 import { TeacherModule } from 'src/teacher/teacher.module';
 import { JwtTeacherStrategy } from './strategies/jwt-teacher.strategy';
 import { LoginHistoryModule } from 'src/login_history/login_history.module';
+import { ConstantModule } from 'src/constant/constant.module';
 
 @Module({
   imports: [

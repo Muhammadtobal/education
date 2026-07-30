@@ -29,6 +29,7 @@ import { EmployeeService } from 'src/employee/employee.service';
 import { TeacherService } from 'src/teacher/teacher.service';
 import { CheckActivationEmployeeCodeOutput } from './dto/check-activation-employee-code.output';
 import { LoginHistoryService } from 'src/login_history/login_history.service';
+import { ConstantService } from 'src/constant/constant.service';
 
 @Resolver()
 export class AuthResolver {
@@ -403,10 +404,19 @@ export class AuthResolver {
         );
 
       if (hasFrequentDeviceChanges) {
-        throw new HttpException(
-          ErrorMessages.DEVICE_CHANGED_MULTIPLE_TIMES,
-          HttpStatus.FORBIDDEN,
-        );
+        if (!user.allow_device_change_once) {
+          throw new HttpException(
+            ErrorMessages.DEVICE_CHANGED_MULTIPLE_TIMES,
+            HttpStatus.FORBIDDEN,
+          );
+        }
+
+        await this.userService.update({
+          id: user.id,
+          allow_device_change_once: false,
+        });
+
+        user.allow_device_change_once = false;
       }
     }
 
@@ -420,6 +430,7 @@ export class AuthResolver {
     await this.userService.update({
       id: user.id,
       refresh_token: refreshToken,
+      device_info: checkActivationCodeInput.device_info,
       fcm_token: checkActivationCodeInput.fcm_token,
     });
 
@@ -431,6 +442,11 @@ export class AuthResolver {
         device_key: deviceKey,
       });
     }
+
+    user.device_info = checkActivationCodeInput.device_info;
+    user.refresh_token = refreshToken;
+    user.fcm_token = checkActivationCodeInput.fcm_token;
+
     return {
       user: user,
       access_token: accessToken,

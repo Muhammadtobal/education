@@ -326,6 +326,7 @@ type User {
   lang: String!
   city_id: String!
   level_id: String!
+  allow_device_change_once: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
   city: City
@@ -1220,6 +1221,7 @@ input CreateUserInput {
   img_url: String
   device_info: JSON
   active: Boolean
+  allow_device_change_once: Boolean
   fcm_token: String
   lang: String
 }

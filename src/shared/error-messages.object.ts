@@ -23,7 +23,8 @@ export const ErrorMessages = {
 
   COUPON_NOT_ALLOWED_FOR_THIS_PLAN: 'غير مسموح باستخدام هذا الكوبون لهذه الخطة',
 
-  DEVICE_CHANGED_MULTIPLE_TIMES: 'تم تغيير الجهاز عدة مرات خلال آخر يومين',
+  DEVICE_CHANGED_MULTIPLE_TIMES:
+    'تم تغيير الجهاز عدة مرات  خلال مدة  قصيرة يرجى التواصل مع الدعم الفني',
   COUPON_NOT_FOUND: '{"ar":"الكوبون غير موجود","en":"Coupon not found"}',
 
   COUPON_NOT_ACTIVE_YET: (date: string) =>

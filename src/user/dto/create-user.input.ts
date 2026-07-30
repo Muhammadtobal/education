@@ -57,6 +57,11 @@ export class CreateUserInput {
   active?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  allow_device_change_once?: boolean;
+
+  @IsOptional()
   @IsString()
   @Field({ nullable: true })
   fcm_token?: string;
