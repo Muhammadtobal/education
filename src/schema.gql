@@ -927,6 +927,7 @@ input FindAllLevelInput {
   name: MatchInput
   active: Boolean
   parent_id: JSON
+  parent_level: Boolean
 }
 
 input FindAllVendorLevelInput {
@@ -1023,6 +1024,7 @@ input FindAllContentInput {
   pagination: PaginationInput!
   sort: SortInput
   course_id: JSON
+  parent_content: Boolean
 }
 
 input FindAllStoryInput {

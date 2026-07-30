@@ -36,8 +36,14 @@ export class ContentService {
       .createQueryBuilder('content')
       .leftJoinAndSelect('content.course', 'course')
       .where('true');
-    generateQuerySorts<Content>(query, filter, Content, 'content');
-    generateQueryConditions<Content>(query, filter, 'content');
+
+    if (filter.parent_content === true) {
+      query.andWhere('content.parent_id IS NULL');
+    }
+
+    const { parent_content, ...contentFilter } = filter;
+    generateQuerySorts<Content>(query, contentFilter, Content, 'content');
+    generateQueryConditions<Content>(query, contentFilter, 'content');
 
     return customPaginate<Content, PaginationMetadata>(query, {
       limit: filter.pagination.limit,

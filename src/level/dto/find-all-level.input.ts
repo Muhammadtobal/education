@@ -47,4 +47,9 @@ export class FindAllLevelInput {
   @IsSingleIdOrList()
   @Field(() => GraphQLJSON, { nullable: true })
   parent_id?: SingleIdInput | ListOfIdsInput;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  parent_level?: boolean;
 }

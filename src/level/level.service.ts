@@ -36,8 +36,15 @@ export class LevelService {
       .createQueryBuilder('level')
       .leftJoinAndSelect('level.parent', 'parent')
       .where('true');
-    generateQuerySorts<Level>(query, filter, Level, 'level');
-    generateQueryConditions<Level>(query, filter, 'level');
+
+    if (filter.parent_level === true) {
+      query.andWhere('level.parent_id IS NULL');
+    }
+
+    const { parent_level, ...levelFilter } = filter;
+
+    generateQuerySorts<Level>(query, levelFilter, Level, 'level');
+    generateQueryConditions<Level>(query, levelFilter, 'level');
 
     return customPaginate<Level, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
