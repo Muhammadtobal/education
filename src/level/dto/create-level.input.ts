@@ -17,6 +17,16 @@ export class CreateLevelInput {
   @IsNotEmpty()
   @IsString()
   @Field()
+  icon: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Field()
+  color: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Field()
   title: string;
 
   @IsOptional()

@@ -29,6 +29,14 @@ export class Level {
   @Field()
   title: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  @Field()
+  icon: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  @Field()
+  color: string;
+
   @Column({ type: 'bigint', nullable: true })
   @Field({ nullable: true })
   parent_id?: string;

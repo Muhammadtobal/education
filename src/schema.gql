@@ -457,6 +457,8 @@ type Level {
   id: String!
   name: String!
   title: String!
+  icon: String!
+  color: String!
   parent_id: String
   active: Boolean!
   next_level: Boolean!
@@ -468,8 +470,8 @@ type Story {
   id: String!
   url: String
   title: String
-  level_id: String!
-  vendor_id: String!
+  level_id: String
+  vendor_id: String
   active: Boolean!
   comment: String
   created_at: DateTime!
@@ -591,6 +593,11 @@ type CourseTeacherPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type EmployeeVendorPaginationResultOutput {
+  items: [EmployeeVendor!]!
+  meta: PaginationMetadata!
+}
+
 type SubscriptionPaginationResultOutput {
   items: [UserSubscription!]!
   meta: PaginationMetadata!
@@ -628,11 +635,6 @@ type LevelPaginationResultOutput {
 
 type VendorLevelPaginationResultOutput {
   items: [VendorLevel!]!
-  meta: PaginationMetadata!
-}
-
-type EmployeeVendorPaginationResultOutput {
-  items: [EmployeeVendor!]!
   meta: PaginationMetadata!
 }
 
@@ -718,17 +720,19 @@ type Query {
   course(id: String!): Course!
   course_teachers(filter: FindAllCourseTeacherInput!): CourseTeacherPaginationResultOutput!
   course_teacher(id: String!): CourseTeacher!
+  employee_vendors(filter: FindAllEmployeeVendorInput!): EmployeeVendorPaginationResultOutput!
+  employee_vendor(id: String!): EmployeeVendor!
+  permissions(filter: FindAllPermissionInput!): PermissionPaginationResultOutput!
+  permission(id: String!): Permission!
+  employees(filter: FindAllEmployeeInput!): EmployeePaginationResultOutput!
+  employee(id: String!): Employee!
+  myEmployeeProfile: Employee
   payments(filter: FindAllPaymentInput!): PaymentPaginationResultOutput!
   payment(id: String!): Payment!
   coupons(filter: FindAllCouponInput!): CouponPaginationResultOutput!
   coupon(id: String!): Coupon!
   plan_coupons(filter: FindAllPlanCouponInput!): PlanCouponPaginationResultOutput!
   plan_coupon(id: String!): PlanCoupon!
-  employees(filter: FindAllEmployeeInput!): EmployeePaginationResultOutput!
-  employee(id: String!): Employee!
-  myEmployeeProfile: Employee
-  permissions(filter: FindAllPermissionInput!): PermissionPaginationResultOutput!
-  permission(id: String!): Permission!
   cities(filter: FindAllCityInput!): CityPaginationResultOutput!
   city(id: String!): City!
   levels(filter: FindAllLevelInput!): LevelPaginationResultOutput!
@@ -739,8 +743,6 @@ type Query {
   notification(id: String!): Notification!
   scheduled_notifications(filter: FindAllScheduledNotificationInput!): ScheduledNotificationPaginationResultOutput!
   scheduled_notification(id: String!): ScheduledNotification!
-  employee_vendors(filter: FindAllEmployeeVendorInput!): EmployeeVendorPaginationResultOutput!
-  employee_vendor(id: String!): EmployeeVendor!
   plans(filter: FindAllPlanInput!): PlanPaginationResultOutput!
   plan(id: String!): Plan!
   plan_courses(filter: FindAllPlanCourseInput!): PlanCoursePaginationResultOutput!
@@ -844,6 +846,7 @@ input FindAllCourseInput {
   sort: SortInput
   name: MatchInput
   level_id: JSON
+  vendor_id: JSON
 }
 
 input FindAllCourseTeacherInput {
@@ -851,6 +854,33 @@ input FindAllCourseTeacherInput {
   sort: SortInput
   course_id: JSON
   teacher_id: JSON
+}
+
+input FindAllEmployeeVendorInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  vendor_id: JSON
+  employee_id: JSON
+}
+
+input FindAllPermissionInput {
+  name: MatchInput
+  description: MatchInput
+  active: Boolean
+  for_vendor: Boolean
+  created_at: JSON
+  pagination: PaginationInput!
+  sort: SortInput
+}
+
+input FindAllEmployeeInput {
+  username: MatchInput
+  full_name: MatchInput
+  account_type: MatchInput
+  active: Boolean
+  pagination: PaginationInput!
+  sort: SortInput
+  created_at: JSON
 }
 
 input FindAllPaymentInput {
@@ -881,26 +911,6 @@ input FindAllPlanCouponInput {
   value: JSON
   coupon_id: JSON
   plan_id: JSON
-}
-
-input FindAllEmployeeInput {
-  username: MatchInput
-  full_name: MatchInput
-  account_type: MatchInput
-  active: Boolean
-  pagination: PaginationInput!
-  sort: SortInput
-  created_at: JSON
-}
-
-input FindAllPermissionInput {
-  name: MatchInput
-  description: MatchInput
-  active: Boolean
-  for_vendor: Boolean
-  created_at: JSON
-  pagination: PaginationInput!
-  sort: SortInput
 }
 
 input FindAllCityInput {
@@ -947,13 +957,6 @@ input FindAllScheduledNotificationInput {
   vendor_id: JSON
   pagination: PaginationInput!
   sort: SortInput
-}
-
-input FindAllEmployeeVendorInput {
-  pagination: PaginationInput!
-  sort: SortInput
-  vendor_id: JSON
-  employee_id: JSON
 }
 
 input FindAllPlanInput {
@@ -1066,6 +1069,15 @@ type Mutation {
   createCourseTeacher(createCourseTeacherInput: CreateCourseTeacherInput!): CourseTeacher!
   updateCourseTeacher(updateCourseTeacherInput: UpdateCourseTeacherInput!): CourseTeacher!
   removeCourseTeacher(id: String!): DoneResponseOutput!
+  createEmployeeVendor(createEmployeeVendorInput: CreateEmployeeVendorInput!): EmployeeVendor!
+  updateEmployeeVendor(updateEmployeeVendorInput: UpdateEmployeeVendorInput!): EmployeeVendor!
+  removeEmployeeVendor(id: String!): DoneResponseOutput!
+  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
+  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
+  removePermission(id: String!): DoneResponseOutput!
+  createEmployee(createEmployeeInput: CreateEmployeeInput!): CheckActivationEmployeeCodeOutput!
+  assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
+  unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
   createPayment(createPaymentInput: CreatePaymentInput!): Payment!
   updatePayment(updatePaymentInput: UpdatePaymentInput!): Payment!
   removePayment(id: String!): DoneResponseOutput!
@@ -1077,12 +1089,6 @@ type Mutation {
   createPlanCoupon(createPlanCouponInput: CreatePlanCouponInput!): PlanCoupon!
   updatePlanCoupon(updatePlanCouponInput: UpdatePlanCouponInput!): PlanCoupon!
   removePlanCoupon(id: String!): DoneResponseOutput!
-  createEmployee(createEmployeeInput: CreateEmployeeInput!): CheckActivationEmployeeCodeOutput!
-  assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
-  unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
-  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
-  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
-  removePermission(id: String!): DoneResponseOutput!
   createCity(createCityInput: CreateCityInput!): City!
   updateCity(updateCityInput: UpdateCityInput!): City!
   removeCity(id: String!): DoneResponseOutput!
@@ -1100,9 +1106,6 @@ type Mutation {
   updateScheduledNotification(updateScheduledNotificationInput: UpdateScheduledNotificationInput!): ScheduledNotification!
   removeScheduledNotification(id: String!): DoneResponseOutput!
   sendScheduledNotification(sendScheduledNotification: CreateScheduledNotificationInput!): ScheduledNotification!
-  createEmployeeVendor(createEmployeeVendorInput: CreateEmployeeVendorInput!): EmployeeVendor!
-  updateEmployeeVendor(updateEmployeeVendorInput: UpdateEmployeeVendorInput!): EmployeeVendor!
-  removeEmployeeVendor(id: String!): DoneResponseOutput!
   createPlan(createPlanInput: CreatePlanInput!): Plan!
   updatePlan(updatePlanInput: UpdatePlanInput!): Plan!
   removePlan(id: String!): DoneResponseOutput!
@@ -1338,6 +1341,52 @@ input UpdateCourseTeacherInput {
   id: String!
 }
 
+input CreateEmployeeVendorInput {
+  vendor_id: String!
+  employee_id: String!
+  active: Boolean
+}
+
+input UpdateEmployeeVendorInput {
+  vendor_id: String
+  employee_id: String
+  active: Boolean
+  id: String!
+}
+
+input CreatePermissionInput {
+  name: String!
+  description: String
+  translation: String
+  active: Boolean
+  for_vendor: Boolean
+}
+
+input UpdatePermissionInput {
+  name: String
+  description: String
+  translation: String
+  active: Boolean
+  for_vendor: Boolean
+  id: String!
+}
+
+input CreateEmployeeInput {
+  phone: String!
+  gender: Gender!
+  full_name: String!
+  city_id: String!
+  active: Boolean = true
+  device_info: JSON
+  fcm_token: String
+  refresh_token: String
+}
+
+input AssignPermissionInput {
+  permission_ids: [String!]!
+  employee_id: String!
+}
+
 input CreatePaymentInput {
   user_id: String!
   vendor_id: String!
@@ -1415,39 +1464,6 @@ input UpdatePlanCouponInput {
   id: String!
 }
 
-input CreateEmployeeInput {
-  phone: String!
-  gender: Gender!
-  full_name: String!
-  city_id: String!
-  active: Boolean = true
-  device_info: JSON
-  fcm_token: String
-  refresh_token: String
-}
-
-input AssignPermissionInput {
-  permission_ids: [String!]!
-  employee_id: String!
-}
-
-input CreatePermissionInput {
-  name: String!
-  description: String
-  translation: String
-  active: Boolean
-  for_vendor: Boolean
-}
-
-input UpdatePermissionInput {
-  name: String
-  description: String
-  translation: String
-  active: Boolean
-  for_vendor: Boolean
-  id: String!
-}
-
 input CreateCityInput {
   name: String!
   active: Boolean
@@ -1461,6 +1477,8 @@ input UpdateCityInput {
 
 input CreateLevelInput {
   name: String!
+  icon: String!
+  color: String!
   title: String!
   parent_id: String
   active: Boolean
@@ -1469,6 +1487,8 @@ input CreateLevelInput {
 
 input UpdateLevelInput {
   name: String
+  icon: String
+  color: String
   title: String
   parent_id: String
   active: Boolean
@@ -1558,19 +1578,6 @@ input UpdateScheduledNotificationInput {
   employee_id: String
   filter_data: NotificationFilterDataInput
   approved: Boolean
-  id: String!
-}
-
-input CreateEmployeeVendorInput {
-  vendor_id: String!
-  employee_id: String!
-  active: Boolean
-}
-
-input UpdateEmployeeVendorInput {
-  vendor_id: String
-  employee_id: String
-  active: Boolean
   id: String!
 }
 
@@ -1748,16 +1755,16 @@ input UpdateContentInput {
 }
 
 input CreateStoryInput {
-  level_id: String!
-  vendor_id: String!
   url: String
   title: String
+  level_id: String
+  vendor_id: String
 }
 
 input UpdateStoryInput {
-  level_id: String
-  vendor_id: String
   url: String
   title: String
+  level_id: String
+  vendor_id: String
   id: String!
 }

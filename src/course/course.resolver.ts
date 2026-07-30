@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { CourseService } from './course.service';
@@ -14,37 +14,83 @@ import { DoneResponseOutput } from 'src/shared/types/done-output';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
+
 import { CourseTeacher } from './entities/course_teacher.entity';
 import { CreateCourseTeacherInput } from './dto/create-course_teacher.input';
 import { CourseTeacherPaginationResultOutput } from './dto/find-all-course_teacher.output';
 import { FindAllCourseTeacherInput } from './dto/find-all-course_teacher.input';
 import { UpdateCourseTeacherInput } from './dto/update-course_teacher.input';
 
+import { GqlContext } from 'src/shared/types/context';
+import { getEmpId, getEmpVendors } from 'src/shared/helpers';
+import { EmployeeVendorService } from 'src/employee_vendor/employee_vendor.service';
+
 @Resolver(() => Course)
 export class CourseResolver {
-  constructor(private readonly courseService: CourseService) {}
+  constructor(
+    private readonly courseService: CourseService,
+    private readonly employeeVendorService: EmployeeVendorService,
+  ) {}
 
   @Mutation(() => Course)
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.CREATE + Course.name)
-  public createCourse(
+  public async createCourse(
     @Args('createCourseInput') createCourseInput: CreateCourseInput,
+    @Context() context: GqlContext,
   ) {
+    const empId = getEmpId(context.req.user);
+    const vendors = getEmpVendors(context.req.user);
+
+    if (vendors.length > 0 && empId) {
+      await this.employeeVendorService.validateEmployeeVendor(
+        empId,
+        createCourseInput.vendor_id,
+      );
+    }
+
     return this.courseService.create(createCourseInput);
   }
 
   @Query(() => CoursePaginationResultOutput, { name: 'courses' })
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Course.name)
-  public findAll(@Args('filter') filter: FindAllCourseInput) {
+  public findAll(
+    @Args('filter') filter: FindAllCourseInput,
+    @Context() context: GqlContext,
+  ) {
+    const empId = getEmpId(context.req.user);
+    const vendors = getEmpVendors(context.req.user);
+
+    if (vendors.length > 0 && empId) {
+      return this.courseService.findAll({
+        ...filter,
+        vendor_id: {
+          ids: vendors.map((vendor) => vendor.vendor_id),
+        },
+      });
+    }
+
     return this.courseService.findAll(filter);
   }
 
   @Query(() => Course, { name: 'course' })
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Course.name)
-  public findOne(@Args('id') id: string) {
-    return this.courseService.findOne({ id });
+  public async findOne(@Args('id') id: string, @Context() context: GqlContext) {
+    const empId = getEmpId(context.req.user);
+    const vendors = getEmpVendors(context.req.user);
+
+    const course = await this.courseService.findOne({ id });
+
+    if (vendors.length > 0 && empId && course) {
+      await this.employeeVendorService.validateEmployeeVendor(
+        empId,
+        course.vendor_id,
+      );
+    }
+
+    return course;
   }
 
   @Mutation(() => Course)

@@ -8,16 +8,6 @@ import {
 
 @InputType()
 export class CreateStoryInput {
-  @IsNotEmpty()
-  @IsNumberString()
-  @Field()
-  level_id: string;
-
-  @IsNotEmpty()
-  @IsNumberString()
-  @Field()
-  vendor_id: string;
-
   @IsOptional()
   @IsString()
   @Field({ nullable: true })
@@ -27,4 +17,14 @@ export class CreateStoryInput {
   @IsString()
   @Field({ nullable: true })
   title?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  level_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  vendor_id?: string;
 }

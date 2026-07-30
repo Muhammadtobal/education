@@ -17,7 +17,7 @@ import { UserService } from 'src/user/user.service';
 import { booleanSchema, stringSchema } from 'src/shared/types/zod-schemas';
 import { CityService } from 'src/city/city.service';
 import { ErrorMessages } from 'src/shared/error-messages.object';
-import { getEmpId } from 'src/shared/helpers';
+import { getEmpId, getEmpVendors } from 'src/shared/helpers';
 import { GqlContext } from 'src/shared/types/context';
 import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
@@ -25,13 +25,15 @@ import { ScheduledNotification } from './entities/scheduled_notification.entity'
 import { CreateScheduledNotificationInput } from './dto/create-scheduled_notification.input';
 import { ScheduledNotificationPaginationResultOutput } from './dto/find-all-scheduled_notification.output';
 import { FindAllScheduledNotificationInput } from './dto/find-all-scheduled_notification.input';
-import { UpdateScheduledNotificationInput } from './dto/update-secheduled_notification.input';
+import { UpdateScheduledNotificationInput } from './dto/update-scheduled_notification.input';
+import { EmployeeVendorService } from 'src/employee_vendor/employee_vendor.service';
 @Resolver(() => Notification)
 export class NotificationResolver {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly userService: UserService,
     private readonly cityService: CityService,
+    private readonly employeeVendorService: EmployeeVendorService,
   ) {}
 
   @Mutation(() => Notification)
@@ -197,17 +199,39 @@ export class NotificationResolver {
   public findAllScheduledNotification(
     @Args('filter')
     filter: FindAllScheduledNotificationInput,
+    @Context() context: GqlContext,
   ) {
+    const empId = getEmpId(context.req.user);
+    const vendors = getEmpVendors(context.req.user);
+
+    if (vendors.length > 0 && empId) {
+      return this.notificationService.findAll({
+        ...filter,
+        vendor_id: {
+          ids: vendors.map((vendor) => vendor.vendor_id),
+        },
+      });
+    }
+
     return this.notificationService.findAll(filter);
   }
 
   @Query(() => ScheduledNotification, {
     name: 'scheduled_notification',
   })
+  @Query(() => ScheduledNotification, {
+    name: 'scheduled_notification',
+  })
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + ScheduledNotification.name)
-  public findOneScheduledNotification(@Args('id') id: string) {
-    return this.notificationService.findOne(
+  public async findOneScheduledNotification(
+    @Args('id') id: string,
+    @Context() context: GqlContext,
+  ) {
+    const empId = getEmpId(context.req.user);
+    const vendors = getEmpVendors(context.req.user);
+
+    const notification = await this.notificationService.findOne(
       { id },
       {
         relations: {
@@ -216,6 +240,15 @@ export class NotificationResolver {
         },
       },
     );
+
+    if (vendors.length > 0 && empId && notification) {
+      await this.employeeVendorService.validateEmployeeVendor(
+        empId,
+        notification.vendor_id,
+      );
+    }
+
+    return notification;
   }
 
   @Mutation(() => ScheduledNotification)

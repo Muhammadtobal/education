@@ -27,13 +27,13 @@ export class Story {
   @Field({ nullable: true })
   title?: string;
 
-  @Column('bigint')
-  @Field()
-  level_id: string;
+  @Column('bigint', { nullable: true })
+  @Field({ nullable: true })
+  level_id?: string;
 
-  @Column('bigint')
-  @Field()
-  vendor_id: string;
+  @Column('bigint', { nullable: true })
+  @Field({ nullable: true })
+  vendor_id?: string;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
