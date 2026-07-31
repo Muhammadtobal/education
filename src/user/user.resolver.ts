@@ -21,12 +21,14 @@ import { UpdateMeUserInput } from './dto/update-me-user.inputs';
 import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 import { CheckActivationUserCodeOutput } from 'src/auth/dto/check-activation-user-code.output';
 import { LoginHistoryService } from 'src/login_history/login_history.service';
+import { NotificationService } from 'src/notification/notification.service';
 @Resolver(() => User)
 export class UserResolver {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly loginHistoryService: LoginHistoryService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   @Mutation(() => CheckActivationUserCodeOutput)
@@ -104,67 +106,65 @@ export class UserResolver {
     );
   }
 
-  // @Mutation(() => User)
-  // @UseGuards(JwtAuthEmployeeGuard)
-  // @Permissions(Operation.UPDATE + User.name)
-  // public async updateUser(
-  //   @Args("updateUserInput") updateUserInput: UpdateUserInput,
-  // ) {
-  //   const user = await this.userService.findOne(
-  //     { id: updateUserInput.id },
-  //     {
-  //       selected: { id: true, active: true },
-  //     },
-  //   );
+  @Mutation(() => User)
+  @UseGuards(JwtAuthEmployeeGuard)
+  @Permissions(Operation.UPDATE + User.name)
+  public async updateUser(
+    @Args('updateUserInput') updateUserInput: UpdateUserInput,
+  ) {
+    const user = await this.userService.findOne(
+      { id: updateUserInput.id },
+      {
+        selected: { id: true, active: true },
+      },
+    );
 
-  //   if (!user)
-  //     throw new HttpException(
-  //       ErrorMessages.NOT_FOUND_USER,
-  //       HttpStatus.NOT_FOUND,
-  //     );
-  //   const updateUser = this.userService.update(updateUserInput);
+    if (!user)
+      throw new HttpException(
+        ErrorMessages.NOT_FOUND_USER,
+        HttpStatus.NOT_FOUND,
+      );
+    const updateUser = this.userService.update(updateUserInput);
 
-  //   if (
-  //     booleanSchema.safeParse(updateUserInput.active).success &&
-  //     user.active !== updateUserInput.active
-  //   ) {
-  //     let body = { ar: "", en: "" };
-  //     let title = { ar: "", en: "" };
+    if (
+      booleanSchema.safeParse(updateUserInput.active).success &&
+      user.active !== updateUserInput.active
+    ) {
+      let body = { ar: '', en: '' };
+      let title = { ar: '', en: '' };
 
-  //     if (updateUserInput.active) {
-  //       body = { ar: "تم تفعيل حسابك", en: "Your account has been activated" };
-  //       title = { ar: "عملية تفعيل حساب", en: "Account activation" };
-  //     } else {
-  //       body = {
-  //         ar: "تم إلغاء تفعيل حسابك",
-  //         en: "Your account has been deactivated",
-  //       };
-  //       title = { ar: "عملية إيقاف الحساب", en: "Account deactivation" };
-  //     }
-  //     this.notificationService.sendNotificationToUser({
-  //       user_id: updateUserInput.id,
+      if (updateUserInput.active) {
+        body = { ar: 'تم تفعيل حسابك', en: 'Your account has been activated' };
+        title = { ar: 'عملية تفعيل حساب', en: 'Account activation' };
+      } else {
+        body = {
+          ar: 'تم إلغاء تفعيل حسابك',
+          en: 'Your account has been deactivated',
+        };
+        title = { ar: 'عملية إيقاف الحساب', en: 'Account deactivation' };
+      }
+      this.notificationService.sendNotificationToUser({
+        user_id: updateUserInput.id,
 
-  //       body: JSON.stringify(body),
-  //       title: JSON.stringify(title),
-  //       employee_id: " ",
-  //       broker_id: " ",
-  //     });
-  //   }
-  //   return updateUser;
-  // }
+        body: JSON.stringify(body),
+        title: JSON.stringify(title),
+      });
+    }
+    return updateUser;
+  }
 
-  // @Mutation(() => User)
-  // @UseGuards(JwtAuthUserGuard)
-  // @Permissions(Operation.UPDATE + User.name)
-  // public updateMeUser(
-  //   @Args("updateMeInput") updateMeUserInput: UpdateMeUserInput,
-  //   @Context() context: GqlContext,
-  // ) {
-  //   const userId = getUserId(context.req.user);
+  @Mutation(() => User)
+  @UseGuards(JwtAuthUserGuard)
+  @Permissions(Operation.UPDATE + User.name)
+  public updateMeUser(
+    @Args('updateMeInput') updateMeUserInput: UpdateMeUserInput,
+    @Context() context: GqlContext,
+  ) {
+    const userId = getUserId(context.req.user);
 
-  //   return this.userService.update({
-  //     id: userId,
-  //     ...updateMeUserInput,
-  //   });
-  // }
+    return this.userService.update({
+      id: userId,
+      ...updateMeUserInput,
+    });
+  }
 }

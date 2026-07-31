@@ -7,12 +7,14 @@ import { User } from './entities/user.entity';
 import { ActivationCode } from './entities/activation_code.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { LoginHistoryModule } from 'src/login_history/login_history.module';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, ActivationCode]),
     forwardRef(() => AuthModule),
     LoginHistoryModule,
+    NotificationModule,
   ],
   exports: [UserService],
   providers: [UserResolver, UserService],

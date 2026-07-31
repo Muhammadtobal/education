@@ -584,6 +584,26 @@ type LoginHistoryPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type NotificationPaginationResultOutput {
+  items: [Notification!]!
+  meta: PaginationMetadata!
+}
+
+type ScheduledNotificationPaginationResultOutput {
+  items: [ScheduledNotification!]!
+  meta: PaginationMetadata!
+}
+
+type CityPaginationResultOutput {
+  items: [City!]!
+  meta: PaginationMetadata!
+}
+
+type EmployeeVendorPaginationResultOutput {
+  items: [EmployeeVendor!]!
+  meta: PaginationMetadata!
+}
+
 type CoursePaginationResultOutput {
   items: [Course!]!
   meta: PaginationMetadata!
@@ -591,11 +611,6 @@ type CoursePaginationResultOutput {
 
 type CourseTeacherPaginationResultOutput {
   items: [Course!]!
-  meta: PaginationMetadata!
-}
-
-type EmployeeVendorPaginationResultOutput {
-  items: [EmployeeVendor!]!
   meta: PaginationMetadata!
 }
 
@@ -621,11 +636,6 @@ type CouponPaginationResultOutput {
 
 type PlanCouponPaginationResultOutput {
   items: [PlanCoupon!]!
-  meta: PaginationMetadata!
-}
-
-type CityPaginationResultOutput {
-  items: [City!]!
   meta: PaginationMetadata!
 }
 
@@ -684,16 +694,6 @@ type ContentPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
-type NotificationPaginationResultOutput {
-  items: [Notification!]!
-  meta: PaginationMetadata!
-}
-
-type ScheduledNotificationPaginationResultOutput {
-  items: [ScheduledNotification!]!
-  meta: PaginationMetadata!
-}
-
 type StoryPaginationResultOutput {
   items: [Story!]!
   meta: PaginationMetadata!
@@ -728,22 +728,22 @@ type Query {
   employees(filter: FindAllEmployeeInput!): EmployeePaginationResultOutput!
   employee(id: String!): Employee!
   myEmployeeProfile: Employee
+  notifications(filter: FindAllNotificationInput!): NotificationPaginationResultOutput!
+  notification(id: String!): Notification!
+  scheduled_notifications(filter: FindAllScheduledNotificationInput!): ScheduledNotificationPaginationResultOutput!
+  scheduled_notification(id: String!): ScheduledNotification!
+  cities(filter: FindAllCityInput!): CityPaginationResultOutput!
+  city(id: String!): City!
   payments(filter: FindAllPaymentInput!): PaymentPaginationResultOutput!
   payment(id: String!): Payment!
   coupons(filter: FindAllCouponInput!): CouponPaginationResultOutput!
   coupon(id: String!): Coupon!
   plan_coupons(filter: FindAllPlanCouponInput!): PlanCouponPaginationResultOutput!
   plan_coupon(id: String!): PlanCoupon!
-  cities(filter: FindAllCityInput!): CityPaginationResultOutput!
-  city(id: String!): City!
   levels(filter: FindAllLevelInput!): LevelPaginationResultOutput!
   level(id: String!): Level!
   vendor_levels(filter: FindAllVendorLevelInput!): VendorLevelPaginationResultOutput!
   vendor_level(id: String!): VendorLevel!
-  notifications(filter: FindAllNotificationInput!): NotificationPaginationResultOutput!
-  notification(id: String!): Notification!
-  scheduled_notifications(filter: FindAllScheduledNotificationInput!): ScheduledNotificationPaginationResultOutput!
-  scheduled_notification(id: String!): ScheduledNotification!
   plans(filter: FindAllPlanInput!): PlanPaginationResultOutput!
   plan(id: String!): Plan!
   plan_courses(filter: FindAllPlanCourseInput!): PlanCoursePaginationResultOutput!
@@ -884,6 +884,36 @@ input FindAllEmployeeInput {
   created_at: JSON
 }
 
+input FindAllNotificationInput {
+  title: MatchInput
+  body: Boolean
+  created_at: JSON
+  active: Boolean
+  user_id: JSON
+  employee_id: JSON
+  vendor_id: JSON
+  pagination: PaginationInput!
+  sort: SortInput
+}
+
+input FindAllScheduledNotificationInput {
+  title: MatchInput
+  body: Boolean
+  created_at: JSON
+  active: Boolean
+  vendor_id: JSON
+  pagination: PaginationInput!
+  sort: SortInput
+}
+
+input FindAllCityInput {
+  name: MatchInput
+  active: Boolean
+  created_at: JSON
+  pagination: PaginationInput!
+  sort: SortInput
+}
+
 input FindAllPaymentInput {
   pagination: PaginationInput!
   sort: SortInput
@@ -914,14 +944,6 @@ input FindAllPlanCouponInput {
   plan_id: JSON
 }
 
-input FindAllCityInput {
-  name: MatchInput
-  active: Boolean
-  created_at: JSON
-  pagination: PaginationInput!
-  sort: SortInput
-}
-
 input FindAllLevelInput {
   pagination: PaginationInput!
   sort: SortInput
@@ -937,28 +959,6 @@ input FindAllVendorLevelInput {
   active: Boolean
   vendor_id: JSON
   level_id: JSON
-}
-
-input FindAllNotificationInput {
-  title: MatchInput
-  body: Boolean
-  created_at: JSON
-  active: Boolean
-  user_id: JSON
-  employee_id: JSON
-  vendor_id: JSON
-  pagination: PaginationInput!
-  sort: SortInput
-}
-
-input FindAllScheduledNotificationInput {
-  title: MatchInput
-  body: Boolean
-  created_at: JSON
-  active: Boolean
-  vendor_id: JSON
-  pagination: PaginationInput!
-  sort: SortInput
 }
 
 input FindAllPlanInput {
@@ -1047,6 +1047,8 @@ type Mutation {
   updateTeacherVendor(updateTeacherVendorInput: UpdateTeacherVendorInput!): TeacherVendor!
   removeTeacherVendor(id: String!): DoneResponseOutput!
   createUser(createUserInput: CreateUserInput!): CheckActivationUserCodeOutput!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  updateMeUser(updateMeInput: UpdateMeUserInput!): User!
   refreshTokenEmployee(refreshTokenInput: RefreshTokenInput!): RefreshTokenOutput!
   checkEmployeeActivationCode(checkActivationCodeInput: CheckActivationCodeInput!): CheckActivationEmployeeCodeOutput!
   sendActivationCode(sendActivationCodeInput: SendActivationCodeInput!): SendActivationCodeOutput!
@@ -1081,6 +1083,17 @@ type Mutation {
   createEmployee(createEmployeeInput: CreateEmployeeInput!): CheckActivationEmployeeCodeOutput!
   assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
   unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
+  createNotification(createNotificationInput: CreateNotificationInput!): Notification!
+  updateNotification(updateNotificationInput: UpdateNotificationInput!): Notification!
+  removeNotification(id: String!): DoneResponseOutput!
+  sendNotification(sendNotification: CreateNotificationInput!): Notification!
+  createScheduledNotification(createScheduledNotificationInput: CreateScheduledNotificationInput!): ScheduledNotification!
+  updateScheduledNotification(updateScheduledNotificationInput: UpdateScheduledNotificationInput!): ScheduledNotification!
+  removeScheduledNotification(id: String!): DoneResponseOutput!
+  sendScheduledNotification(sendScheduledNotification: CreateScheduledNotificationInput!): ScheduledNotification!
+  createCity(createCityInput: CreateCityInput!): City!
+  updateCity(updateCityInput: UpdateCityInput!): City!
+  removeCity(id: String!): DoneResponseOutput!
   createPayment(createPaymentInput: CreatePaymentInput!): Payment!
   updatePayment(updatePaymentInput: UpdatePaymentInput!): Payment!
   removePayment(id: String!): DoneResponseOutput!
@@ -1092,23 +1105,12 @@ type Mutation {
   createPlanCoupon(createPlanCouponInput: CreatePlanCouponInput!): PlanCoupon!
   updatePlanCoupon(updatePlanCouponInput: UpdatePlanCouponInput!): PlanCoupon!
   removePlanCoupon(id: String!): DoneResponseOutput!
-  createCity(createCityInput: CreateCityInput!): City!
-  updateCity(updateCityInput: UpdateCityInput!): City!
-  removeCity(id: String!): DoneResponseOutput!
   createLevel(createLevelInput: CreateLevelInput!): Level!
   updateLevel(updateLevelInput: UpdateLevelInput!): Level!
   removeLevel(id: String!): DoneResponseOutput!
   createVendorLevel(createVendorLevelInput: CreateVendorLevelInput!): VendorLevel!
   updateVendorLevel(updateVendorLevelInput: UpdateVendorLevelInput!): VendorLevel!
   removeVendorLevel(id: String!): DoneResponseOutput!
-  createNotification(createNotificationInput: CreateNotificationInput!): Notification!
-  updateNotification(updateNotificationInput: UpdateNotificationInput!): Notification!
-  removeNotification(id: String!): DoneResponseOutput!
-  sendNotification(sendNotification: CreateNotificationInput!): Notification!
-  createScheduledNotification(createScheduledNotificationInput: CreateScheduledNotificationInput!): ScheduledNotification!
-  updateScheduledNotification(updateScheduledNotificationInput: UpdateScheduledNotificationInput!): ScheduledNotification!
-  removeScheduledNotification(id: String!): DoneResponseOutput!
-  sendScheduledNotification(sendScheduledNotification: CreateScheduledNotificationInput!): ScheduledNotification!
   createPlan(createPlanInput: CreatePlanInput!): Plan!
   updatePlan(updatePlanInput: UpdatePlanInput!): Plan!
   removePlan(id: String!): DoneResponseOutput!
@@ -1224,6 +1226,32 @@ input CreateUserInput {
   allow_device_change_once: Boolean
   fcm_token: String
   lang: String
+}
+
+input UpdateUserInput {
+  full_name: String
+  phone: String
+  gender: Gender
+  city_id: String
+  level_id: String
+  img_url: String
+  device_info: JSON
+  active: Boolean
+  allow_device_change_once: Boolean
+  fcm_token: String
+  lang: String
+  id: String!
+}
+
+input UpdateMeUserInput {
+  full_name: String
+  phone: String
+  gender: Gender
+  img_url: String
+  device_info: JSON
+  fcm_token: String
+  lang: String
+  city_id: String
 }
 
 input RefreshTokenInput {
@@ -1391,6 +1419,89 @@ input AssignPermissionInput {
   employee_id: String!
 }
 
+input CreateNotificationInput {
+  title: String!
+  body: String!
+  filter_data: NotificationFilterDataInput
+  active: Boolean
+  img_url: String
+  link: String
+  global: Boolean
+  vendor_id: String
+  user_id: String
+  employee_id: String
+  approved: Boolean
+  extraData: JSON
+}
+
+input NotificationFilterDataInput {
+  city: CityInput!
+  is_user: Boolean
+}
+
+input CityInput {
+  id: String!
+  name: String!
+}
+
+input UpdateNotificationInput {
+  title: String
+  body: String
+  filter_data: NotificationFilterDataInput
+  active: Boolean
+  img_url: String
+  link: String
+  global: Boolean
+  vendor_id: String
+  user_id: String
+  employee_id: String
+  approved: Boolean
+  extraData: JSON
+  id: String!
+}
+
+input CreateScheduledNotificationInput {
+  title: String!
+  body: String!
+  count: Int!
+  scheduled_notification_type: ScheduledNotificationType!
+  active: Boolean
+  link: String
+  img_url: String
+  user_id: String
+  vendor_id: String
+  employee_id: String
+  filter_data: NotificationFilterDataInput
+  approved: Boolean
+}
+
+input UpdateScheduledNotificationInput {
+  title: String
+  body: String
+  count: Int
+  scheduled_notification_type: ScheduledNotificationType
+  active: Boolean
+  link: String
+  img_url: String
+  user_id: String
+  vendor_id: String
+  employee_id: String
+  filter_data: NotificationFilterDataInput
+  approved: Boolean
+  id: String!
+}
+
+input CreateCityInput {
+  name: String!
+  active: Boolean
+}
+
+input UpdateCityInput {
+  name: String
+  active: Boolean
+  id: String!
+}
+
 input CreatePaymentInput {
   user_id: String!
   vendor_id: String!
@@ -1468,17 +1579,6 @@ input UpdatePlanCouponInput {
   id: String!
 }
 
-input CreateCityInput {
-  name: String!
-  active: Boolean
-}
-
-input UpdateCityInput {
-  name: String
-  active: Boolean
-  id: String!
-}
-
 input CreateLevelInput {
   name: String!
   icon: String!
@@ -1510,78 +1610,6 @@ input UpdateVendorLevelInput {
   vendor_id: String
   level_id: String
   active: Boolean = true
-  id: String!
-}
-
-input CreateNotificationInput {
-  title: String!
-  body: String!
-  filter_data: NotificationFilterDataInput
-  active: Boolean
-  img_url: String
-  link: String
-  global: Boolean
-  vendor_id: String
-  user_id: String
-  employee_id: String
-  approved: Boolean
-  extraData: JSON
-}
-
-input NotificationFilterDataInput {
-  city: CityInput!
-  is_user: Boolean
-}
-
-input CityInput {
-  id: String!
-  name: String!
-}
-
-input UpdateNotificationInput {
-  title: String
-  body: String
-  filter_data: NotificationFilterDataInput
-  active: Boolean
-  img_url: String
-  link: String
-  global: Boolean
-  vendor_id: String
-  user_id: String
-  employee_id: String
-  approved: Boolean
-  extraData: JSON
-  id: String!
-}
-
-input CreateScheduledNotificationInput {
-  title: String!
-  body: String!
-  count: Int!
-  scheduled_notification_type: ScheduledNotificationType!
-  active: Boolean
-  link: String
-  img_url: String
-  user_id: String
-  vendor_id: String
-  employee_id: String
-  filter_data: NotificationFilterDataInput
-  approved: Boolean
-}
-
-input UpdateScheduledNotificationInput {
-  title: String
-  body: String
-  count: Int
-  scheduled_notification_type: ScheduledNotificationType
-  active: Boolean
-  link: String
-  img_url: String
-  user_id: String
-  vendor_id: String
-  employee_id: String
-  filter_data: NotificationFilterDataInput
-  approved: Boolean
   id: String!
 }
 
