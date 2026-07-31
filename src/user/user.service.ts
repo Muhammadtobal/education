@@ -90,6 +90,7 @@ export class UserService {
       {
         relations: {
           city: true,
+          level: true,
         },
       },
     );
