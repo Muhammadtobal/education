@@ -27,6 +27,7 @@ export class VendorService {
   ) {}
   public create(createVendorInput: CreateVendorInput) {
     const vendor = this.vendorRepository.create(createVendorInput);
+    console.log('Das');
     return this.vendorRepository.save(vendor);
   }
 
