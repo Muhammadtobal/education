@@ -111,6 +111,7 @@ export class UserService {
   }
 
   public async removeActivationCode(id: string) {
+    console.log('j');
     await this.activationCodeRepository.delete({ id });
   }
 
