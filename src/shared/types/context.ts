@@ -9,9 +9,6 @@ interface GqlRequest {
     | { teacherId: string }
     | {
         empId: string;
-        employee_vendors: {
-          vendor_id: string;
-        }[];
       };
   body: { query: string };
 }

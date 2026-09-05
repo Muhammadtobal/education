@@ -6,7 +6,6 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { join } from 'path';
 import { GraphQLError } from 'graphql';
-import { VendorModule } from './vendor/vendor.module';
 import { TeacherModule } from './teacher/teacher.module';
 
 import { SubscriptionModule } from './subscription/subscription.module';
@@ -19,8 +18,6 @@ import { PermissionModule } from './permission/permission.module';
 import { EmployeeModule } from './employee/employee.module';
 import { EmployeePermissionModule } from './employee_permission/employee_permission.module';
 import { LevelModule } from './level/level.module';
-import { VendorLevelModule } from './vendor_level/vendor_level.module';
-import { EmployeeVendorModule } from './employee_vendor/employee_vendor.module';
 import { PlanModule } from './plan/plan.module';
 import { CourseModule } from './course/course.module';
 import { PlanCourseModule } from './plan_course/plan_course.module';
@@ -82,7 +79,6 @@ import { AppController } from './app.controller';
           ? [ApolloServerPluginLandingPageLocalDefault()]
           : [],
     }),
-    VendorModule,
     TeacherModule,
 
     SubscriptionModule,
@@ -95,9 +91,8 @@ import { AppController } from './app.controller';
     EmployeeModule,
     EmployeePermissionModule,
     LevelModule,
-    VendorLevelModule,
     NotificationModule,
-    EmployeeVendorModule,
+
     PlanModule,
     CourseModule,
     PlanCourseModule,

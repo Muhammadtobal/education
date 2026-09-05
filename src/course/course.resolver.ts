@@ -23,14 +23,10 @@ import { UpdateCourseTeacherInput } from './dto/update-course_teacher.input';
 
 import { GqlContext } from 'src/shared/types/context';
 import { getEmpId, getEmpVendors } from 'src/shared/helpers';
-import { EmployeeVendorService } from 'src/employee_vendor/employee_vendor.service';
 
 @Resolver(() => Course)
 export class CourseResolver {
-  constructor(
-    private readonly courseService: CourseService,
-    private readonly employeeVendorService: EmployeeVendorService,
-  ) {}
+  constructor(private readonly courseService: CourseService) {}
 
   @Mutation(() => Course)
   @UseGuards(JwtAuthSharedGuard)
@@ -39,16 +35,6 @@ export class CourseResolver {
     @Args('createCourseInput') createCourseInput: CreateCourseInput,
     @Context() context: GqlContext,
   ) {
-    const empId = getEmpId(context.req.user);
-    const vendors = getEmpVendors(context.req.user);
-
-    if (vendors.length > 0 && empId) {
-      await this.employeeVendorService.validateEmployeeVendor(
-        empId,
-        createCourseInput.vendor_id,
-      );
-    }
-
     return this.courseService.create(createCourseInput);
   }
 
@@ -59,18 +45,6 @@ export class CourseResolver {
     @Args('filter') filter: FindAllCourseInput,
     @Context() context: GqlContext,
   ) {
-    const empId = getEmpId(context.req.user);
-    const vendors = getEmpVendors(context.req.user);
-
-    if (vendors.length > 0 && empId) {
-      return this.courseService.findAll({
-        ...filter,
-        vendor_id: {
-          ids: vendors.map((vendor) => vendor.vendor_id),
-        },
-      });
-    }
-
     return this.courseService.findAll(filter);
   }
 
@@ -82,13 +56,6 @@ export class CourseResolver {
     const vendors = getEmpVendors(context.req.user);
 
     const course = await this.courseService.findOne({ id });
-
-    if (vendors.length > 0 && empId && course) {
-      await this.employeeVendorService.validateEmployeeVendor(
-        empId,
-        course.vendor_id,
-      );
-    }
 
     return course;
   }

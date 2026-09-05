@@ -61,11 +61,6 @@ export class CreateScheduledNotificationInput {
   @IsOptional()
   @IsNumberString()
   @Field({ nullable: true })
-  vendor_id?: string;
-
-  @IsOptional()
-  @IsNumberString()
-  @Field({ nullable: true })
   employee_id?: string;
 
   @IsOptional()

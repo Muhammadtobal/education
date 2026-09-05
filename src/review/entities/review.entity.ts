@@ -11,7 +11,6 @@ import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 
 import { User } from 'src/user/entities/user.entity';
 import { Course } from 'src/course/entities/course.entity';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
 
 @ObjectType()

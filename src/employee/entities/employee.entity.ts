@@ -1,4 +1,3 @@
-import { EmployeeVendor } from 'src/employee_vendor/entities/employee_vendor.entity';
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import {
   Column,
@@ -72,13 +71,6 @@ export class Employee {
   )
   @Field(() => [EmployeePermission], { nullable: true })
   employee_permissions: EmployeePermission[];
-
-  @OneToMany(
-    () => EmployeeVendor,
-    (employee_vendor) => employee_vendor.employee,
-  )
-  @Field(() => [EmployeeVendor], { nullable: true })
-  employee_vendors: EmployeeVendor[];
 
   @OneToMany(() => Notification, (notification) => notification.employee)
   notifications: Notification[];

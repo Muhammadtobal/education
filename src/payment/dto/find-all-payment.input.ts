@@ -35,12 +35,6 @@ export class FindAllPaymentInput {
   @IsObject()
   @IsSingleIdOrList()
   @Field(() => GraphQLJSON, { nullable: true })
-  vendor_id?: SingleIdInput | ListOfIdsInput;
-
-  @IsOptional()
-  @IsObject()
-  @IsSingleIdOrList()
-  @Field(() => GraphQLJSON, { nullable: true })
   user_id?: SingleIdInput | ListOfIdsInput;
 
   @IsOptional()

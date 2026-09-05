@@ -32,7 +32,6 @@ export class JwtEmployeeStrategy extends PassportStrategy(
       empId: payload.empId,
       type: 'employee',
 
-      employee_vendors: payload.employee_vendors,
       permissions: employee.employee_permissions.map(
         (employeePermission) => employeePermission.permission?.name,
       ),

@@ -27,7 +27,6 @@ import {
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
 import { PlanCourse } from 'src/plan_course/entities/plan_course.entity';
 import { Course } from 'src/course/entities/course.entity';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { PlanType } from 'src/shared/enums/plan_type.enum';
@@ -193,7 +192,6 @@ export class PaymentService {
 
       const payment = queryRunner.manager.create(Payment, {
         subscription_id: subscription.id,
-        vendor_id: createPaymentInput.vendor_id,
         teacher_id: createPaymentInput.teacher_id,
 
         value: price,
@@ -219,9 +217,6 @@ export class PaymentService {
           );
         }
 
-        vendorId = course.vendor_id;
-        vendorShare = Number(course.vendor_share ?? 0);
-
         if (createPaymentInput.teacher_id) {
           const courseTeacher = await queryRunner.manager.findOne(
             CourseTeacher,
@@ -240,9 +235,6 @@ export class PaymentService {
           where: {
             id: planCourse.content_id,
           },
-          relations: {
-            course: { vendor: true },
-          },
         });
 
         if (!content) {
@@ -251,9 +243,6 @@ export class PaymentService {
             'CONTENT_NOT_FOUND',
           );
         }
-
-        vendorId = content.course?.vendor_id;
-        vendorShare = Number(content.course?.vendor_share ?? 0);
 
         if (createPaymentInput.teacher_id) {
           const courseTeacher = await queryRunner.manager.findOne(
@@ -268,28 +257,6 @@ export class PaymentService {
 
           teacherShare = Number(courseTeacher?.teacher_share ?? 0);
         }
-      }
-
-      if (vendorId && vendorShare > 0) {
-        const vendor = await queryRunner.manager.findOne(Vendor, {
-          where: {
-            id: vendorId,
-          },
-          lock: {
-            mode: 'pessimistic_write',
-          },
-        });
-
-        if (!vendor) {
-          throw new PaymentValidationError(
-            'Vendor not found',
-            'VENDOR_NOT_FOUND',
-          );
-        }
-
-        vendor.balance = Number(vendor.balance) + (price * vendorShare) / 100;
-
-        await queryRunner.manager.save(vendor);
       }
 
       if (createPaymentInput.teacher_id && teacherShare > 0) {

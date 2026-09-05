@@ -11,7 +11,6 @@ import {
 
 import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 import { PlanType } from 'src/shared/enums/plan_type.enum';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 
 @ObjectType()
 @Entity()
@@ -23,10 +22,6 @@ export class Plan {
   @Column({ type: 'varchar', length: 255 })
   @Field()
   name: string;
-
-  @Column({ type: 'bigint' })
-  @Field()
-  vendor_id: string;
 
   @Column({
     type: 'enum',
@@ -69,11 +64,6 @@ export class Plan {
   })
   @Field(() => Date)
   updated_at: Date;
-
-  @ManyToOne(() => Vendor, (vendor) => vendor.plans)
-  @JoinColumn({ name: 'vendor_id' })
-  @Field(() => Vendor, { nullable: true })
-  vendor?: Vendor;
 
   @OneToMany(() => PlanCourse, (plan_course) => plan_course.plan)
   plan_courses: PlanCourse[];

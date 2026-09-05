@@ -59,12 +59,6 @@ export class FindAllNotificationInput {
   @Field(() => GraphQLJSON, { nullable: true })
   employee_id?: SingleIdInput | ListOfIdsInput;
 
-  @IsOptional()
-  @IsObject()
-  @IsSingleIdOrList()
-  @Field(() => GraphQLJSON, { nullable: true })
-  vendor_id?: SingleIdInput | ListOfIdsInput;
-
   @IsNotEmpty()
   @IsObject()
   @Type(() => PaginationInput)

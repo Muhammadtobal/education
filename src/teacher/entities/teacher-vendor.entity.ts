@@ -8,7 +8,6 @@ import {
 import { ObjectType, Field } from '@nestjs/graphql';
 
 import { Teacher } from 'src/teacher/entities/teacher.entity';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 
 @ObjectType()
 @Entity()
@@ -20,10 +19,6 @@ export class TeacherVendor {
   @Column({ type: 'bigint' })
   @Field()
   teacher_id: string;
-
-  @Column({ type: 'bigint' })
-  @Field()
-  vendor_id: string;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
@@ -45,9 +40,4 @@ export class TeacherVendor {
   @JoinColumn({ name: 'teacher_id' })
   @Field(() => Teacher)
   teacher: Teacher;
-
-  @ManyToOne(() => Vendor, (vendor) => vendor.teacher_vendors, {})
-  @JoinColumn({ name: 'vendor_id' })
-  @Field(() => Vendor)
-  vendor: Vendor;
 }

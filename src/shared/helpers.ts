@@ -252,9 +252,6 @@ export function getEmpId(
     | { userId: string }
     | {
         empId: string;
-        employee_vendors: {
-          vendor_id: string;
-        }[];
       }
     | { teacherId: string },
 ) {
@@ -269,9 +266,6 @@ export function getEmpVendors(
     | { teacherId: string }
     | {
         empId: string;
-        employee_vendors: {
-          vendor_id: string;
-        }[];
       },
 ) {
   if ('employee_vendors' in user) {
@@ -285,9 +279,6 @@ export function getUserId(
     | { userId: string }
     | {
         empId: string;
-        employee_vendors: {
-          vendor_id: string;
-        }[];
       }
     | { teacherId: string },
 ) {
@@ -302,9 +293,6 @@ export function getTeacherId(
     | { teacherId: string }
     | {
         empId: string;
-        employee_vendors: {
-          vendor_id: string;
-        }[];
       },
 ) {
   if ('teacherId' in user) return user.teacherId;

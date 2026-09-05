@@ -17,9 +17,9 @@ import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { Discussion } from 'src/discussion/entities/discussion.entity';
 import { CourseTeacher } from './course_teacher.entity';
+import { CourseType } from 'src/shared/enums/course_type.enum';
 
 @ObjectType()
 @Entity()
@@ -44,10 +44,6 @@ export class Course {
   @Field()
   level_id: string;
 
-  @Column('bigint')
-  @Field()
-  vendor_id: string;
-
   @Column({
     type: 'float',
     default: 0,
@@ -61,6 +57,12 @@ export class Course {
   })
   @Field(() => Float)
   rating: number;
+
+  @Column({
+    type: 'enum',
+    enum: CourseType,
+  })
+  course_type: CourseType;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
@@ -77,11 +79,6 @@ export class Course {
   })
   @Field(() => Date)
   updated_at: Date;
-
-  @ManyToOne(() => Vendor, (vendor) => vendor.courses)
-  @JoinColumn({ name: 'vendor_id' })
-  @Field(() => Vendor, { nullable: true })
-  vendor?: Vendor;
 
   @ManyToOne(() => Level, (level) => level.courses)
   @JoinColumn({ name: 'level_id' })

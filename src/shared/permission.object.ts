@@ -139,18 +139,8 @@ const PermissionsStore = {
   DELETE_USER: 'deleteUser',
   CREATE_USER: 'createUser',
 
-  GET_VENDOR: 'getVendor',
-  UPDATE_VENDOR: 'updateVendor',
-  DELETE_VENDOR: 'deleteVendor',
-  CREATE_VENDOR: 'createVendor',
-
-  GET_VENDOR_LEVEL: 'getVendorLevel',
-  UPDATE_VENDOR_LEVEL: 'updateVendorLevel',
-  DELETE_VENDOR_LEVEL: 'deleteVendorLevel',
-  CREATE_VENDOR_LEVEL: 'createVendorLevel',
-
-  GET_COURSE_TEACHER: 'getVendorLevel',
-  UPDATE_COURSE_TEACHER: 'updateVendorLevel',
+  GET_COURSE_TEACHER: 'getCourseTeacher',
+  UPDATE_COURSE_TEACHER: 'updateCourseTeacher',
   DELETE_COURSE_TEACHER: 'deleteCourseTeacher',
   CREATE_COURSE_TEACHER: 'createCourseTeacher',
 

@@ -17,7 +17,6 @@ import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { Discussion } from 'src/discussion/entities/discussion.entity';
 import { Course } from './course.entity';
 

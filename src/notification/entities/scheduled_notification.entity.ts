@@ -13,7 +13,6 @@ import { City } from 'src/city/entities/city.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { User } from 'src/user/entities/user.entity';
 import { ScheduledNotificationType } from 'src/shared/enums/scheduled_notification.enum';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 
 @Entity()
 @ObjectType()
@@ -73,10 +72,6 @@ export class ScheduledNotification {
   @Field()
   created_at: Date;
 
-  @Column('bigint', { nullable: true })
-  @Field({ nullable: true })
-  vendor_id: string;
-
   @Column('simple-json')
   @Field(() => GraphQLJSON)
   filter_data: {
@@ -108,9 +103,4 @@ export class ScheduledNotification {
   @JoinColumn({ name: 'employee_id' })
   @Field(() => Employee, { nullable: true })
   employee?: Employee;
-
-  @ManyToOne(() => Vendor, (vendor) => vendor.scheduled_notifications)
-  @JoinColumn({ name: 'vendor_id' })
-  @Field(() => Vendor, { nullable: true })
-  vendor?: Vendor;
 }

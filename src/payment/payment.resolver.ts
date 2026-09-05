@@ -20,14 +20,10 @@ import {
   PaymentValidationError,
 } from 'src/shared/helpers';
 import { GqlContext } from 'src/shared/types/context';
-import { EmployeeVendorService } from 'src/employee_vendor/employee_vendor.service';
 
 @Resolver(() => Payment)
 export class PaymentResolver {
-  constructor(
-    private readonly paymentService: PaymentService,
-    private readonly employeeVendorService: EmployeeVendorService,
-  ) {}
+  constructor(private readonly paymentService: PaymentService) {}
 
   @Mutation(() => Payment)
   @UseGuards(JwtAuthSharedGuard)
@@ -56,18 +52,6 @@ export class PaymentResolver {
     @Args('filter') filter: FindAllPaymentInput,
     @Context() context: GqlContext,
   ) {
-    const empId = getEmpId(context.req.user);
-    const vendors = getEmpVendors(context.req.user);
-
-    if (vendors.length > 0 && empId) {
-      return this.paymentService.findAll({
-        ...filter,
-        vendor_id: {
-          ids: vendors.map((vendor) => vendor.vendor_id),
-        },
-      });
-    }
-
     return this.paymentService.findAll(filter);
   }
 
@@ -79,13 +63,6 @@ export class PaymentResolver {
     const vendors = getEmpVendors(context.req.user);
 
     const payment = await this.paymentService.findOne({ id });
-
-    if (vendors.length > 0 && empId && payment) {
-      await this.employeeVendorService.validateEmployeeVendor(
-        empId,
-        payment.vendor_id,
-      );
-    }
 
     return payment;
   }

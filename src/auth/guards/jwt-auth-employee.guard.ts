@@ -37,16 +37,8 @@ export class JwtAuthEmployeeGuard extends AuthGuard('jwt-employee') {
 
     const permission = context.requiredPermission;
 
-    const isVendorEmployee = user.employee_vendors?.length > 0;
-
-    if (isVendorEmployee) {
-      if (user.permissions.includes(permission)) {
-        return user;
-      }
-    } else {
-      if (user.permissions.includes(permission)) {
-        return user;
-      }
+    if (user.permissions.includes(permission)) {
+      return user;
     }
 
     throw new UnauthorizedException();

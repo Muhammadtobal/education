@@ -5,7 +5,6 @@ import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
-import { VendorModule } from 'src/vendor/vendor.module';
 import { EmployeeModule } from 'src/employee/employee.module';
 import { JwtEmployeeStrategy } from './strategies/jwt-employee.strategy';
 import { TeacherModule } from 'src/teacher/teacher.module';

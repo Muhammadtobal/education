@@ -13,7 +13,6 @@ import * as bcrypt from 'bcryptjs';
 import { SendActivationCodeInput } from './dto/send-activation-code.input';
 import { SendActivationCodeOutput } from './dto/send-activation-code.output';
 import { AuthService } from './auth.service';
-import { VendorService } from 'src/vendor/vendor.service';
 import { UserService } from 'src/user/user.service';
 import { CheckActivationTeacherCodeOutput } from './dto/check-activation-teacher-code.output';
 
@@ -74,17 +73,10 @@ export class AuthResolver {
       }
     }
 
-    const employee = await this.employeeService.findOne(
-      {
-        id: jwtData.empId,
-        refresh_token: refreshTokenInput.refresh_token,
-      },
-      {
-        relations: {
-          employee_vendors: true,
-        },
-      },
-    );
+    const employee = await this.employeeService.findOne({
+      id: jwtData.empId,
+      refresh_token: refreshTokenInput.refresh_token,
+    });
 
     if (!employee)
       throw new HttpException(
@@ -95,9 +87,6 @@ export class AuthResolver {
     const accessToken = await this.authService.generateJwtToken(
       {
         empId: employee.id,
-        employee_vendors: employee.employee_vendors.map((v) => ({
-          vendor_id: v.vendor_id,
-        })),
       },
       process.env.EMPLOYEE_JWT_KEY!,
     );
@@ -136,7 +125,6 @@ export class AuthResolver {
       {
         relations: {
           employee_permissions: { permission: true },
-          employee_vendors: true,
         },
       },
     );
@@ -146,9 +134,6 @@ export class AuthResolver {
     const accessToken = await this.authService.generateJwtToken(
       {
         empId: employee.id,
-        employee_vendors: employee.employee_vendors.map((v) => ({
-          vendor_id: v.vendor_id,
-        })),
       },
       process.env.EMPLOYEE_JWT_KEY!,
     );

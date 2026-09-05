@@ -60,11 +60,6 @@ export class CreateNotificationInput {
   @IsOptional()
   @IsNumberString()
   @Field({ nullable: true })
-  vendor_id?: string;
-
-  @IsOptional()
-  @IsNumberString()
-  @Field({ nullable: true })
   user_id?: string;
 
   @IsOptional()

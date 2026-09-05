@@ -4,14 +4,9 @@ import { Payment } from './entities/payment.entity';
 import { PaymentService } from './payment.service';
 import { PaymentResolver } from './payment.resolver';
 import { CouponModule } from 'src/coupon/coupon.module';
-import { EmployeeVendorModule } from 'src/employee_vendor/employee_vendor.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Payment]),
-    CouponModule,
-    EmployeeVendorModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Payment]), CouponModule],
   providers: [PaymentService, PaymentResolver],
 })
 export class PaymentModule {}

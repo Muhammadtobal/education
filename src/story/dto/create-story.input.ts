@@ -22,9 +22,4 @@ export class CreateStoryInput {
   @IsNumberString()
   @Field({ nullable: true })
   level_id?: string;
-
-  @IsOptional()
-  @IsNumberString()
-  @Field({ nullable: true })
-  vendor_id?: string;
 }

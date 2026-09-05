@@ -26,14 +26,12 @@ import { CreateScheduledNotificationInput } from './dto/create-scheduled_notific
 import { ScheduledNotificationPaginationResultOutput } from './dto/find-all-scheduled_notification.output';
 import { FindAllScheduledNotificationInput } from './dto/find-all-scheduled_notification.input';
 import { UpdateScheduledNotificationInput } from './dto/update-scheduled_notification.input';
-import { EmployeeVendorService } from 'src/employee_vendor/employee_vendor.service';
 @Resolver(() => Notification)
 export class NotificationResolver {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly userService: UserService,
     private readonly cityService: CityService,
-    private readonly employeeVendorService: EmployeeVendorService,
   ) {}
 
   @Mutation(() => Notification)
@@ -201,18 +199,6 @@ export class NotificationResolver {
     filter: FindAllScheduledNotificationInput,
     @Context() context: GqlContext,
   ) {
-    const empId = getEmpId(context.req.user);
-    const vendors = getEmpVendors(context.req.user);
-
-    if (vendors.length > 0 && empId) {
-      return this.notificationService.findAll({
-        ...filter,
-        vendor_id: {
-          ids: vendors.map((vendor) => vendor.vendor_id),
-        },
-      });
-    }
-
     return this.notificationService.findAll(filter);
   }
 
@@ -240,13 +226,6 @@ export class NotificationResolver {
         },
       },
     );
-
-    if (vendors.length > 0 && empId && notification) {
-      await this.employeeVendorService.validateEmployeeVendor(
-        empId,
-        notification.vendor_id,
-      );
-    }
 
     return notification;
   }

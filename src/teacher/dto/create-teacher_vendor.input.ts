@@ -13,11 +13,6 @@ export class CreateTeacherVendorInput {
   @Field()
   teacher_id: string;
 
-  @IsNotEmpty()
-  @IsNumberString()
-  @Field()
-  vendor_id: string;
-
   @IsOptional()
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })

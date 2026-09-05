@@ -16,14 +16,10 @@ import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
 import { GqlContext } from 'src/shared/types/context';
 import { getEmpId, getEmpVendors } from 'src/shared/helpers';
-import { EmployeeVendorService } from 'src/employee_vendor/employee_vendor.service';
 
 @Resolver(() => Plan)
 export class PlanResolver {
-  constructor(
-    private readonly planService: PlanService,
-    private readonly employeeVendorService: EmployeeVendorService,
-  ) {}
+  constructor(private readonly planService: PlanService) {}
 
   @Mutation(() => Plan)
   @UseGuards(JwtAuthSharedGuard)
@@ -35,13 +31,6 @@ export class PlanResolver {
     const empId = getEmpId(context.req.user);
     const vendors = getEmpVendors(context.req.user);
 
-    if (vendors.length > 0 && empId) {
-      await this.employeeVendorService.validateEmployeeVendor(
-        empId,
-        createPlanInput.vendor_id,
-      );
-    }
-
     return this.planService.create(createPlanInput);
   }
 
@@ -52,17 +41,6 @@ export class PlanResolver {
     @Args('filter') filter: FindAllPlanInput,
     @Context() context: GqlContext,
   ) {
-    const empId = getEmpId(context.req.user);
-    const vendors = getEmpVendors(context.req.user);
-
-    if (vendors.length > 0 && empId) {
-      return this.planService.findAll({
-        ...filter,
-        vendor_id: {
-          ids: vendors.map((vendor) => vendor.vendor_id),
-        },
-      });
-    }
     return this.planService.findAll(filter);
   }
 
@@ -74,13 +52,6 @@ export class PlanResolver {
     const vendors = getEmpVendors(context.req.user);
 
     const plan = await this.planService.findOne({ id });
-
-    if (vendors.length > 0 && empId && plan) {
-      await this.employeeVendorService.validateEmployeeVendor(
-        empId,
-        plan.vendor_id,
-      );
-    }
 
     return plan;
   }

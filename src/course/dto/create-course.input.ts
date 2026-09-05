@@ -1,12 +1,14 @@
 import { InputType, Field, Float } from '@nestjs/graphql';
 import {
   IsBoolean,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { CourseType } from 'src/shared/enums/course_type.enum';
 
 @InputType()
 export class CreateCourseInput {
@@ -31,9 +33,9 @@ export class CreateCourseInput {
   level_id: string;
 
   @IsNotEmpty()
-  @IsNumberString()
-  @Field()
-  vendor_id: string;
+  @IsEnum(CourseType)
+  @Field(() => CourseType)
+  course_type: CourseType;
 
   @IsNotEmpty()
   @IsNumberString()

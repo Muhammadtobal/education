@@ -45,14 +45,8 @@ export class JwtAuthTeacherUserGuard extends AuthGuard([
 
       const isVendorEmployee = user.employee_vendors?.length > 0;
 
-      if (isVendorEmployee) {
-        if (!user.permissions.includes(permission)) {
-          throw new UnauthorizedException();
-        }
-      } else {
-        if (!user.permissions.includes(permission)) {
-          throw new UnauthorizedException();
-        }
+      if (!user.permissions.includes(permission)) {
+        throw new UnauthorizedException();
       }
     }
 

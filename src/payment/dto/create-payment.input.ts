@@ -18,11 +18,6 @@ export class CreatePaymentInput {
   @IsNotEmpty()
   @IsNumberString()
   @Field()
-  vendor_id: string;
-
-  @IsNotEmpty()
-  @IsNumberString()
-  @Field()
   plan_id: string;
 
   @IsNotEmpty()

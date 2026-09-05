@@ -20,11 +20,6 @@ export class CreatePlanInput {
   name: string;
 
   @IsNotEmpty()
-  @IsNumberString()
-  @Field()
-  vendor_id: string;
-
-  @IsNotEmpty()
   @IsEnum(PlanType)
   @Field(() => PlanType)
   plan_type: PlanType;

@@ -21,7 +21,6 @@ import {
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { Course } from 'src/course/entities/course.entity';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { Content } from 'src/content/entities/content.entity';
@@ -123,9 +122,6 @@ export class SubscriptionService {
             throw new Error('Course not found');
           }
 
-          vendorId = course.vendor_id;
-          vendorShare = Number(course.vendor_share ?? 0);
-
           if (payment.teacher_id) {
             const courseTeacher = await queryRunner.manager.findOne(
               CourseTeacher,
@@ -153,9 +149,6 @@ export class SubscriptionService {
             throw new Error('Content not found');
           }
 
-          vendorId = content.course?.vendor_id;
-          vendorShare = Number(content.course?.vendor_share ?? 0);
-
           if (payment.teacher_id) {
             const courseTeacher = await queryRunner.manager.findOne(
               CourseTeacher,
@@ -169,25 +162,6 @@ export class SubscriptionService {
 
             teacherShare = Number(courseTeacher?.teacher_share ?? 0);
           }
-        }
-
-        if (vendorId && vendorShare > 0) {
-          const vendor = await queryRunner.manager.findOne(Vendor, {
-            where: {
-              id: vendorId,
-            },
-            lock: {
-              mode: 'pessimistic_write',
-            },
-          });
-
-          if (!vendor) {
-            throw new Error('Vendor not found');
-          }
-
-          vendor.balance = Number(vendor.balance) - (price * vendorShare) / 100;
-
-          await queryRunner.manager.save(vendor);
         }
 
         if (payment.teacher_id && teacherShare > 0) {

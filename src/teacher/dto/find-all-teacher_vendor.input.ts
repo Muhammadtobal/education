@@ -30,10 +30,4 @@ export class FindAllTeacherVendorInput {
   @Type(() => SortInput)
   @Field(() => SortInput, { nullable: true })
   sort?: SortInput;
-
-  @IsOptional()
-  @IsObject()
-  @IsSingleIdOrList()
-  @Field(() => GraphQLJSON, { nullable: true })
-  vendor_id?: SingleIdInput | ListOfIdsInput;
 }

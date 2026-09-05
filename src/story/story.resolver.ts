@@ -17,14 +17,10 @@ import { Operation } from 'src/shared/enums/operation.enum';
 
 import { GqlContext } from 'src/shared/types/context';
 import { getEmpId, getEmpVendors } from 'src/shared/helpers';
-import { EmployeeVendorService } from 'src/employee_vendor/employee_vendor.service';
 
 @Resolver(() => Story)
 export class StoryResolver {
-  constructor(
-    private readonly storyService: StoryService,
-    private readonly employeeVendorService: EmployeeVendorService,
-  ) {}
+  constructor(private readonly storyService: StoryService) {}
 
   @Mutation(() => Story)
   @UseGuards(JwtAuthSharedGuard)
@@ -34,14 +30,6 @@ export class StoryResolver {
     @Context() context: GqlContext,
   ) {
     const empId = getEmpId(context.req.user);
-    const vendors = getEmpVendors(context.req.user);
-
-    if (vendors.length > 0 && empId && createStoryInput.vendor_id) {
-      await this.employeeVendorService.validateEmployeeVendor(
-        empId,
-        createStoryInput.vendor_id,
-      );
-    }
 
     return this.storyService.create(createStoryInput);
   }
@@ -56,15 +44,6 @@ export class StoryResolver {
     const empId = getEmpId(context.req.user);
     const vendors = getEmpVendors(context.req.user);
 
-    if (vendors.length > 0 && empId) {
-      return this.storyService.findAll({
-        ...filter,
-        vendor_id: {
-          ids: vendors.map((vendor) => vendor.vendor_id),
-        },
-      });
-    }
-
     return this.storyService.findAll(filter);
   }
 
@@ -76,13 +55,6 @@ export class StoryResolver {
     const vendors = getEmpVendors(context.req.user);
 
     const story = await this.storyService.findOne({ id });
-
-    if (vendors.length > 0 && empId && story && story.vendor_id) {
-      await this.employeeVendorService.validateEmployeeVendor(
-        empId,
-        story.vendor_id,
-      );
-    }
 
     return story;
   }

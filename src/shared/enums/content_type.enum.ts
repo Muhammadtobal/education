@@ -4,6 +4,7 @@ export enum ContentType {
   FILE = 'file',
   VIDEO = 'video',
   AUDIO = 'audio',
+  FOLDER = 'folder',
 }
 
 registerEnumType(ContentType, {

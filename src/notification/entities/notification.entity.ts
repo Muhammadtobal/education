@@ -52,10 +52,6 @@ export class Notification {
   @Field()
   created_at: Date;
 
-  @Column('bigint', { nullable: true })
-  @Field({ nullable: true })
-  vendor_id: string;
-
   @Column('simple-json')
   @Field(() => GraphQLJSON)
   filter_data: {

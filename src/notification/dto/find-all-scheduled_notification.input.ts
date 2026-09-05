@@ -47,12 +47,6 @@ export class FindAllScheduledNotificationInput {
   @Field(() => Boolean, { nullable: true })
   active?: boolean;
 
-  @IsOptional()
-  @IsObject()
-  @IsSingleIdOrList()
-  @Field(() => GraphQLJSON, { nullable: true })
-  vendor_id?: SingleIdInput | ListOfIdsInput;
-
   @IsNotEmpty()
   @IsObject()
   @Type(() => PaginationInput)

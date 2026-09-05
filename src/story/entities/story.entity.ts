@@ -10,7 +10,6 @@ import {
 import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 
 import { Level } from 'src/level/entities/level.entity';
-import { Vendor } from 'src/vendor/entities/vendor.entity';
 
 @ObjectType()
 @Entity()
@@ -30,10 +29,6 @@ export class Story {
   @Column('bigint', { nullable: true })
   @Field({ nullable: true })
   level_id?: string;
-
-  @Column('bigint', { nullable: true })
-  @Field({ nullable: true })
-  vendor_id?: string;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
@@ -59,9 +54,4 @@ export class Story {
   @JoinColumn({ name: 'level_id' })
   @Field(() => Level, { nullable: true })
   level?: Level;
-
-  @ManyToOne(() => Vendor, (vendor) => vendor.stories)
-  @JoinColumn({ name: 'vendor_id' })
-  @Field(() => Vendor, { nullable: true })
-  vendor?: Vendor;
 }

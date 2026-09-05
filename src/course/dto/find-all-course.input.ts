@@ -39,13 +39,13 @@ export class FindAllCourseInput {
 
   @IsOptional()
   @IsObject()
-  @IsSingleIdOrList()
-  @Field(() => GraphQLJSON, { nullable: true })
-  level_id?: SingleIdInput | ListOfIdsInput;
+  @Type(() => MatchInput)
+  @Field(() => MatchInput, { nullable: true })
+  course_type?: MatchInput;
 
   @IsOptional()
   @IsObject()
   @IsSingleIdOrList()
   @Field(() => GraphQLJSON, { nullable: true })
-  vendor_id?: SingleIdInput | ListOfIdsInput;
+  level_id?: SingleIdInput | ListOfIdsInput;
 }

@@ -12,9 +12,6 @@ export interface TeacherJWTPayload {
 export interface EmployeeJWTPayload {
   empId: string;
   permissions: string[];
-  employee_vendors: {
-    vendor_id: string;
-  }[];
 }
 
 export const verifyJwtToken = <T>(

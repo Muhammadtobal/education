@@ -1,7 +1,5 @@
 import { Story } from 'src/story/entities/story.entity';
 import { Course } from 'src/course/entities/course.entity';
-import { EmployeeVendor } from 'src/employee_vendor/entities/employee_vendor.entity';
-import { VendorLevel } from 'src/vendor_level/entities/vendor_level.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -75,9 +73,6 @@ export class Level {
 
   @OneToMany(() => Course, (course) => course.level)
   courses: Course[];
-
-  @OneToMany(() => VendorLevel, (vendor_level) => vendor_level.level)
-  vendor_levels: VendorLevel[];
 
   @OneToMany(() => Story, (story) => story.level)
   stories: Story[];
