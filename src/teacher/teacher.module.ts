@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Teacher } from './entities/teacher.entity';
 import { TeacherService } from './teacher.service';
 import { TeacherResolver } from './teacher.resolver';
-import { TeacherVendor } from './entities/teacher-vendor.entity';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
@@ -12,7 +11,7 @@ import { SubscriptionModule } from 'src/subscription/subscription.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Teacher, TeacherVendor]),
+    TypeOrmModule.forFeature([Teacher]),
     forwardRef(() => UserModule),
     forwardRef(() => AuthModule),
     CourseModule,

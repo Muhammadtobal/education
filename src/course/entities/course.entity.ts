@@ -49,13 +49,6 @@ export class Course {
     default: 0,
   })
   @Field(() => Float)
-  vendor_share: number;
-
-  @Column({
-    type: 'float',
-    default: 0,
-  })
-  @Field(() => Float)
   rating: number;
 
   @Column({

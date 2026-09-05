@@ -50,11 +50,6 @@ export class CreateCourseInput {
   @IsOptional()
   @IsNumber()
   @Field(() => Float, { nullable: true })
-  vendor_share?: number;
-
-  @IsOptional()
-  @IsNumber()
-  @Field(() => Float, { nullable: true })
   rating?: number;
 
   @IsOptional()

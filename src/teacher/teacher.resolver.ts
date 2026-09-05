@@ -15,11 +15,6 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
-import { TeacherVendor } from './entities/teacher-vendor.entity';
-import { CreateTeacherVendorInput } from './dto/create-teacher_vendor.input';
-import { TeacherVendorPaginationResultOutput } from './dto/find-all-teacher_vendor.output';
-import { FindAllTeacherVendorInput } from './dto/find-all-teacher_vendor.input';
-import { UpdateTeacherVendorInput } from './dto/update-teacher_vendor.input';
 import { JwtAuthTeacherGuard } from 'src/auth/guards/jwt-auth-teacher.guard';
 import { TeacherStaticsOutput } from './dto/teacher-statics.output';
 import { GqlContext } from 'src/shared/types/context';
@@ -111,64 +106,13 @@ export class TeacherResolver {
     return { done: true };
   }
 
-  @Mutation(() => TeacherVendor)
-  @UseGuards(JwtAuthSharedGuard)
-  @Permissions(Operation.CREATE + TeacherVendor.name)
-  public createTeacherVendor(
-    @Args('createTeacherVendorInput')
-    createTeacherVendorInput: CreateTeacherVendorInput,
-  ) {
-    return this.teacherService.createTeacherVendor(createTeacherVendorInput);
-  }
-
-  @Query(() => TeacherVendorPaginationResultOutput, {
-    name: 'teacher_vendors',
-  })
-  @UseGuards(JwtAuthSharedGuard)
-  @Permissions(Operation.GET + TeacherVendor.name)
-  public findAllTeacherVendor(
-    @Args('filter') filter: FindAllTeacherVendorInput,
-  ) {
-    return this.teacherService.findAllTeacherVendor(filter);
-  }
-
-  @Query(() => TeacherVendor, {
-    name: 'teacher_vendor',
-  })
-  @UseGuards(JwtAuthSharedGuard)
-  @Permissions(Operation.GET + TeacherVendor.name)
-  public findOneTeacherVendor(@Args('id') id: string) {
-    return this.teacherService.findOneTeacherVendor({ id });
-  }
-
-  @Mutation(() => TeacherVendor)
-  @UseGuards(JwtAuthSharedGuard)
-  @Permissions(Operation.UPDATE + TeacherVendor.name)
-  public updateTeacherVendor(
-    @Args('updateTeacherVendorInput')
-    updateTeacherVendorInput: UpdateTeacherVendorInput,
-  ) {
-    return this.teacherService.updateTeacherVendor(updateTeacherVendorInput);
-  }
-
-  @Mutation(() => DoneResponseOutput)
-  @UseGuards(JwtAuthSharedGuard)
-  @Permissions(Operation.DELETE + TeacherVendor.name)
-  public removeTeacherVendor(@Args('id') id: string) {
-    this.teacherService.removeTeacherVendor(id);
-
-    return {
-      done: true,
-    };
-  }
-
-  @Query(() => TeacherStaticsOutput)
-  @UseGuards(JwtAuthTeacherGuard)
-  @Permissions(Operation.GET + TeacherVendor.name)
-  public teacherStatics(@Context() context: GqlContext) {
-    const user = context.req.user;
-    const teacherId = getTeacherId(user);
-    console.log('teacher>>', teacherId);
-    return this.teacherService.teacherStatics(teacherId);
-  }
+  // @Query(() => TeacherStaticsOutput)
+  // @UseGuards(JwtAuthTeacherGuard)
+  // @Permissions(Operation.GET + TeacherVendor.name)
+  // public teacherStatics(@Context() context: GqlContext) {
+  //   const user = context.req.user;
+  //   const teacherId = getTeacherId(user);
+  //   console.log('teacher>>', teacherId);
+  //   return this.teacherService.teacherStatics(teacherId);
+  // }
 }

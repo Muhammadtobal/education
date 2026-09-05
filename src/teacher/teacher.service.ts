@@ -18,10 +18,6 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
-import { TeacherVendor } from './entities/teacher-vendor.entity';
-import { CreateTeacherVendorInput } from './dto/create-teacher_vendor.input';
-import { FindAllTeacherVendorInput } from './dto/find-all-teacher_vendor.input';
-import { UpdateTeacherVendorInput } from './dto/update-teacher_vendor.input';
 import { CourseService } from 'src/course/course.service';
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import { paginate } from 'nestjs-typeorm-paginate';
@@ -31,9 +27,6 @@ export class TeacherService {
   constructor(
     @InjectRepository(Teacher)
     private readonly teacherRepository: Repository<Teacher>,
-
-    @InjectRepository(TeacherVendor)
-    private readonly teacherVendorRepository: Repository<TeacherVendor>,
 
     private readonly courseService: CourseService,
     private readonly subscriptionService: SubscriptionService,
@@ -82,70 +75,6 @@ export class TeacherService {
 
   public remove(id: string) {
     this.teacherRepository.delete(id);
-  }
-
-  public createTeacherVendor(
-    createTeacherVendorInput: CreateTeacherVendorInput,
-  ) {
-    const teacherVendor = this.teacherVendorRepository.create(
-      createTeacherVendorInput,
-    );
-
-    return this.teacherVendorRepository.save(teacherVendor);
-  }
-
-  public findAllTeacherVendor(filter: FindAllTeacherVendorInput) {
-    const query = this.teacherVendorRepository
-      .createQueryBuilder('teacherVendor')
-
-      .leftJoinAndSelect('teacherVendor.teacher', 'teacher')
-      .leftJoinAndSelect('teacherVendor.vendor', 'vendor')
-      .where('true');
-
-    generateQuerySorts<TeacherVendor>(
-      query,
-      filter,
-      TeacherVendor,
-      'teacherVendor',
-    );
-
-    generateQueryConditions<TeacherVendor>(query, filter, 'teacherVendor');
-
-    return customPaginate<TeacherVendor, PaginationMetadata>(query, {
-      limit: filter.pagination.limit,
-      page: filter.pagination.page,
-    });
-  }
-
-  public findOneTeacherVendor(
-    teacherVendorOptions: FindOptionsWhere<TeacherVendor>,
-    options?: {
-      selected?: FindOptionsSelect<TeacherVendor>;
-      relations?: FindOptionsRelations<TeacherVendor>;
-    },
-  ) {
-    return this.teacherVendorRepository.findOne({
-      select: options?.selected,
-      relations: options?.relations,
-      where: teacherVendorOptions,
-    });
-  }
-
-  public async updateTeacherVendor(
-    updateTeacherVendorInput: UpdateTeacherVendorInput,
-  ) {
-    await this.teacherVendorRepository.update(
-      { id: updateTeacherVendorInput.id },
-      updateTeacherVendorInput,
-    );
-
-    return this.findOneTeacherVendor({
-      id: updateTeacherVendorInput.id,
-    });
-  }
-
-  public removeTeacherVendor(id: string) {
-    return this.teacherVendorRepository.delete(id);
   }
 
   public async teacherStatics(teacherId: string) {

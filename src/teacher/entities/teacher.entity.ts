@@ -13,7 +13,6 @@ import GraphQLJSON from 'graphql-type-json';
 import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 
 import { City } from 'src/city/entities/city.entity';
-import { TeacherVendor } from './teacher-vendor.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Gender } from 'src/shared/enums/gender.enum';
 import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
@@ -98,9 +97,6 @@ export class Teacher {
 
   @OneToMany(() => Discussion, (discussion) => discussion.teacher)
   discussions: Discussion[];
-
-  @OneToMany(() => TeacherVendor, (teacher_vendor) => teacher_vendor.teacher)
-  teacher_vendors: TeacherVendor[];
 
   @OneToMany(() => Review, (review) => review.teacher)
   reviews: Review[];

@@ -358,7 +358,6 @@ type Course {
   url: String!
   description: String!
   level_id: String!
-  vendor_share: Float!
   rating: Float!
   active: Boolean!
   created_at: DateTime!
@@ -420,15 +419,6 @@ type Discussion {
   children: [Discussion!]
 }
 
-type TeacherVendor {
-  id: String!
-  teacher_id: String!
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  teacher: Teacher!
-}
-
 type Teacher {
   id: String!
   name: String!
@@ -467,17 +457,6 @@ type CheckActivationTeacherCodeOutput {
   access_token: String
   refresh_token: String
   expires_in: Int
-}
-
-type TeacherVendorPaginationResultOutput {
-  items: [TeacherVendor!]!
-  meta: PaginationMetadata!
-}
-
-type TeacherStaticsOutput {
-  totalCourses: Int!
-  totalSubscriptions: Int!
-  totalStudents: Int!
 }
 
 type UserPaginationResultOutput {
@@ -639,9 +618,6 @@ type StoryPaginationResultOutput {
 type Query {
   teachers(filter: FindAllTeacherInput!): TeacherPaginationResultOutput!
   teacher(id: String!): Teacher!
-  teacher_vendors(filter: FindAllTeacherVendorInput!): TeacherVendorPaginationResultOutput!
-  teacher_vendor(id: String!): TeacherVendor!
-  teacherStatics: TeacherStaticsOutput!
   users(filter: FindAllUserInput!): UserPaginationResultOutput!
   user(id: String!): User!
   loginHistorys(filter: FindAllLoginHistoryInput!): LoginHistoryPaginationResultOutput!
@@ -719,11 +695,6 @@ input SortInput {
 input MatchInput {
   value: String!
   op: String!
-}
-
-input FindAllTeacherVendorInput {
-  pagination: PaginationInput!
-  sort: SortInput
 }
 
 input FindAllUserInput {
@@ -942,9 +913,6 @@ type Mutation {
   createTeacher(createTeacherInput: CreateTeacherInput!): CheckActivationTeacherCodeOutput!
   updateTeacher(updateTeacherInput: UpdateTeacherInput!): Teacher!
   removeTeacher(id: String!): DoneResponseOutput!
-  createTeacherVendor(createTeacherVendorInput: CreateTeacherVendorInput!): TeacherVendor!
-  updateTeacherVendor(updateTeacherVendorInput: UpdateTeacherVendorInput!): TeacherVendor!
-  removeTeacherVendor(id: String!): DoneResponseOutput!
   createUser(createUserInput: CreateUserInput!): CheckActivationUserCodeOutput!
   updateUser(updateUserInput: UpdateUserInput!): User!
   updateMeUser(updateMeInput: UpdateMeUserInput!): User!
@@ -1069,17 +1037,6 @@ input UpdateTeacherInput {
   device_info: JSON
   fcm_token: String
   refresh_token: String
-  active: Boolean
-  id: String!
-}
-
-input CreateTeacherVendorInput {
-  teacher_id: String!
-  active: Boolean
-}
-
-input UpdateTeacherVendorInput {
-  teacher_id: String
   active: Boolean
   id: String!
 }
@@ -1209,7 +1166,6 @@ input CreateCourseInput {
   course_type: CourseType!
   teacher_id: String!
   teacher_share: Float
-  vendor_share: Float
   rating: Float
   active: Boolean
 }
@@ -1228,7 +1184,6 @@ input UpdateCourseInput {
   course_type: CourseType
   teacher_id: String
   teacher_share: Float
-  vendor_share: Float
   rating: Float
   active: Boolean
   id: String!
