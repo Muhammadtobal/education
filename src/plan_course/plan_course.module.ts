@@ -6,6 +6,7 @@ import { PlanCourseResolver } from './plan_course.resolver';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PlanCourse])],
+  exports: [PlanCourseService],
   providers: [PlanCourseService, PlanCourseResolver],
 })
 export class PlanCourseModule {}

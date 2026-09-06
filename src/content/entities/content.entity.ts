@@ -1,3 +1,4 @@
+import { PaymentCode } from 'src/payment_code/entities/payment_code.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -14,6 +15,7 @@ import { Course } from 'src/course/entities/course.entity';
 import { ContentType } from 'src/shared/enums/content_type.enum';
 import { PlanCourse } from 'src/plan_course/entities/plan_course.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
+import { Exam } from 'src/exam/entities/exam.entity';
 
 @ObjectType()
 @Entity()
@@ -25,6 +27,10 @@ export class Content {
   @Column('bigint')
   @Field()
   course_id: string;
+
+  @Column('bigint', { nullable: true })
+  @Field({ nullable: true })
+  exam_id?: string;
 
   @Column({ type: 'varchar', length: 255 })
   @Field()
@@ -57,6 +63,10 @@ export class Content {
   @Field(() => Boolean)
   is_free: boolean;
 
+  @Column('boolean', { default: false })
+  @Field(() => Boolean)
+  is_pdf: boolean;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Field(() => Date)
   created_at: Date;
@@ -76,6 +86,13 @@ export class Content {
   @Field(() => Content, { nullable: true })
   parent?: Content;
 
+  @ManyToOne(() => Exam, (exam) => exam.contents, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'exam_id' })
+  @Field(() => Exam, { nullable: true })
+  exam?: Exam;
+
   @OneToMany(() => Content, (content) => content.parent)
   @Field(() => [Content], { nullable: true })
   children?: Content[];
@@ -90,4 +107,7 @@ export class Content {
 
   @OneToMany(() => Subscription, (subscription) => subscription.course)
   subscriptions: Subscription[];
+
+  @OneToMany(() => PaymentCode, (payment_code) => payment_code.content)
+  payment_codes: PaymentCode[];
 }

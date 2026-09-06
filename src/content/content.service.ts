@@ -35,6 +35,7 @@ export class ContentService {
     const query = this.contentRepository
       .createQueryBuilder('content')
       .leftJoinAndSelect('content.course', 'course')
+      .leftJoinAndSelect('content.exam', 'exam')
       .where('true');
 
     if (filter.parent_content === true) {

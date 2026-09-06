@@ -69,10 +69,10 @@ const PermissionsStore = {
   DELETE_PAYMENT: 'deletePayment',
   CREATE_PAYMENT: 'createPayment',
 
-  GET_SCHEDULED_NOTIFICATION: 'getScheduledNotification',
-  UPDATE_SCHEDULED_NOTIFICATION: 'updateScheduledNotification',
-  DELETE_SCHEDULED_NOTIFICATION: 'deleteScheduledNotification',
-  CREATE_SCHEDULED_NOTIFICATION: 'createScheduledNotification',
+  GET_PAYMENT_CODE: 'getPaymentCode',
+  UPDATE_PAYMENT_CODE: 'updatePaymentCode',
+  DELETE_PAYMENT_CODE: 'deletePaymentCode',
+  CREATE_PAYMENT_CODE: 'createPaymentCode',
 
   GET_ANSWER_USER: 'getAnswerUser',
   UPDATE_ANSWER_USER: 'updateAnswerUser',

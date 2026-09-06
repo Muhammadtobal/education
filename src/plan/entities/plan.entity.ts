@@ -1,3 +1,4 @@
+import { PaymentCode } from 'src/payment_code/entities/payment_code.entity';
 import { PlanCoupon } from 'src/plan_coupon/entities/plan_coupon.entity';
 import { PlanCourse } from 'src/plan_course/entities/plan_course.entity';
 import {
@@ -11,6 +12,7 @@ import {
 
 import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 import { PlanType } from 'src/shared/enums/plan_type.enum';
+import { Subscription } from 'src/subscription/entities/subscription.entity';
 
 @ObjectType()
 @Entity()
@@ -70,4 +72,10 @@ export class Plan {
 
   @OneToMany(() => PlanCoupon, (plan_coupon) => plan_coupon.plan)
   plan_coupons: PlanCoupon[];
+
+  @OneToMany(() => Subscription, (subscription) => subscription.plan)
+  subscriptions: Subscription[];
+
+  @OneToMany(() => PaymentCode, (payment_code) => payment_code.plan)
+  payment_codes: PaymentCode[];
 }

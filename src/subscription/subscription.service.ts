@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import {
   DataSource,
@@ -24,6 +24,12 @@ import { Course } from 'src/course/entities/course.entity';
 import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { Content } from 'src/content/entities/content.entity';
+import { ErrorMessages } from 'src/shared/error-messages.object';
+import { CheckContentAccessInput } from './dto/check-access-content.inputs';
+import { PlanCourse } from 'src/plan_course/entities/plan_course.entity';
+import { ContentService } from 'src/content/content.service';
+import { PlanCourseService } from 'src/plan_course/plan_course.service';
+import { CourseService } from 'src/course/course.service';
 
 @Injectable()
 export class SubscriptionService {
@@ -33,6 +39,10 @@ export class SubscriptionService {
 
     @InjectDataSource()
     private readonly dataSource: DataSource,
+
+    private readonly ContentService: ContentService,
+    private readonly planCourseService: PlanCourseService,
+    private readonly courseService: CourseService,
   ) {}
   public create(createSubscriptionInput: CreateSubscriptionInput) {
     const subscription = this.subscriptionRepository.create(
@@ -220,5 +230,217 @@ export class SubscriptionService {
 
   public remove(id: string) {
     this.subscriptionRepository.delete(id);
+  }
+  private checkSubscriptionValid(subscription: Subscription) {
+    if (!subscription.active) {
+      throw new HttpException(
+        ErrorMessages.SUBSCRIPTION_NOT_ACTIVE,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (subscription.end_date && new Date() > new Date(subscription.end_date)) {
+      throw new HttpException(
+        ErrorMessages.SUBSCRIPTION_EXPIRED,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return subscription;
+  }
+
+  private isSubscriptionValid(subscription: Subscription): boolean {
+    if (!subscription.active) {
+      return false;
+    }
+
+    if (subscription.end_date && new Date() > new Date(subscription.end_date)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private async checkCourseAccess(user_id: string, course_id: string) {
+    const subscription = await this.findOne({
+      user_id,
+      course_id,
+    });
+
+    if (!subscription) {
+      throw new HttpException(
+        ErrorMessages.COURSE_ACCESS_DENIED,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    this.checkSubscriptionValid(subscription);
+
+    return {
+      allowed: true,
+      reason: 'COURSE_SUBSCRIPTION',
+      subscription_id: subscription.id,
+    };
+  }
+
+  private async checkPlanAccess(user_id: string, plan_id: string) {
+    const subscription = await this.findOne({
+      user_id,
+      plan_id,
+    });
+
+    if (!subscription) {
+      throw new HttpException(
+        ErrorMessages.PLAN_ACCESS_DENIED,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    this.checkSubscriptionValid(subscription);
+
+    return {
+      allowed: true,
+      reason: 'PLAN_SUBSCRIPTION',
+      subscription_id: subscription.id,
+    };
+  }
+
+  private async checkContentAccess(user_id: string, content_id: string) {
+    const content = await this.ContentService.findOne({
+      id: content_id,
+    });
+
+    if (!content) {
+      throw new HttpException(
+        ErrorMessages.CONTENT_NOT_FOUND,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (content.is_free) {
+      return {
+        allowed: true,
+        reason: 'FREE_CONTENT',
+      };
+    }
+
+    const contentSubscription = await this.findOne({
+      user_id,
+      content_id,
+    });
+
+    if (contentSubscription) {
+      if (this.isSubscriptionValid(contentSubscription)) {
+        return {
+          allowed: true,
+          reason: 'CONTENT_SUBSCRIPTION',
+          subscription_id: contentSubscription.id,
+        };
+      }
+    }
+
+    if (content.course_id) {
+      const courseSubscription = await this.findOne({
+        user_id,
+        course_id: content.course_id,
+      });
+
+      const course = await this.courseService.findOne({
+        id: content.course_id,
+      });
+
+      if (course && course.active === false) {
+        throw new HttpException(
+          ErrorMessages.COURSE_NOT_ACTIVE,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (courseSubscription) {
+        if (this.isSubscriptionValid(courseSubscription)) {
+          return {
+            allowed: true,
+            reason: 'COURSE_SUBSCRIPTION',
+            subscription_id: courseSubscription.id,
+          };
+        }
+      }
+    }
+
+    const planCourseRepository = this.dataSource.getRepository(PlanCourse);
+
+    const planCourses = await planCourseRepository.find({
+      where: [
+        ...(content.course_id
+          ? [
+              {
+                course_id: content.course_id,
+                active: true,
+              },
+            ]
+          : []),
+        {
+          content_id: content.id,
+          active: true,
+        },
+      ],
+    });
+
+    for (const planCourse of planCourses) {
+      if (!planCourse.plan_id) {
+        continue;
+      }
+
+      const planSubscription = await this.findOne({
+        user_id,
+        plan_id: planCourse.plan_id,
+      });
+
+      if (planSubscription) {
+        // إذا صالح → Allow
+        if (this.isSubscriptionValid(planSubscription)) {
+          return {
+            allowed: true,
+            reason: 'PLAN_SUBSCRIPTION',
+            subscription_id: planSubscription.id,
+          };
+        }
+      }
+    }
+
+    throw new HttpException(
+      ErrorMessages.CONTENT_ACCESS_DENIED,
+      HttpStatus.FORBIDDEN,
+    );
+  }
+
+  public async checkAccess(user_id: string, input: CheckContentAccessInput) {
+    const { content_id, course_id, plan_id } = input;
+
+    const targets = [content_id, course_id, plan_id].filter(Boolean);
+
+    if (targets.length !== 1) {
+      throw new HttpException(
+        ErrorMessages.PROVIDE_EXACTLY_ONE_TARGET,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (content_id) {
+      return this.checkContentAccess(user_id, content_id);
+    }
+
+    if (course_id) {
+      return this.checkCourseAccess(user_id, course_id);
+    }
+
+    if (plan_id) {
+      return this.checkPlanAccess(user_id, plan_id);
+    }
+
+    throw new HttpException(
+      ErrorMessages.PROVIDE_EXACTLY_ONE_TARGET,
+      HttpStatus.BAD_REQUEST,
+    );
   }
 }

@@ -1,16 +1,16 @@
-import { InputType, Int, Field, Float } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
+import GraphQLJSON from 'graphql-type-json';
 import {
-  IsArray,
   IsBoolean,
-  IsDecimal,
-  IsEmail,
-  IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsNumberString,
   IsOptional,
   IsString,
+  IsEnum,
+  IsObject,
 } from 'class-validator';
+
+import { ContentType } from 'src/shared/enums/content_type.enum';
 
 @InputType()
 export class CreateContentInput {
@@ -20,12 +20,47 @@ export class CreateContentInput {
   course_id: string;
 
   @IsNotEmpty()
+  @IsString()
+  @Field()
+  url: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Field()
+  title: string;
+
+  @IsNotEmpty()
   @IsBoolean()
   @Field(() => Boolean)
   is_free: boolean;
+
+  @IsNotEmpty()
+  @IsEnum(ContentType)
+  @Field(() => ContentType)
+  content_type: ContentType;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  parent_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  exam_id?: string;
+
+  @IsOptional()
+  @IsObject()
+  @Field(() => GraphQLJSON, { nullable: true })
+  content_info?: Record<string, any>;
 
   @IsOptional()
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   active?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  is_pdf?: boolean;
 }

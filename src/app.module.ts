@@ -34,6 +34,7 @@ import { LoginHistoryModule } from './login_history/login_history.module';
 import { ConstantModule } from './constant/constant.module';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
+import { PaymentCodeModule } from './payment_code/payment_code.module';
 
 @Module({
   imports: [
@@ -109,6 +110,7 @@ import { AppController } from './app.controller';
     StoryModule,
     LoginHistoryModule,
     ConstantModule,
+    PaymentCodeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

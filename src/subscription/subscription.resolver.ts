@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { SubscriptionService } from './subscription.service';
@@ -14,6 +14,11 @@ import { DoneResponseOutput } from 'src/shared/types/done-output';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
+import { CheckContentAccessInput } from './dto/check-access-content.inputs';
+import { CheckAccessOutput } from './dto/check-access-content.output';
+import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
+import { GqlContext } from 'src/shared/types/context';
+import { getUserId } from 'src/shared/helpers';
 
 @Resolver(() => Subscription)
 export class SubscriptionResolver {
@@ -62,5 +67,17 @@ export class SubscriptionResolver {
     return {
       done: true,
     };
+  }
+
+  @Mutation(() => CheckAccessOutput)
+  @UseGuards(JwtAuthUserGuard)
+  public async checkAccess(
+    @Args('input')
+    input: CheckContentAccessInput,
+    @Context() context: GqlContext,
+  ) {
+    const userId = getUserId(context.req.user);
+
+    return this.subscriptionService.checkAccess(userId, input);
   }
 }

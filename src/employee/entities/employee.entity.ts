@@ -12,7 +12,6 @@ import { EmployeePermission } from 'src/employee_permission/entities/employee_pe
 import { Notification } from 'src/notification/entities/notification.entity';
 import { City } from 'src/city/entities/city.entity';
 import GraphQLJSON from 'graphql-type-json';
-import { ScheduledNotification } from 'src/notification/entities/scheduled_notification.entity';
 import { Gender } from 'src/shared/enums/gender.enum';
 import { Discussion } from 'src/discussion/entities/discussion.entity';
 
@@ -74,12 +73,6 @@ export class Employee {
 
   @OneToMany(() => Notification, (notification) => notification.employee)
   notifications: Notification[];
-
-  @OneToMany(
-    () => ScheduledNotification,
-    (scheduled_notification) => scheduled_notification.employee,
-  )
-  scheduled_notifications: ScheduledNotification[];
 
   @OneToMany(() => Discussion, (discussion) => discussion.employee)
   discussions: Discussion[];

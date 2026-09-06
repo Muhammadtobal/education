@@ -21,7 +21,6 @@ import { UserCoupon } from 'src/coupon/entities/user_coupon.entity';
 import { Coupon } from 'src/coupon/entities/coupon.entity';
 import { ExamUser } from 'src/exam/entities/exam-user.entity';
 import { AnswerUser } from 'src/answer/entities/answer-user.entity';
-import { ScheduledNotification } from 'src/notification/entities/scheduled_notification.entity';
 
 @Entity()
 @ObjectType()
@@ -120,12 +119,6 @@ export class User {
 
   @OneToMany(() => AnswerUser, (answer_user) => answer_user.user)
   answer_users: AnswerUser[];
-
-  @OneToMany(
-    () => ScheduledNotification,
-    (scheduled_notification) => scheduled_notification.user,
-  )
-  scheduled_notifications: ScheduledNotification[];
 
   @OneToMany(() => LoginHistory, (login_history) => login_history.user)
   login_histories: LoginHistory[];

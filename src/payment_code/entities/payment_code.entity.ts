@@ -9,40 +9,42 @@ import {
 
 import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 
-import { User } from 'src/user/entities/user.entity';
-import { Course } from 'src/course/entities/course.entity';
-import { Payment } from 'src/payment/entities/payment.entity';
-import { Content } from 'src/content/entities/content.entity';
 import { Plan } from 'src/plan/entities/plan.entity';
+import { Content } from 'src/content/entities/content.entity';
+import { Course } from 'src/course/entities/course.entity';
 
-@ObjectType('UserSubscription')
+@ObjectType()
 @Entity()
-export class Subscription {
+export class PaymentCode {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   @Field()
   id: string;
 
-  @Column('bigint', { nullable: true })
-  @Field({ nullable: true })
-  course_id?: string;
-
-  @Column('bigint', { nullable: true })
-  @Field({ nullable: true })
-  content_id?: string;
-
-  @Column('bigint')
+  @Column({ type: 'varchar', length: 255 })
   @Field()
-  user_id: string;
+  code: string;
 
   @Column('bigint', { nullable: true })
   @Field({ nullable: true })
   plan_id?: string;
 
-  @Column({ type: 'timestamp', nullable: true })
-  @Field(() => Date, { nullable: true })
-  end_date?: Date;
+  @Column('bigint', { nullable: true })
+  @Field({ nullable: true })
+  content_id?: string;
 
-  @Column('boolean', { default: true })
+  @Column('bigint', { nullable: true })
+  @Field({ nullable: true })
+  course_id?: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  @Field({ nullable: true })
+  starts_at?: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  @Field({ nullable: true })
+  expires_at?: Date;
+
+  @Column({ type: 'boolean', default: true })
   @Field(() => Boolean)
   active: boolean;
 
@@ -58,26 +60,18 @@ export class Subscription {
   @Field(() => Date)
   updated_at: Date;
 
-  @ManyToOne(() => Course, (course) => course.subscriptions)
-  @JoinColumn({ name: 'course_id' })
-  @Field(() => Course, { nullable: true })
-  course?: Course;
-
-  @ManyToOne(() => Plan, (plan) => plan.subscriptions)
+  @ManyToOne(() => Plan, (plan) => plan.payment_codes)
   @JoinColumn({ name: 'plan_id' })
   @Field(() => Plan, { nullable: true })
   plan?: Plan;
 
-  @ManyToOne(() => Content, (content) => content.subscriptions)
+  @ManyToOne(() => Content, (content) => content.payment_codes)
   @JoinColumn({ name: 'content_id' })
   @Field(() => Content, { nullable: true })
   content?: Content;
 
-  @ManyToOne(() => User, (user) => user.subscriptions)
-  @JoinColumn({ name: 'user_id' })
-  @Field(() => User, { nullable: true })
-  user?: User;
-
-  @OneToMany(() => Payment, (payment) => payment.subscription)
-  payments: Payment[];
+  @ManyToOne(() => Course, (course) => course.payment_codes)
+  @JoinColumn({ name: 'course_id' })
+  @Field(() => Course, { nullable: true })
+  course?: Course;
 }

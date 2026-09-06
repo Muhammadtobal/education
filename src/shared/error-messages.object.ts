@@ -51,4 +51,56 @@ export const ErrorMessages = {
   IMAGE_NOT_CORRECT: 'امتداد الصورة غير صحيح',
 
   SIZE_IMAGE: 'حجم الصورة أكبر من المسموح (10 ميغابايت)',
+
+  PAYMENT_CODE_NOT_FOUND:
+    '{"ar":"رمز الدفع غير موجود","en":"Payment code not found"}',
+
+  PAYMENT_CODE_COURSE_ID_REQUIRED:
+    '{"ar":"يجب تحديد الكورس المرتبط برمز الدفع","en":"Course ID is required for this payment code"}',
+
+  PAYMENT_CODE_CONTENT_ID_REQUIRED:
+    '{"ar":"يجب تحديد المحتوى المرتبط برمز الدفع","en":"Content ID is required for this payment code"}',
+
+  PAYMENT_CODE_PLAN_ID_REQUIRED:
+    '{"ar":"يجب تحديد الخطة المرتبطة برمز الدفع","en":"Plan ID is required for this payment code"}',
+
+  PAYMENT_CODE_IS_NOT_FOR_THIS_COURSE:
+    '{"ar":"رمز الدفع غير صالح لهذا الكورس","en":"Payment code is not valid for this course"}',
+
+  PAYMENT_CODE_IS_NOT_FOR_THIS_CONTENT:
+    '{"ar":"رمز الدفع غير صالح لهذا المحتوى","en":"Payment code is not valid for this content"}',
+
+  PAYMENT_CODE_IS_NOT_FOR_THIS_PLAN:
+    '{"ar":"رمز الدفع غير صالح لهذه الخطة","en":"Payment code is not valid for this plan"}',
+
+  PAYMENT_CODE_HAS_NO_TARGET:
+    '{"ar":"رمز الدفع غير مرتبط بكورس أو محتوى أو خطة","en":"Payment code has no target"}',
+
+  PAYMENT_CODE_NOT_ACTIVE_YET: (date: string) =>
+    `{"ar":"رمز الدفع سيكون فعالاً بدءاً من ${date}","en":"Payment code will be active starting from ${date}"}`,
+
+  PAYMENT_CODE_EXPIRED: (date: string) =>
+    `{"ar":"انتهت صلاحية رمز الدفع بتاريخ ${date}","en":"Payment code expired on ${date}"}`,
+
+  SUBSCRIPTION_NOT_ACTIVE:
+    '{"ar":"الاشتراك غير فعّال","en":"Subscription is not active"}',
+
+  SUBSCRIPTION_EXPIRED:
+    '{"ar":"انتهت صلاحية الاشتراك","en":"Subscription has expired"}',
+
+  COURSE_ACCESS_DENIED:
+    '{"ar":"لا تملك صلاحية الوصول إلى هذا الكورس","en":"You do not have access to this course"}',
+
+  PLAN_ACCESS_DENIED:
+    '{"ar":"لا تملك صلاحية الوصول إلى هذه الخطة","en":"You do not have access to this plan"}',
+
+  CONTENT_ACCESS_DENIED:
+    '{"ar":"لا تملك صلاحية الوصول إلى هذا المحتوى","en":"You do not have access to this content"}',
+
+  PROVIDE_EXACTLY_ONE_TARGET:
+    '{"ar":"يجب تحديد واحد فقط من المحتوى أو الكورس أو الخطة","en":"You must provide exactly one of content, course, or plan"}',
+
+  CONTENT_NOT_FOUND: '{"ar":لا يوجد محتوى} , "en":"content not found"',
+
+  COURSE_NOT_ACTIVE: '{"ar":"الكورس غير موجود" ,"en":"course not found"}',
 };

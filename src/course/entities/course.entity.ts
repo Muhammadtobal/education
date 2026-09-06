@@ -1,3 +1,4 @@
+import { PaymentCode } from 'src/payment_code/entities/payment_code.entity';
 import { Content } from 'src/content/entities/content.entity';
 import { Exam } from 'src/exam/entities/exam.entity';
 import { PlanCourse } from 'src/plan_course/entities/plan_course.entity';
@@ -98,4 +99,7 @@ export class Course {
 
   @OneToMany(() => Discussion, (discussion) => discussion.course)
   discussions: Discussion[];
+
+  @OneToMany(() => PaymentCode, (payment_code) => payment_code.course)
+  payment_codes: PaymentCode[];
 }

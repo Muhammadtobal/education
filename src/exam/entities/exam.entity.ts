@@ -14,6 +14,7 @@ import { Course } from 'src/course/entities/course.entity';
 import { Direction } from 'src/shared/enums/direction.enum';
 import { ExamUser } from './exam-user.entity';
 import { AnswerUser } from 'src/answer/entities/answer-user.entity';
+import { Content } from 'src/content/entities/content.entity';
 
 @ObjectType()
 @Entity()
@@ -74,4 +75,7 @@ export class Exam {
 
   @OneToMany(() => AnswerUser, (answer_user) => answer_user.exam)
   answer_users: AnswerUser[];
+
+  @OneToMany(() => Content, (content) => content.exam)
+  contents: Content[];
 }
