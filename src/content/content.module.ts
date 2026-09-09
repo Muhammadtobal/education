@@ -10,7 +10,6 @@ import { CourseModule } from 'src/course/course.module';
   imports: [
     TypeOrmModule.forFeature([Content]),
     forwardRef(() => SubscriptionModule),
-    forwardRef(() => CourseModule),
   ],
   exports: [ContentService],
   providers: [ContentService, ContentResolver],

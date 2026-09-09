@@ -28,21 +28,10 @@ export class ContentService {
     @InjectRepository(Content)
     private readonly contentRepository: Repository<Content>,
     // private readonly subscriptionService: SubscriptionService,
-    private readonly courseService: CourseService,
   ) {}
-  public async create(createContentInput: CreateContentInput) {
+  public create(createContentInput: CreateContentInput) {
     const content = this.contentRepository.create(createContentInput);
 
-    if (createContentInput.has_children === false) {
-      const course = await this.courseService.findOne({
-        id: createContentInput.course_id,
-      });
-      if (course)
-        await this.courseService.update({
-          id: createContentInput.course_id,
-          lessons_count: Number(course.lessons_count + 1),
-        });
-    }
     return this.contentRepository.save(content);
   }
 

@@ -83,10 +83,6 @@ export class Content {
   @Field(() => Boolean)
   is_pdf: boolean;
 
-  @Column('boolean', { default: false })
-  @Field(() => Boolean)
-  has_children: boolean;
-
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Field(() => Date)
   created_at: Date;

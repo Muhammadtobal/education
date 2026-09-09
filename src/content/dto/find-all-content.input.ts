@@ -40,10 +40,5 @@ export class FindAllContentInput {
   @IsOptional()
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })
-  has_children?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @Field(() => Boolean, { nullable: true })
   parent_content?: boolean;
 }
