@@ -5,7 +5,6 @@ import { TeacherService } from './teacher.service';
 import { TeacherResolver } from './teacher.resolver';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
-import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
 import { CourseModule } from 'src/course/course.module';
 import { SubscriptionModule } from 'src/subscription/subscription.module';
 

@@ -16,6 +16,7 @@ import { ContentType } from 'src/shared/enums/content_type.enum';
 import { PlanCourse } from 'src/plan_course/entities/plan_course.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { Exam } from 'src/exam/entities/exam.entity';
+import { PlanCoupon } from 'src/plan_coupon/entities/plan_coupon.entity';
 
 @ObjectType()
 @Entity()
@@ -63,6 +64,21 @@ export class Content {
   @Field(() => Boolean)
   is_free: boolean;
 
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  @Field(() => Float)
+  price: number;
+
+  @Column({
+    type: 'int',
+    default: 0,
+  })
+  @Field(() => Int)
+  count_days: number;
+
   @Column('boolean', { default: false })
   @Field(() => Boolean)
   is_pdf: boolean;
@@ -102,12 +118,15 @@ export class Content {
   @Field(() => Course, { nullable: true })
   course?: Course;
 
-  @OneToMany(() => PlanCourse, (plan_course) => plan_course.course)
+  @OneToMany(() => PlanCourse, (plan_course) => plan_course.content)
   plan_courses: PlanCourse[];
 
-  @OneToMany(() => Subscription, (subscription) => subscription.course)
+  @OneToMany(() => Subscription, (subscription) => subscription.content)
   subscriptions: Subscription[];
 
   @OneToMany(() => PaymentCode, (payment_code) => payment_code.content)
   payment_codes: PaymentCode[];
+
+  @OneToMany(() => PlanCoupon, (plan_coupon) => plan_coupon.content)
+  plan_coupons: PlanCoupon[];
 }

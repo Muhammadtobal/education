@@ -1,32 +1,34 @@
 import { InputType, Field, Float } from '@nestjs/graphql';
 import {
   IsBoolean,
-  IsNotEmpty,
   IsNumber,
   IsNumberString,
   IsOptional,
-  IsString,
 } from 'class-validator';
 
 @InputType()
-export class CreateCourseTeacherInput {
-  @IsNotEmpty()
+export class CreatePlanCourseFirstInput {
+  @IsOptional()
   @IsNumberString()
-  @Field()
-  teacher_id: string;
+  @Field({ nullable: true })
+  course_id?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumberString()
-  @Field()
-  course_id: string;
+  @Field({ nullable: true })
+  content_id?: string;
+
+  @IsNumber()
+  @Field(() => Float)
+  rate: number;
 
   @IsOptional()
   @IsNumber()
   @Field(() => Float, { nullable: true })
-  teacher_share?: number;
+  price_after_discount?: number;
 
   @IsOptional()
   @IsBoolean()
-  @Field({ nullable: true })
+  @Field(() => Boolean, { nullable: true })
   active?: boolean;
 }

@@ -25,6 +25,8 @@ import { UserCoupon } from './entities/user_coupon.entity';
 import { CheckActivationCouponInput } from './dto/check-activation-coupon.input';
 import { ErrorMessages } from 'src/shared/error-messages.object';
 import { PlanCouponService } from 'src/plan_coupon/plan_coupon.service';
+import { PaymentItemType } from 'src/shared/enums/payment_item_type.enum';
+import { PlanCoupon } from 'src/plan_coupon/entities/plan_coupon.entity';
 
 @Injectable()
 export class CouponService {
@@ -104,6 +106,43 @@ export class CouponService {
     checkActivationCouponInput: CheckActivationCouponInput,
     userId: string,
   ) {
+    switch (checkActivationCouponInput.type) {
+      case PaymentItemType.PLAN: {
+        if (!checkActivationCouponInput.plan_id) {
+          throw new HttpException(
+            'plan_id is required for PLAN coupon',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        break;
+      }
+
+      case PaymentItemType.COURSE: {
+        if (!checkActivationCouponInput.course_id) {
+          throw new HttpException(
+            'course_id is required for COURSE coupon',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        break;
+      }
+
+      case PaymentItemType.CONTENT: {
+        if (!checkActivationCouponInput.content_id) {
+          throw new HttpException(
+            'content_id is required for CONTENT coupon',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        break;
+      }
+
+      default:
+        throw new HttpException('Invalid coupon type', HttpStatus.BAD_REQUEST);
+    }
     const loadedCoupon = await this.findOne({
       code: checkActivationCouponInput.code,
       active: true,
@@ -113,6 +152,53 @@ export class CouponService {
       throw new HttpException(
         ErrorMessages.COUPON_NOT_FOUND,
         HttpStatus.NOT_FOUND,
+      );
+    }
+
+    let planCoupon: PlanCoupon | null = null;
+
+    switch (checkActivationCouponInput.type) {
+      case PaymentItemType.PLAN: {
+        planCoupon = await this.planCouponService.findOne({
+          coupon_id: loadedCoupon.id,
+          plan_id: checkActivationCouponInput.plan_id,
+          active: true,
+        });
+
+        break;
+      }
+
+      case PaymentItemType.COURSE: {
+        planCoupon = await this.planCouponService.findOne({
+          coupon_id: loadedCoupon.id,
+          course_id: checkActivationCouponInput.course_id,
+          active: true,
+        });
+
+        break;
+      }
+
+      case PaymentItemType.CONTENT: {
+        planCoupon = await this.planCouponService.findOne({
+          coupon_id: loadedCoupon.id,
+          content_id: checkActivationCouponInput.content_id,
+          active: true,
+        });
+
+        break;
+      }
+
+      default:
+        throw new HttpException(
+          ErrorMessages.CONTENT_NOT_FOUND,
+          HttpStatus.BAD_REQUEST,
+        );
+    }
+
+    if (!planCoupon) {
+      throw new HttpException(
+        ErrorMessages.COUPON_NOT_ALLOWED_FOR_THIS_PLAN,
+        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -172,18 +258,7 @@ export class CouponService {
         );
       }
     }
-    const planCoupon = await this.planCouponService.findOne({
-      coupon_id: loadedCoupon.id,
-      plan_id: checkActivationCouponInput.plan_id,
-      active: true,
-    });
 
-    if (!planCoupon) {
-      throw new HttpException(
-        ErrorMessages.COUPON_NOT_ALLOWED_FOR_THIS_PLAN,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
     return loadedCoupon;
   }
 }

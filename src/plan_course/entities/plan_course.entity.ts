@@ -28,6 +28,21 @@ export class PlanCourse {
   @Field({ nullable: true })
   course_id?: string;
 
+  @Column({
+    type: 'float',
+    default: 0,
+  })
+  @Field(() => Float)
+  rate: number;
+
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  @Field(() => Float)
+  price_after_discount: number;
+
   @Column('bigint', { nullable: true })
   @Field({ nullable: true })
   content_id?: string;

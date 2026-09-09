@@ -20,29 +20,19 @@ import {
   PaymentValidationError,
 } from 'src/shared/helpers';
 import { GqlContext } from 'src/shared/types/context';
+import { CreatePaymentResponse } from './dto/paymet-response.output';
 
 @Resolver(() => Payment)
 export class PaymentResolver {
   constructor(private readonly paymentService: PaymentService) {}
 
-  @Mutation(() => Payment)
+  @Mutation(() => CreatePaymentResponse)
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.CREATE + Payment.name)
   public async createPayment(
     @Args('createPaymentInput') createPaymentInput: CreatePaymentInput,
   ) {
-    try {
-      return await this.paymentService.create(createPaymentInput);
-    } catch (error) {
-      if (error instanceof PaymentValidationError) {
-        throw new BadRequestException({
-          message: error.message,
-          code: error.code,
-        });
-      }
-
-      throw error;
-    }
+    return await this.paymentService.create(createPaymentInput);
   }
 
   @Query(() => PaymentPaginationResultOutput, { name: 'payments' })

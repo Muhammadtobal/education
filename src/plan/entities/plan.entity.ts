@@ -25,17 +25,6 @@ export class Plan {
   @Field()
   name: string;
 
-  @Column({
-    type: 'enum',
-    enum: PlanType,
-  })
-  @Field(() => PlanType)
-  plan_type: PlanType;
-
-  @Column({ type: 'timestamp', nullable: true })
-  @Field(() => Date, { nullable: true })
-  end_date?: Date;
-
   @Column('decimal', {
     precision: 10,
     scale: 2,
@@ -46,10 +35,10 @@ export class Plan {
 
   @Column({
     type: 'int',
-    nullable: true,
+    default: 0,
   })
-  @Field(() => Float, { nullable: true })
-  days?: number;
+  @Field(() => Int)
+  count_days: number;
 
   @Column('boolean', { default: true })
   @Field(() => Boolean)
@@ -67,7 +56,9 @@ export class Plan {
   @Field(() => Date)
   updated_at: Date;
 
-  @OneToMany(() => PlanCourse, (plan_course) => plan_course.plan)
+  @OneToMany(() => PlanCourse, (plan_course) => plan_course.plan, {
+    cascade: true,
+  })
   plan_courses: PlanCourse[];
 
   @OneToMany(() => PlanCoupon, (plan_coupon) => plan_coupon.plan)

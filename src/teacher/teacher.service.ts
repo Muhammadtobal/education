@@ -77,74 +77,74 @@ export class TeacherService {
     this.teacherRepository.delete(id);
   }
 
-  public async teacherStatics(teacherId: string) {
-    let totalCourses = 0;
-    let totalSubscriptions = 0;
+  // public async teacherStatics(teacherId: string) {
+  //   let totalCourses = 0;
+  //   let totalSubscriptions = 0;
 
-    const students = new Set<string>();
+  //   const students = new Set<string>();
 
-    const courseLimit = 200;
-    let coursePage = 1;
-    let courseLastPage = false;
+  //   const courseLimit = 200;
+  //   let coursePage = 1;
+  //   let courseLastPage = false;
 
-    while (!courseLastPage) {
-      const coursesResult = await this.courseService.findAllCourseTeacher({
-        teacher_id: { value: teacherId },
-        pagination: {
-          page: coursePage,
-          limit: courseLimit,
-        },
-      });
+  //   while (!courseLastPage) {
+  //     const coursesResult = await this.courseService.findAll({
+  //       teacher_id: { value: teacherId },
+  //       pagination: {
+  //         page: coursePage,
+  //         limit: courseLimit,
+  //       },
+  //     });
 
-      if (!coursesResult.items.length) break;
+  //     if (!coursesResult.items.length) break;
 
-      totalCourses += coursesResult.items.length;
+  //     totalCourses += coursesResult.items.length;
 
-      for (const courseTeacher of coursesResult.items) {
-        const courseId = courseTeacher.course_id;
+  //     for (const courseTeacher of coursesResult.items) {
+  //       const courseId = courseTeacher.course_id;
 
-        const subscriptionLimit = 200;
-        let subscriptionPage = 1;
-        let subscriptionLastPage = false;
+  //       const subscriptionLimit = 200;
+  //       let subscriptionPage = 1;
+  //       let subscriptionLastPage = false;
 
-        while (!subscriptionLastPage) {
-          const subscriptionsResult = await this.subscriptionService.findAll({
-            course_id: {
-              value: courseId,
-            },
-            pagination: {
-              page: subscriptionPage,
-              limit: subscriptionLimit,
-            },
-          });
+  //       while (!subscriptionLastPage) {
+  //         const subscriptionsResult = await this.subscriptionService.findAll({
+  //           course_id: {
+  //             value: courseId,
+  //           },
+  //           pagination: {
+  //             page: subscriptionPage,
+  //             limit: subscriptionLimit,
+  //           },
+  //         });
 
-          if (!subscriptionsResult.items.length) break;
+  //         if (!subscriptionsResult.items.length) break;
 
-          totalSubscriptions += subscriptionsResult.items.length;
+  //         totalSubscriptions += subscriptionsResult.items.length;
 
-          for (const subscription of subscriptionsResult.items) {
-            students.add(subscription.user_id);
-          }
+  //         for (const subscription of subscriptionsResult.items) {
+  //           students.add(subscription.user_id);
+  //         }
 
-          if (subscriptionsResult.items.length < subscriptionLimit) {
-            subscriptionLastPage = true;
-          } else {
-            subscriptionPage++;
-          }
-        }
-      }
+  //         if (subscriptionsResult.items.length < subscriptionLimit) {
+  //           subscriptionLastPage = true;
+  //         } else {
+  //           subscriptionPage++;
+  //         }
+  //       }
+  //     }
 
-      if (coursesResult.items.length < courseLimit) {
-        courseLastPage = true;
-      } else {
-        coursePage++;
-      }
-    }
+  //     if (coursesResult.items.length < courseLimit) {
+  //       courseLastPage = true;
+  //     } else {
+  //       coursePage++;
+  //     }
+  //   }
 
-    return {
-      totalCourses,
-      totalSubscriptions,
-      totalStudents: students.size,
-    };
-  }
+  //   return {
+  //     totalCourses,
+  //     totalSubscriptions,
+  //     totalStudents: students.size,
+  //   };
+  // }
 }

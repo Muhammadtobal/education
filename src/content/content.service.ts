@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
 import {
@@ -19,12 +19,14 @@ import {
   customPaginate,
 } from 'src/shared/helpers';
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
+import { SubscriptionService } from 'src/subscription/subscription.service';
 
 @Injectable()
 export class ContentService {
   constructor(
     @InjectRepository(Content)
     private readonly contentRepository: Repository<Content>,
+    // private readonly subscriptionService: SubscriptionService,
   ) {}
   public create(createContentInput: CreateContentInput) {
     const content = this.contentRepository.create(createContentInput);
@@ -77,4 +79,23 @@ export class ContentService {
   public remove(id: string) {
     this.contentRepository.delete(id);
   }
+
+  // async getPlaybackUrl(userId: string, contentId: string) {
+  //   await this.subscriptionService.checkContentAccess(userId, contentId);
+
+  //   const content = await this.findOne({
+  //     id: contentId,
+  //   });
+  //   if (!content) {
+  //     throw new HttpException('not found', HttpStatus.BAD_REQUEST);
+  //   }
+  //   const playbackUrl = await this.videoService.generateSignedUrl(
+  //     content.video_key,
+  //   );
+
+  //   return {
+  //     playback_url: playbackUrl,
+  //     expires_in: 300,
+  //   };
+  // }
 }

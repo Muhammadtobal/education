@@ -15,7 +15,6 @@ import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 import { City } from 'src/city/entities/city.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Gender } from 'src/shared/enums/gender.enum';
-import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 
 @ObjectType()
@@ -92,14 +91,14 @@ export class Teacher {
   @Field(() => City, { nullable: true })
   city?: City;
 
-  @OneToMany(() => CourseTeacher, (course_teacher) => course_teacher.teacher)
-  course_teachers: CourseTeacher[];
-
   @OneToMany(() => Discussion, (discussion) => discussion.teacher)
   discussions: Discussion[];
 
   @OneToMany(() => Review, (review) => review.teacher)
   reviews: Review[];
+
+  @OneToMany(() => Course, (course) => course.teacher)
+  courses: Course[];
 
   @OneToMany(() => Payment, (payment) => payment.teacher)
   payments: Payment[];

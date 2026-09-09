@@ -1,4 +1,4 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, Float, Int } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 import {
   IsBoolean,
@@ -8,6 +8,8 @@ import {
   IsString,
   IsEnum,
   IsObject,
+  IsNumber,
+  IsInt,
 } from 'class-validator';
 
 import { ContentType } from 'src/shared/enums/content_type.enum';
@@ -58,6 +60,16 @@ export class CreateContentInput {
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   active?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Float, { nullable: true })
+  price?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Field(() => Int, { nullable: true })
+  count_day?: number;
 
   @IsOptional()
   @IsBoolean()

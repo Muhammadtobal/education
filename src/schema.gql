@@ -118,14 +118,18 @@ enum DiscountType {
   FIXED
 }
 
-type PlanCoupon {
+type PlanCourse {
   id: String!
-  coupon_id: String!
   plan_id: String!
+  course_id: String
+  rate: Float!
+  price_after_discount: Float!
+  content_id: String
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
-  coupon: Coupon
+  course: Course
+  content: Content
   plan: Plan
 }
 
@@ -241,6 +245,8 @@ type Content {
   content_info: JSON
   active: Boolean!
   is_free: Boolean!
+  price: Float!
+  count_days: Int!
   is_pdf: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
@@ -259,36 +265,29 @@ enum ContentType {
   EXAM
 }
 
-type PlanCourse {
+type PlanCoupon {
   id: String!
-  plan_id: String!
+  coupon_id: String!
+  plan_id: String
   course_id: String
   content_id: String
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
+  coupon: Coupon
+  plan: Plan
   course: Course
   content: Content
-  plan: Plan
 }
 
 type Plan {
   id: String!
   name: String!
-  plan_type: PlanType!
-  end_date: DateTime
   price: Float!
-  days: Float
+  count_days: Int!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
-}
-
-"""Plan type (daily or seasonal)"""
-enum PlanType {
-  DAILY
-  SEASONAL
-  FREE
 }
 
 type PaymentCode {
@@ -332,29 +331,22 @@ type Level {
   updated_at: DateTime!
 }
 
-type CourseTeacher {
-  id: String!
-  teacher_id: String!
-  course_id: String!
-  teacher_share: Float!
-  active: Boolean!
-  created_at: DateTime!
-  updated_at: DateTime!
-  teacher: Teacher
-  course: Course
-}
-
 type Course {
   id: String!
   name: String!
   url: String!
   description: String!
   level_id: String!
+  teacher_id: String!
+  price: Float!
   rating: Float!
+  teacher_share: Float!
+  count_days: Int!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
   level: Level
+  teacher: Teacher
 }
 
 type Review {
@@ -517,11 +509,6 @@ type CoursePaginationResultOutput {
   meta: PaginationMetadata!
 }
 
-type CourseTeacherPaginationResultOutput {
-  items: [Course!]!
-  meta: PaginationMetadata!
-}
-
 type SubscriptionPaginationResultOutput {
   items: [UserSubscription!]!
   meta: PaginationMetadata!
@@ -553,6 +540,11 @@ type PaymentPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type CreatePaymentResponse {
+  payment: Payment
+  payments: [Payment!]
+}
+
 type CouponPaginationResultOutput {
   items: [Coupon!]!
   meta: PaginationMetadata!
@@ -560,6 +552,11 @@ type CouponPaginationResultOutput {
 
 type PlanCouponPaginationResultOutput {
   items: [PlanCoupon!]!
+  meta: PaginationMetadata!
+}
+
+type PaymentCodePaginationResultOutput {
+  items: [PaymentCode!]!
   meta: PaginationMetadata!
 }
 
@@ -608,11 +605,6 @@ type StoryPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
-type PaymentCodePaginationResultOutput {
-  items: [PaymentCode!]!
-  meta: PaginationMetadata!
-}
-
 type Query {
   teachers(filter: FindAllTeacherInput!): TeacherPaginationResultOutput!
   teacher(id: String!): Teacher!
@@ -630,8 +622,6 @@ type Query {
   plan_course(id: String!): PlanCourse!
   courses(filter: FindAllCourseInput!): CoursePaginationResultOutput!
   course(id: String!): Course!
-  course_teachers(filter: FindAllCourseTeacherInput!): CourseTeacherPaginationResultOutput!
-  course_teacher(id: String!): CourseTeacher!
   reviews(filter: FindAllReviewInput!): ReviewPaginationResultOutput!
   review(id: String!): Review!
   payments(filter: FindAllPaymentInput!): PaymentPaginationResultOutput!
@@ -640,6 +630,8 @@ type Query {
   coupon(id: String!): Coupon!
   plan_coupons(filter: FindAllPlanCouponInput!): PlanCouponPaginationResultOutput!
   plan_coupon(id: String!): PlanCoupon!
+  payment_codes(filter: FindAllPaymentCodeInput!): PaymentCodePaginationResultOutput!
+  payment_code(id: String!): PaymentCode!
   employees(filter: FindAllEmployeeInput!): EmployeePaginationResultOutput!
   employee(id: String!): Employee!
   myEmployeeProfile: Employee
@@ -667,8 +659,6 @@ type Query {
   discussion(id: String!): Discussion!
   stories(filter: FindAllStoryInput!): StoryPaginationResultOutput!
   story(id: String!): Story!
-  payment_codes(filter: FindAllPaymentCodeInput!): PaymentCodePaginationResultOutput!
-  payment_code(id: String!): PaymentCode!
 }
 
 input FindAllTeacherInput {
@@ -678,6 +668,7 @@ input FindAllTeacherInput {
   description: MatchInput
   image_url: MatchInput
   count_review: JSON
+  teacher_id: JSON
 }
 
 input PaginationInput {
@@ -747,13 +738,6 @@ input FindAllCourseInput {
   level_id: JSON
 }
 
-input FindAllCourseTeacherInput {
-  pagination: PaginationInput!
-  sort: SortInput
-  course_id: JSON
-  teacher_id: JSON
-}
-
 input FindAllReviewInput {
   pagination: PaginationInput!
   sort: SortInput
@@ -790,6 +774,15 @@ input FindAllPlanCouponInput {
   value: JSON
   coupon_id: JSON
   plan_id: JSON
+}
+
+input FindAllPaymentCodeInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  code: MatchInput
+  plan_id: JSON
+  content_id: JSON
+  course_id: JSON
 }
 
 input FindAllEmployeeInput {
@@ -898,15 +891,6 @@ input FindAllStoryInput {
   level_id: JSON
 }
 
-input FindAllPaymentCodeInput {
-  pagination: PaginationInput!
-  sort: SortInput
-  code: MatchInput
-  plan_id: JSON
-  content_id: JSON
-  course_id: JSON
-}
-
 type Mutation {
   createTeacher(createTeacherInput: CreateTeacherInput!): CheckActivationTeacherCodeOutput!
   updateTeacher(updateTeacherInput: UpdateTeacherInput!): Teacher!
@@ -940,13 +924,10 @@ type Mutation {
   createCourse(createCourseInput: CreateCourseInput!): Course!
   updateCourse(updateCourseInput: UpdateCourseInput!): Course!
   removeCourse(id: String!): DoneResponseOutput!
-  createCourseTeacher(createCourseTeacherInput: CreateCourseTeacherInput!): CourseTeacher!
-  updateCourseTeacher(updateCourseTeacherInput: UpdateCourseTeacherInput!): CourseTeacher!
-  removeCourseTeacher(id: String!): DoneResponseOutput!
   createReview(createReviewInput: CreateReviewInput!): Review!
   updateReview(updateReviewInput: UpdateReviewInput!): Review!
   removeReview(id: String!): DoneResponseOutput!
-  createPayment(createPaymentInput: CreatePaymentInput!): Payment!
+  createPayment(createPaymentInput: CreatePaymentInput!): CreatePaymentResponse!
   updatePayment(updatePaymentInput: UpdatePaymentInput!): Payment!
   removePayment(id: String!): DoneResponseOutput!
   createCoupon(createCouponInput: CreateCouponInput!): Coupon!
@@ -957,6 +938,10 @@ type Mutation {
   createPlanCoupon(createPlanCouponInput: CreatePlanCouponInput!): PlanCoupon!
   updatePlanCoupon(updatePlanCouponInput: UpdatePlanCouponInput!): PlanCoupon!
   removePlanCoupon(id: String!): DoneResponseOutput!
+  createPaymentCode(createPaymentCodeInput: CreatePaymentCodeInput!): [PaymentCode!]!
+  updatePaymentCode(updatePaymentCodeInput: UpdatePaymentCodeInput!): PaymentCode!
+  removePaymentCode(id: String!): DoneResponseOutput!
+  checkActivationPaymentCode(checkActivationPaymentCodeInput: CheckActivationPaymentCodeInput!): PaymentCode!
   createEmployee(createEmployeeInput: CreateEmployeeInput!): CheckActivationEmployeeCodeOutput!
   assignPermission(assignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
   unassignPermission(unassignPermissionInput: AssignPermissionInput!): DoneResponseOutput!
@@ -997,10 +982,6 @@ type Mutation {
   createStory(createStoryInput: CreateStoryInput!): Story!
   updateStory(updateStoryInput: UpdateStoryInput!): Story!
   removeStory(id: String!): DoneResponseOutput!
-  createPaymentCode(createPaymentCodeInput: CreatePaymentCodeInput!): [PaymentCode!]!
-  updatePaymentCode(updatePaymentCodeInput: UpdatePaymentCodeInput!): PaymentCode!
-  removePaymentCode(id: String!): DoneResponseOutput!
-  checkActivationPaymentCode(checkActivationPaymentCodeInput: CheckActivationPaymentCodeInput!): PaymentCode!
 }
 
 input CreateTeacherInput {
@@ -1154,6 +1135,8 @@ input CreateContentInput {
   exam_id: String
   content_info: JSON
   active: Boolean
+  price: Float
+  count_day: Int
   is_pdf: Boolean
 }
 
@@ -1167,12 +1150,16 @@ input UpdateContentInput {
   exam_id: String
   content_info: JSON
   active: Boolean
+  price: Float
+  count_day: Int
   is_pdf: Boolean
   id: String!
 }
 
 input CreatePlanCourseInput {
   plan_id: String!
+  rate: Float!
+  price_after_discount: Float
   course_id: String
   content_id: String
   active: Boolean
@@ -1180,6 +1167,8 @@ input CreatePlanCourseInput {
 
 input UpdatePlanCourseInput {
   plan_id: String
+  rate: Float
+  price_after_discount: Float
   course_id: String
   content_id: String
   active: Boolean
@@ -1195,13 +1184,15 @@ input CreateCourseInput {
   teacher_id: String!
   teacher_share: Float
   rating: Float
+  price: Float
+  count_day: Int
   active: Boolean
 }
 
 """Course type (internal or external)"""
 enum CourseType {
-  INTERNAL
-  EXTERNAL
+  THEORETICAL
+  PRACTICAL
 }
 
 input UpdateCourseInput {
@@ -1213,21 +1204,8 @@ input UpdateCourseInput {
   teacher_id: String
   teacher_share: Float
   rating: Float
-  active: Boolean
-  id: String!
-}
-
-input CreateCourseTeacherInput {
-  teacher_id: String!
-  course_id: String!
-  teacher_share: Float
-  active: Boolean
-}
-
-input UpdateCourseTeacherInput {
-  teacher_id: String
-  course_id: String
-  teacher_share: Float
+  price: Float
+  count_day: Int
   active: Boolean
   id: String!
 }
@@ -1253,20 +1231,29 @@ input UpdateReviewInput {
 
 input CreatePaymentInput {
   user_id: String!
-  plan_id: String!
-  teacher_id: String!
+  payment_code: String!
+  payment_item_type: PaymentItemType!
   course_id: String
+  plan_id: String
   content_id: String
   value: Float
   code: String
   active: Boolean
 }
 
+"""PaymentItemType type (course or CONTENT)"""
+enum PaymentItemType {
+  CONTENT
+  COURSE
+  PLAN
+}
+
 input UpdatePaymentInput {
   user_id: String
-  plan_id: String
-  teacher_id: String
+  payment_code: String
+  payment_item_type: PaymentItemType
   course_id: String
+  plan_id: String
   content_id: String
   value: Float
   code: String
@@ -1311,19 +1298,57 @@ input CreateUserCouponInput {
 input CheckActivationCouponInput {
   code: String!
   plan_id: String
+  type: PaymentItemType!
+  course_id: String
+  content_id: String
 }
 
 input CreatePlanCouponInput {
   coupon_id: String!
-  plan_id: String!
+  plan_id: String
+  course_id: String
+  content_id: String
   active: Boolean
 }
 
 input UpdatePlanCouponInput {
   coupon_id: String
   plan_id: String
+  course_id: String
+  content_id: String
   active: Boolean
   id: String!
+}
+
+input CreatePaymentCodeInput {
+  count: Int!
+  prefix: String!
+  plan_id: String
+  content_id: String
+  course_id: String
+  active: Boolean
+  starts_at: DateTime
+  expires_at: DateTime
+}
+
+input UpdatePaymentCodeInput {
+  count: Int
+  prefix: String
+  plan_id: String
+  content_id: String
+  course_id: String
+  active: Boolean
+  starts_at: DateTime
+  expires_at: DateTime
+  id: String!
+}
+
+input CheckActivationPaymentCodeInput {
+  code: String!
+  payment_item_type: PaymentItemType!
+  plan_id: String
+  content_id: String
+  course_id: String
 }
 
 input CreateEmployeeInput {
@@ -1432,20 +1457,26 @@ input UpdateLevelInput {
 
 input CreatePlanInput {
   name: String!
-  plan_type: PlanType!
-  end_date: DateTime
-  days: Int
-  price: Float!
+  count_days: Int
+  price: Float
+  active: Boolean
+  plan_courses: [CreatePlanCourseFirstInput!]
+}
+
+input CreatePlanCourseFirstInput {
+  course_id: String
+  content_id: String
+  rate: Float!
+  price_after_discount: Float
   active: Boolean
 }
 
 input UpdatePlanInput {
   name: String
-  plan_type: PlanType
-  end_date: DateTime
-  days: Int
+  count_days: Int
   price: Float
   active: Boolean
+  plan_courses: [CreatePlanCourseFirstInput!]
   id: String!
 }
 
@@ -1584,34 +1615,4 @@ input UpdateStoryInput {
   title: String
   level_id: String
   id: String!
-}
-
-input CreatePaymentCodeInput {
-  count: Int!
-  prefix: String!
-  plan_id: String
-  content_id: String
-  course_id: String
-  active: Boolean
-  starts_at: DateTime
-  expires_at: DateTime
-}
-
-input UpdatePaymentCodeInput {
-  count: Int
-  prefix: String
-  plan_id: String
-  content_id: String
-  course_id: String
-  active: Boolean
-  starts_at: DateTime
-  expires_at: DateTime
-  id: String!
-}
-
-input CheckActivationPaymentCodeInput {
-  code: String!
-  plan_id: String
-  content_id: String
-  course_id: String
 }

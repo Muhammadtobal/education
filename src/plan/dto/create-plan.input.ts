@@ -1,4 +1,5 @@
 import { InputType, Field, Float, Int } from '@nestjs/graphql';
+import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsEnum,
@@ -8,7 +9,10 @@ import {
   IsNumberString,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
+import { CreatePlanCourseFirstInput } from 'src/plan_course/dto/create-paln_course_first.input';
+import { CreatePlanCourseInput } from 'src/plan_course/dto/create-plan_course.input';
 
 import { PlanType } from 'src/shared/enums/plan_type.enum';
 
@@ -19,27 +23,23 @@ export class CreatePlanInput {
   @Field()
   name: string;
 
-  @IsNotEmpty()
-  @IsEnum(PlanType)
-  @Field(() => PlanType)
-  plan_type: PlanType;
-
-  @IsOptional()
-  @Field(() => Date, { nullable: true })
-  end_date?: Date;
-
   @IsOptional()
   @IsInt()
   @Field(() => Int, { nullable: true })
-  days?: number;
+  count_days?: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  @Field(() => Float)
-  price: number;
+  @Field(() => Float, { nullable: true })
+  price?: number;
 
   @IsOptional()
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   active?: boolean;
+
+  @ValidateNested({ each: true })
+  @Type(() => CreatePlanCourseFirstInput)
+  @Field(() => [CreatePlanCourseFirstInput], { nullable: true })
+  plan_courses?: CreatePlanCourseFirstInput[];
 }

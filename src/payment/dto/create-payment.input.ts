@@ -1,12 +1,14 @@
 import { InputType, Field, Float } from '@nestjs/graphql';
 import {
   IsBoolean,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { PaymentItemType } from 'src/shared/enums/payment_item_type.enum';
 
 @InputType()
 export class CreatePaymentInput {
@@ -16,19 +18,24 @@ export class CreatePaymentInput {
   user_id: string;
 
   @IsNotEmpty()
-  @IsNumberString()
+  @IsString()
   @Field()
-  plan_id: string;
+  payment_code: string;
 
   @IsNotEmpty()
-  @IsNumberString()
-  @Field()
-  teacher_id: string;
+  @IsEnum(PaymentItemType)
+  @Field(() => PaymentItemType)
+  payment_item_type: PaymentItemType;
 
   @IsOptional()
   @IsNumberString()
   @Field({ nullable: true })
   course_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  plan_id?: string;
 
   @IsOptional()
   @IsNumberString()

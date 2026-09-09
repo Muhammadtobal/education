@@ -1,8 +1,8 @@
 import { registerEnumType } from '@nestjs/graphql';
 
 export enum CourseType {
-  INTERNAL = 'internal',
-  EXTERNAL = 'external',
+  THEORETICAL = 'theoretical',
+  PRACTICAL = 'practical',
 }
 
 registerEnumType(CourseType, {

@@ -22,6 +22,7 @@ import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
 import { randomBytes, randomInt } from 'crypto';
 import { CheckActivationPaymentCodeInput } from './dto/check-payment-code.input';
 import { ErrorMessages } from 'src/shared/error-messages.object';
+import { PaymentItemType } from 'src/shared/enums/payment_item_type.enum';
 
 @Injectable()
 export class PaymentCodeService {
@@ -107,8 +108,51 @@ export class PaymentCodeService {
   public async checkActivationPaymentCode(
     checkActivationPaymentCodeInput: CheckActivationPaymentCodeInput,
   ) {
-    const { code, plan_id, content_id, course_id } =
+    const { code, payment_item_type, plan_id, course_id, content_id } =
       checkActivationPaymentCodeInput;
+
+    // =========================
+    // Validate required ID حسب type
+    // =========================
+
+    switch (payment_item_type) {
+      case PaymentItemType.PLAN:
+        if (!plan_id) {
+          throw new HttpException(
+            ErrorMessages.PAYMENT_CODE_PLAN_ID_REQUIRED,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        break;
+
+      case PaymentItemType.COURSE:
+        if (!course_id) {
+          throw new HttpException(
+            ErrorMessages.PAYMENT_CODE_COURSE_ID_REQUIRED,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        break;
+
+      case PaymentItemType.CONTENT:
+        if (!content_id) {
+          throw new HttpException(
+            ErrorMessages.PAYMENT_CODE_CONTENT_ID_REQUIRED,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        break;
+
+      default:
+        throw new HttpException(
+          ErrorMessages.PAYMENT_CODE_HAS_NO_TARGET,
+          HttpStatus.BAD_REQUEST,
+        );
+    }
+
+    // =========================
+    // Find Payment Code
+    // =========================
 
     const loadedCode = await this.paymentCodeRepository.findOne({
       where: {
@@ -123,58 +167,81 @@ export class PaymentCodeService {
       );
     }
 
-    // =========================
-    // تحديد نوع الكود
-    // =========================
-
-    if (loadedCode.course_id) {
-      if (!course_id) {
-        throw new HttpException(
-          ErrorMessages.PAYMENT_CODE_COURSE_ID_REQUIRED,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      if (loadedCode.course_id !== course_id) {
-        throw new HttpException(
-          ErrorMessages.PAYMENT_CODE_IS_NOT_FOR_THIS_COURSE,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    } else if (loadedCode.content_id) {
-      if (!content_id) {
-        throw new HttpException(
-          ErrorMessages.PAYMENT_CODE_CONTENT_ID_REQUIRED,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      if (loadedCode.content_id !== content_id) {
-        throw new HttpException(
-          ErrorMessages.PAYMENT_CODE_IS_NOT_FOR_THIS_CONTENT,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    } else if (loadedCode.plan_id) {
-      if (!plan_id) {
-        throw new HttpException(
-          ErrorMessages.PAYMENT_CODE_PLAN_ID_REQUIRED,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      if (loadedCode.plan_id !== plan_id) {
-        throw new HttpException(
-          ErrorMessages.PAYMENT_CODE_IS_NOT_FOR_THIS_PLAN,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    } else {
-      throw new HttpException(
-        ErrorMessages.PAYMENT_CODE_HAS_NO_TARGET,
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!loadedCode.active) {
+      throw new HttpException('payment not active', HttpStatus.BAD_REQUEST);
     }
+    // =========================
+    // Validate Payment Code حسب type
+    // =========================
+
+    switch (payment_item_type) {
+      case PaymentItemType.PLAN: {
+        // لازم الكود يكون مربوط بـ Plan
+        if (!loadedCode.plan_id) {
+          throw new HttpException(
+            ErrorMessages.PAYMENT_CODE_IS_NOT_FOR_THIS_PLAN,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        if (loadedCode.plan_id !== plan_id) {
+          throw new HttpException(
+            ErrorMessages.PAYMENT_CODE_IS_NOT_FOR_THIS_PLAN,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        break;
+      }
+
+      case PaymentItemType.COURSE: {
+        // لازم الكود يكون مربوط بـ Course
+        if (!loadedCode.course_id) {
+          throw new HttpException(
+            ErrorMessages.PAYMENT_CODE_IS_NOT_FOR_THIS_COURSE,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        if (loadedCode.course_id !== course_id) {
+          throw new HttpException(
+            ErrorMessages.PAYMENT_CODE_IS_NOT_FOR_THIS_COURSE,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        break;
+      }
+
+      case PaymentItemType.CONTENT: {
+        // لازم الكود يكون مربوط بـ Content
+        if (!loadedCode.content_id) {
+          throw new HttpException(
+            ErrorMessages.PAYMENT_CODE_IS_NOT_FOR_THIS_CONTENT,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        if (loadedCode.content_id !== content_id) {
+          throw new HttpException(
+            ErrorMessages.PAYMENT_CODE_IS_NOT_FOR_THIS_CONTENT,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        break;
+      }
+
+      default:
+        throw new HttpException(
+          ErrorMessages.PAYMENT_CODE_HAS_NO_TARGET,
+          HttpStatus.BAD_REQUEST,
+        );
+    }
+
+    // =========================
+    // Date validation
+    // =========================
 
     const formatDateTime = (date: Date) => {
       const d = new Date(date);
@@ -188,7 +255,12 @@ export class PaymentCodeService {
 
       return `${day}/${month}/${year} ${hours}:${minutes}`;
     };
+
     const now = new Date();
+
+    // =========================
+    // Starts At
+    // =========================
 
     if (loadedCode.starts_at && now < new Date(loadedCode.starts_at)) {
       throw new HttpException(
@@ -199,6 +271,10 @@ export class PaymentCodeService {
       );
     }
 
+    // =========================
+    // Expires At
+    // =========================
+
     if (loadedCode.expires_at && now > new Date(loadedCode.expires_at)) {
       throw new HttpException(
         ErrorMessages.PAYMENT_CODE_EXPIRED(
@@ -207,6 +283,11 @@ export class PaymentCodeService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    // =========================
+    // Valid
+    // =========================
+
     return loadedCode;
   }
 }

@@ -54,4 +54,10 @@ export class FindAllTeacherInput {
   @IsSingleNumberOrRange()
   @Field(() => GraphQLJSON, { nullable: true })
   count_review?: SingleNumberInput | RangeNumberInput;
+
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  @Field(() => GraphQLJSON, { nullable: true })
+  teacher_id?: SingleIdInput | ListOfIdsInput;
 }

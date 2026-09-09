@@ -19,8 +19,8 @@ import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { Discussion } from 'src/discussion/entities/discussion.entity';
-import { CourseTeacher } from './course_teacher.entity';
 import { CourseType } from 'src/shared/enums/course_type.enum';
+import { PlanCoupon } from 'src/plan_coupon/entities/plan_coupon.entity';
 
 @ObjectType()
 @Entity()
@@ -45,12 +45,38 @@ export class Course {
   @Field()
   level_id: string;
 
+  @Column('bigint')
+  @Field()
+  teacher_id: string;
+
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
+  @Field(() => Float)
+  price: number;
+
   @Column({
     type: 'float',
     default: 0,
   })
   @Field(() => Float)
   rating: number;
+
+  @Column({
+    type: 'float',
+    default: 0,
+  })
+  @Field(() => Float)
+  teacher_share: number;
+
+  @Column({
+    type: 'int',
+    default: 0,
+  })
+  @Field(() => Int)
+  count_days: number;
 
   @Column({
     type: 'enum',
@@ -79,6 +105,11 @@ export class Course {
   @Field(() => Level, { nullable: true })
   level?: Level;
 
+  @ManyToOne(() => Teacher, (teacher) => teacher.courses)
+  @JoinColumn({ name: 'teacher_id' })
+  @Field(() => Teacher, { nullable: true })
+  teacher?: Teacher;
+
   @OneToMany(() => PlanCourse, (plan_course) => plan_course.course)
   plan_courses: PlanCourse[];
 
@@ -94,8 +125,8 @@ export class Course {
   @OneToMany(() => Review, (review) => review.course)
   reviews: Review[];
 
-  @OneToMany(() => CourseTeacher, (course_teacher) => course_teacher.course)
-  course_teachers: CourseTeacher[];
+  @OneToMany(() => PlanCoupon, (plan_coupon) => plan_coupon.course)
+  plan_coupons: PlanCoupon[];
 
   @OneToMany(() => Discussion, (discussion) => discussion.course)
   discussions: Discussion[];

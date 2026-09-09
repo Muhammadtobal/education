@@ -21,7 +21,6 @@ import {
 import { PaginationMetadata } from 'src/shared/types/pagination-metadata';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { Course } from 'src/course/entities/course.entity';
-import { CourseTeacher } from 'src/course/entities/course_teacher.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { Content } from 'src/content/entities/content.entity';
 import { ErrorMessages } from 'src/shared/error-messages.object';
@@ -133,15 +132,11 @@ export class SubscriptionService {
           }
 
           if (payment.teacher_id) {
-            const courseTeacher = await queryRunner.manager.findOne(
-              CourseTeacher,
-              {
-                where: {
-                  course_id: course.id,
-                  teacher_id: payment.teacher_id,
-                },
+            const courseTeacher = await queryRunner.manager.findOne(Course, {
+              where: {
+                teacher_id: payment.teacher_id,
               },
-            );
+            });
 
             teacherShare = Number(courseTeacher?.teacher_share ?? 0);
           }
@@ -160,17 +155,13 @@ export class SubscriptionService {
           }
 
           if (payment.teacher_id) {
-            const courseTeacher = await queryRunner.manager.findOne(
-              CourseTeacher,
-              {
-                where: {
-                  course_id: content.course_id,
-                  teacher_id: payment.teacher_id,
-                },
+            const course = await queryRunner.manager.findOne(Course, {
+              where: {
+                teacher_id: payment.teacher_id,
               },
-            );
+            });
 
-            teacherShare = Number(courseTeacher?.teacher_share ?? 0);
+            teacherShare = Number(course?.teacher_share ?? 0);
           }
         }
 
@@ -305,7 +296,7 @@ export class SubscriptionService {
     };
   }
 
-  private async checkContentAccess(user_id: string, content_id: string) {
+  public async checkContentAccess(user_id: string, content_id: string) {
     const content = await this.ContentService.findOne({
       id: content_id,
     });

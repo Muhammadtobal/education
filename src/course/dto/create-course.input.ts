@@ -1,7 +1,8 @@
-import { InputType, Field, Float } from '@nestjs/graphql';
+import { InputType, Field, Float, Int } from '@nestjs/graphql';
 import {
   IsBoolean,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
@@ -51,6 +52,16 @@ export class CreateCourseInput {
   @IsNumber()
   @Field(() => Float, { nullable: true })
   rating?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Field(() => Float, { nullable: true })
+  price?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Field(() => Int, { nullable: true })
+  count_day?: number;
 
   @IsOptional()
   @IsBoolean()

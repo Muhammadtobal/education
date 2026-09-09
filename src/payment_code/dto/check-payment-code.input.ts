@@ -12,6 +12,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { PaymentItemType } from 'src/shared/enums/payment_item_type.enum';
 
 @InputType()
 export class CheckActivationPaymentCodeInput {
@@ -19,6 +20,11 @@ export class CheckActivationPaymentCodeInput {
   @IsString()
   @Field()
   code: string;
+
+  @IsNotEmpty()
+  @IsEnum(PaymentItemType)
+  @Field(() => PaymentItemType)
+  payment_item_type: PaymentItemType;
 
   @IsOptional()
   @IsNumberString()

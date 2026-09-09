@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { ContentService } from './content.service';
@@ -14,6 +14,9 @@ import { DoneResponseOutput } from 'src/shared/types/done-output';
 import { JwtAuthSharedGuard } from 'src/auth/guards/jwt-auth-shared.guard';
 import { Permissions } from 'src/shared/decorators/permissions.decorator';
 import { Operation } from 'src/shared/enums/operation.enum';
+import { TokenShowContentOutput } from './dto/token-show-content.output';
+import { TokenShowContentInput } from './dto/token-show-content.input';
+import { GqlContext } from 'src/shared/types/context';
 
 @Resolver(() => Content)
 export class ContentResolver {
@@ -61,4 +64,12 @@ export class ContentResolver {
       done: true,
     };
   }
+
+  // @Query(() => TokenShowContentOutput)
+  // async getContentPlaybackUrl(
+  //   @Context() context: GqlContext,
+  //   @Args('input') tokenShowContentInput: TokenShowContentInput,
+  // ) {
+  //   return this.contentService.getPlaybackUrl(user.id, input.content_id);
+  // }
 }

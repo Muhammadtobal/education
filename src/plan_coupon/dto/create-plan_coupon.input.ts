@@ -14,10 +14,20 @@ export class CreatePlanCouponInput {
   @Field()
   coupon_id: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumberString()
-  @Field()
-  plan_id: string;
+  @Field({ nullable: true })
+  plan_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  course_id?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @Field({ nullable: true })
+  content_id?: string;
 
   @IsOptional()
   @IsBoolean()

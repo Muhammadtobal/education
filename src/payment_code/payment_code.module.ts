@@ -6,6 +6,7 @@ import { PaymentCodeResolver } from './payment_code.resolver';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PaymentCode])],
+  exports: [PaymentCodeService],
   providers: [PaymentCodeService, PaymentCodeResolver],
 })
 export class PaymentCodeModule {}

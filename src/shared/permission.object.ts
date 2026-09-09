@@ -129,11 +129,6 @@ const PermissionsStore = {
   DELETE_TEACHER: 'deleteTeacher',
   CREATE_TEACHER: 'createTeacher',
 
-  GET_TEACHER_VOUCHER: 'getTeacherVoucher',
-  UPDATE_TEACHER_VOUCHER: 'updateTeacherVoucher',
-  DELETE_TEACHER_VOUCHER: 'deleteTeacherVoucher',
-  CREATE_TEACHER_VOUCHER: 'createTeacherVoucher',
-
   GET_USER: 'getUser',
   UPDATE_USER: 'updateUser',
   DELETE_USER: 'deleteUser',
@@ -148,6 +143,11 @@ const PermissionsStore = {
   UPDATE_CONSTANT: 'updateConstant',
   DELETE_CONSTANT: 'deleteConstant',
   CREATE_CONSTANT: 'createConstant',
+
+  GET_BANNER: 'getBanner',
+  UPDATE_BANNER: 'updateBanner',
+  DELETE_BANNER: 'deleteBanner',
+  CREATE_BANNER: 'createBanner',
 } as const;
 
 type PermissionKey = keyof typeof PermissionsStore;
