@@ -75,4 +75,9 @@ export class CreateContentInput {
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   is_pdf?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  has_children?: boolean;
 }

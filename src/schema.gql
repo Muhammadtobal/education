@@ -255,6 +255,7 @@ type Content {
   price: Float!
   count_days: Int!
   is_pdf: Boolean!
+  has_children: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
   parent: Content
@@ -752,6 +753,7 @@ input FindAllContentInput {
   sort: SortInput
   course_id: JSON
   parent_content: Boolean
+  has_children: Boolean
 }
 
 input FindAllPlanCourseInput {
@@ -1186,6 +1188,7 @@ input CreateContentInput {
   price: Float
   count_day: Int
   is_pdf: Boolean
+  has_children: Boolean
 }
 
 input UpdateContentInput {
@@ -1201,6 +1204,7 @@ input UpdateContentInput {
   price: Float
   count_day: Int
   is_pdf: Boolean
+  has_children: Boolean
   id: String!
 }
 
