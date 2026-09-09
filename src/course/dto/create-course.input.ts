@@ -43,6 +43,11 @@ export class CreateCourseInput {
   @Field()
   teacher_id: string;
 
+  @IsNotEmpty()
+  @IsInt()
+  @Field(() => Int)
+  lessons_count: number;
+
   @IsOptional()
   @IsNumber()
   @Field(() => Float, { nullable: true })

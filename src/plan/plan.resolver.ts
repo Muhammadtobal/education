@@ -28,9 +28,6 @@ export class PlanResolver {
     @Args('createPlanInput') createPlanInput: CreatePlanInput,
     @Context() context: GqlContext,
   ) {
-    const empId = getEmpId(context.req.user);
-    const vendors = getEmpVendors(context.req.user);
-
     return this.planService.create(createPlanInput);
   }
 
@@ -48,9 +45,6 @@ export class PlanResolver {
   @UseGuards(JwtAuthSharedGuard)
   @Permissions(Operation.GET + Plan.name)
   public async findOne(@Args('id') id: string, @Context() context: GqlContext) {
-    const empId = getEmpId(context.req.user);
-    const vendors = getEmpVendors(context.req.user);
-
     const plan = await this.planService.findOne({ id });
 
     return plan;

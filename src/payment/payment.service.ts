@@ -59,9 +59,6 @@ export class PaymentService {
 
     try {
       let loadedPaymentCode: PaymentCode | null = null;
-      // ==================================================
-      // 1. Validate payment item type
-      // ==================================================
 
       switch (createPaymentInput.payment_item_type) {
         case PaymentItemType.PLAN: {
@@ -629,9 +626,8 @@ export class PaymentService {
   public findAll(filter: FindAllPaymentInput) {
     const query = this.paymentRepository
       .createQueryBuilder('payment')
-      .leftJoinAndSelect('payment.user', 'user')
-      .leftJoinAndSelect('payment.vendor', 'vendor')
       .leftJoinAndSelect('payment.course', 'course')
+      .leftJoinAndSelect('payment.teacher', 'teacher')
       .where('true');
     generateQuerySorts<Payment>(query, filter, Payment, 'payment');
     generateQueryConditions<Payment>(query, filter, 'payment');

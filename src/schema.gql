@@ -238,7 +238,7 @@ type Content {
   id: String!
   course_id: String!
   exam_id: String
-  url: String!
+  url: String
   title: String!
   content_type: ContentType!
   parent_id: String
@@ -248,6 +248,7 @@ type Content {
   price: Float!
   count_days: Int!
   is_pdf: Boolean!
+  has_children: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
   parent: Content
@@ -340,6 +341,7 @@ type Course {
   teacher_id: String!
   price: Float!
   rating: Float!
+  lessons_count: Int!
   teacher_share: Float!
   count_days: Int!
   active: Boolean!
@@ -605,6 +607,26 @@ type StoryPaginationResultOutput {
   meta: PaginationMetadata!
 }
 
+type Banner {
+  id: String!
+  image_url: String!
+  title: String
+  subtitle: String
+  action_url: String
+  action_type: String
+  sort_order: Int!
+  active: Boolean!
+  start_date: DateTime!
+  end_date: DateTime!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type BannerPaginationResultOutput {
+  items: [Banner!]!
+  meta: PaginationMetadata!
+}
+
 type Query {
   teachers(filter: FindAllTeacherInput!): TeacherPaginationResultOutput!
   teacher(id: String!): Teacher!
@@ -659,6 +681,8 @@ type Query {
   discussion(id: String!): Discussion!
   stories(filter: FindAllStoryInput!): StoryPaginationResultOutput!
   story(id: String!): Story!
+  banners(filter: FindAllBannerInput!): BannerPaginationResultOutput!
+  banner(id: String!): Banner!
 }
 
 input FindAllTeacherInput {
@@ -712,6 +736,8 @@ input FindAllSubscriptionInput {
   sort: SortInput
   active: Boolean
   course_id: JSON
+  plan_id: JSON
+  content_id: JSON
   user_id: JSON
 }
 
@@ -719,6 +745,7 @@ input FindAllContentInput {
   pagination: PaginationInput!
   sort: SortInput
   course_id: JSON
+  has_children: Boolean
   parent_content: Boolean
 }
 
@@ -750,8 +777,7 @@ input FindAllReviewInput {
 input FindAllPaymentInput {
   pagination: PaginationInput!
   sort: SortInput
-  user_id: JSON
-  course_id: JSON
+  teacher_id: JSON
 }
 
 input FindAllCouponInput {
@@ -891,6 +917,19 @@ input FindAllStoryInput {
   level_id: JSON
 }
 
+input FindAllBannerInput {
+  pagination: PaginationInput!
+  sort: SortInput
+  image_url: MatchInput
+  title: MatchInput
+  subtitle: MatchInput
+  action_url: MatchInput
+  action_type: MatchInput
+  sort_order: JSON
+  active: Boolean
+  start_date: MatchInput
+}
+
 type Mutation {
   createTeacher(createTeacherInput: CreateTeacherInput!): CheckActivationTeacherCodeOutput!
   updateTeacher(updateTeacherInput: UpdateTeacherInput!): Teacher!
@@ -982,6 +1021,9 @@ type Mutation {
   createStory(createStoryInput: CreateStoryInput!): Story!
   updateStory(updateStoryInput: UpdateStoryInput!): Story!
   removeStory(id: String!): DoneResponseOutput!
+  createBanner(createBannerInput: CreateBannerInput!): Banner!
+  updateBanner(updateBannerInput: UpdateBannerInput!): Banner!
+  removeBanner(id: String!): DoneResponseOutput!
 }
 
 input CreateTeacherInput {
@@ -1127,32 +1169,34 @@ input CheckContentAccessInput {
 
 input CreateContentInput {
   course_id: String!
-  url: String!
   title: String!
   is_free: Boolean!
   content_type: ContentType!
   parent_id: String
+  url: String
   exam_id: String
   content_info: JSON
   active: Boolean
   price: Float
   count_day: Int
   is_pdf: Boolean
+  has_children: Boolean
 }
 
 input UpdateContentInput {
   course_id: String
-  url: String
   title: String
   is_free: Boolean
   content_type: ContentType
   parent_id: String
+  url: String
   exam_id: String
   content_info: JSON
   active: Boolean
   price: Float
   count_day: Int
   is_pdf: Boolean
+  has_children: Boolean
   id: String!
 }
 
@@ -1182,6 +1226,7 @@ input CreateCourseInput {
   level_id: String!
   course_type: CourseType!
   teacher_id: String!
+  lessons_count: Int!
   teacher_share: Float
   rating: Float
   price: Float
@@ -1202,6 +1247,7 @@ input UpdateCourseInput {
   level_id: String
   course_type: CourseType
   teacher_id: String
+  lessons_count: Int
   teacher_share: Float
   rating: Float
   price: Float
@@ -1614,5 +1660,30 @@ input UpdateStoryInput {
   url: String
   title: String
   level_id: String
+  id: String!
+}
+
+input CreateBannerInput {
+  image_url: String!
+  start_date: String!
+  end_date: String!
+  title: String
+  subtitle: String
+  action_url: String
+  action_type: String
+  sort_order: Int
+  active: Boolean
+}
+
+input UpdateBannerInput {
+  image_url: String
+  start_date: String
+  end_date: String
+  title: String
+  subtitle: String
+  action_url: String
+  action_type: String
+  sort_order: Int
+  active: Boolean
   id: String!
 }

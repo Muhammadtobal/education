@@ -34,7 +34,6 @@ export class StoryService {
   public findAll(filter: FindAllStoryInput) {
     const query = this.storyRepository
       .createQueryBuilder('story')
-      .leftJoinAndSelect('story.vendor', 'vendor')
       .leftJoinAndSelect('story.level', 'level')
       .where('true');
     generateQuerySorts<Story>(query, filter, Story, 'story');

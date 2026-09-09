@@ -21,13 +21,15 @@ import {
 } from 'src/shared/helpers';
 import { GqlContext } from 'src/shared/types/context';
 import { CreatePaymentResponse } from './dto/paymet-response.output';
+import { JwtAuthUserGuard } from 'src/auth/guards/jwt-auth-user.guard';
+import { JwtAuthEmployeeGuard } from 'src/auth/guards/jwt-auth-employee.guard';
 
 @Resolver(() => Payment)
 export class PaymentResolver {
   constructor(private readonly paymentService: PaymentService) {}
 
   @Mutation(() => CreatePaymentResponse)
-  @UseGuards(JwtAuthSharedGuard)
+  @UseGuards(JwtAuthUserGuard)
   @Permissions(Operation.CREATE + Payment.name)
   public async createPayment(
     @Args('createPaymentInput') createPaymentInput: CreatePaymentInput,
@@ -58,7 +60,7 @@ export class PaymentResolver {
   }
 
   @Mutation(() => Payment)
-  @UseGuards(JwtAuthSharedGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   @Permissions(Operation.UPDATE + Payment.name)
   public updatePayment(
     @Args('updatePaymentInput') updatePaymentInput: UpdatePaymentInput,
@@ -67,7 +69,7 @@ export class PaymentResolver {
   }
 
   @Mutation(() => DoneResponseOutput)
-  @UseGuards(JwtAuthSharedGuard)
+  @UseGuards(JwtAuthEmployeeGuard)
   @Permissions(Operation.DELETE + Payment.name)
   public removePayment(@Args('id') id: string) {
     this.paymentService.remove(id);

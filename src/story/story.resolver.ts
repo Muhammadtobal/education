@@ -41,9 +41,6 @@ export class StoryResolver {
     @Args('filter') filter: FindAllStoryInput,
     @Context() context: GqlContext,
   ) {
-    const empId = getEmpId(context.req.user);
-    const vendors = getEmpVendors(context.req.user);
-
     return this.storyService.findAll(filter);
   }
 

@@ -65,6 +65,13 @@ export class Course {
   rating: number;
 
   @Column({
+    type: 'int',
+    default: 0,
+  })
+  @Field(() => Int)
+  lessons_count: number;
+
+  @Column({
     type: 'float',
     default: 0,
   })

@@ -116,8 +116,6 @@ export class SubscriptionService {
 
         const price = Math.abs(Number(payment.value));
 
-        let vendorId: string | undefined;
-        let vendorShare = 0;
         let teacherShare = 0;
 
         if (subscription.course_id) {

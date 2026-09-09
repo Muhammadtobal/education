@@ -33,9 +33,9 @@ export class Content {
   @Field({ nullable: true })
   exam_id?: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  @Field()
-  url: string;
+  @Column({ type: 'varchar', nullable: true, length: 255 })
+  @Field({ nullable: true })
+  url?: string;
 
   @Column({ type: 'varchar', length: 255 })
   @Field()
@@ -82,6 +82,10 @@ export class Content {
   @Column('boolean', { default: false })
   @Field(() => Boolean)
   is_pdf: boolean;
+
+  @Column('boolean', { default: false })
+  @Field(() => Boolean)
+  has_children: boolean;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Field(() => Date)

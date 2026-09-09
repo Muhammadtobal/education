@@ -24,11 +24,6 @@ export class CreateContentInput {
   @IsNotEmpty()
   @IsString()
   @Field()
-  url: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @Field()
   title: string;
 
   @IsNotEmpty()
@@ -45,6 +40,11 @@ export class CreateContentInput {
   @IsNumberString()
   @Field({ nullable: true })
   parent_id?: string;
+
+  @IsOptional()
+  @IsString()
+  @Field({ nullable: true })
+  url?: string;
 
   @IsOptional()
   @IsNumberString()
@@ -75,4 +75,9 @@ export class CreateContentInput {
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   is_pdf?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  has_children?: boolean;
 }

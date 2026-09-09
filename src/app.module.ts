@@ -35,6 +35,7 @@ import { ConstantModule } from './constant/constant.module';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { PaymentCodeModule } from './payment_code/payment_code.module';
+import { BannerModule } from './banner/banner.module';
 
 @Module({
   imports: [
@@ -50,9 +51,9 @@ import { PaymentCodeModule } from './payment_code/payment_code.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
 
-      ssl: {
-        rejectUnauthorized: false,
-      },
+      // ssl: {
+      //   rejectUnauthorized: false,
+      // },
 
       autoLoadEntities: true,
       synchronize: true,
@@ -111,6 +112,7 @@ import { PaymentCodeModule } from './payment_code/payment_code.module';
     LoginHistoryModule,
     ConstantModule,
     PaymentCodeModule,
+    BannerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

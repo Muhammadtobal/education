@@ -46,5 +46,17 @@ export class FindAllSubscriptionInput {
   @IsObject()
   @IsSingleIdOrList()
   @Field(() => GraphQLJSON, { nullable: true })
+  plan_id?: SingleIdInput | ListOfIdsInput;
+
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  @Field(() => GraphQLJSON, { nullable: true })
+  content_id?: SingleIdInput | ListOfIdsInput;
+
+  @IsOptional()
+  @IsObject()
+  @IsSingleIdOrList()
+  @Field(() => GraphQLJSON, { nullable: true })
   user_id?: SingleIdInput | ListOfIdsInput;
 }
