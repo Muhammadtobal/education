@@ -32,6 +32,12 @@ export class FindAllNotificationInput {
   title?: MatchInput;
 
   @IsOptional()
+  @IsObject()
+  @Type(() => MatchInput)
+  @Field(() => MatchInput, { nullable: true })
+  notification_type?: MatchInput;
+
+  @IsOptional()
   @IsBoolean()
   @Field({ nullable: true })
   body?: boolean;

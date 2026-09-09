@@ -15,6 +15,7 @@ import GraphQLJSON from 'graphql-type-json';
 import { City } from 'src/city/entities/city.entity';
 
 import { NotificationFilterDataInput } from 'src/shared/types/graphql-input-types';
+import { NotificationType } from 'src/shared/enums/notification_type.enum';
 
 @InputType()
 export class CreateNotificationInput {
@@ -27,6 +28,11 @@ export class CreateNotificationInput {
   @IsString()
   @Field()
   body: string;
+
+  @IsOptional()
+  @IsEnum(NotificationType)
+  @Field(() => NotificationType, { nullable: true })
+  notification_type?: NotificationType;
 
   @IsOptional()
   @IsObject()

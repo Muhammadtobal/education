@@ -12,6 +12,7 @@ import {
 import { City } from 'src/city/entities/city.entity';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { User } from 'src/user/entities/user.entity';
+import { NotificationType } from 'src/shared/enums/notification_type.enum';
 
 @Entity()
 @ObjectType()
@@ -69,6 +70,13 @@ export class Notification {
   @Column('boolean', { default: false })
   @Field()
   approved: boolean;
+
+  @Column({
+    type: 'enum',
+    enum: NotificationType,
+  })
+  @Field(() => NotificationType)
+  notification_type: NotificationType;
 
   @Column('int', { width: 8, default: 1 })
   @Field(() => Int)

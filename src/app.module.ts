@@ -51,9 +51,9 @@ import { BannerModule } from './banner/banner.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
 
-      // ssl: {
-      //   rejectUnauthorized: false,
-      // },
+      ssl: {
+        rejectUnauthorized: false,
+      },
 
       autoLoadEntities: true,
       synchronize: true,

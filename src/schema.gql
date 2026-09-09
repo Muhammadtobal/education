@@ -51,6 +51,7 @@ type Notification {
   employee_id: String
   global: Boolean!
   approved: Boolean!
+  notification_type: NotificationType!
   receivers_count: Int!
   user: User
   employee: Employee
@@ -60,6 +61,12 @@ type Notification {
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+""" notification type (daily, weekly, or monthly)"""
+enum NotificationType {
+  EXTERNAL
+  INTERNAL
+}
 
 type Employee {
   id: String!
@@ -823,6 +830,7 @@ input FindAllEmployeeInput {
 
 input FindAllNotificationInput {
   title: MatchInput
+  notification_type: MatchInput
   body: Boolean
   created_at: JSON
   active: Boolean
@@ -1416,6 +1424,7 @@ input AssignPermissionInput {
 input CreateNotificationInput {
   title: String!
   body: String!
+  notification_type: NotificationType
   filter_data: NotificationFilterDataInput
   active: Boolean
   img_url: String
@@ -1440,6 +1449,7 @@ input CityInput {
 input UpdateNotificationInput {
   title: String
   body: String
+  notification_type: NotificationType
   filter_data: NotificationFilterDataInput
   active: Boolean
   img_url: String
