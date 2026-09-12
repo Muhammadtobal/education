@@ -17,6 +17,7 @@ import { PlanCourse } from 'src/plan_course/entities/plan_course.entity';
 import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { Exam } from 'src/exam/entities/exam.entity';
 import { PlanCoupon } from 'src/plan_coupon/entities/plan_coupon.entity';
+import { VideoAsset } from './video_asset.entity';
 
 @ObjectType()
 @Entity()
@@ -87,6 +88,12 @@ export class Content {
   @Field(() => Boolean)
   has_children: boolean;
 
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  hls_key?: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Field(() => Date)
   created_at: Date;
@@ -133,4 +140,7 @@ export class Content {
 
   @OneToMany(() => PlanCoupon, (plan_coupon) => plan_coupon.content)
   plan_coupons: PlanCoupon[];
+
+  @OneToMany(() => VideoAsset, (video_asset) => video_asset.content)
+  video_assets: VideoAsset[];
 }

@@ -89,6 +89,7 @@ export class Course {
     type: 'enum',
     enum: CourseType,
   })
+  @Field()
   course_type: CourseType;
 
   @Column('boolean', { default: true })

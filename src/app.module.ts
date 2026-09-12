@@ -36,6 +36,7 @@ import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { PaymentCodeModule } from './payment_code/payment_code.module';
 import { BannerModule } from './banner/banner.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -80,6 +81,13 @@ import { BannerModule } from './banner/banner.module';
         process.env.NODE_ENV !== 'production'
           ? [ApolloServerPluginLandingPageLocalDefault()]
           : [],
+    }),
+
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: Number(process.env.REDIS_PORT || 6379),
+      },
     }),
     TeacherModule,
 

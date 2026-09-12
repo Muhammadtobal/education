@@ -5,13 +5,24 @@ import { ContentService } from './content.service';
 import { ContentResolver } from './content.resolver';
 import { SubscriptionModule } from 'src/subscription/subscription.module';
 import { CourseModule } from 'src/course/course.module';
-
+import { AppModule } from 'src/app.module';
+import { VideoAsset } from './entities/video_asset.entity';
+import { BullModule } from '@nestjs/bullmq';
+import { VideoProcessingProcessor } from './processors/video-processing.processor';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Content]),
+    TypeOrmModule.forFeature([Content, VideoAsset]),
+
+    BullModule.registerQueue({
+      name: 'video-processing',
+    }),
+
     forwardRef(() => SubscriptionModule),
+    forwardRef(() => AppModule),
   ],
+
   exports: [ContentService],
-  providers: [ContentService, ContentResolver],
+
+  providers: [ContentService, ContentResolver, VideoProcessingProcessor],
 })
 export class ContentModule {}
