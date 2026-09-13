@@ -148,6 +148,11 @@ const PermissionsStore = {
   UPDATE_BANNER: 'updateBanner',
   DELETE_BANNER: 'deleteBanner',
   CREATE_BANNER: 'createBanner',
+
+  GET_VIDEO_ASSET: 'getVideoAsset',
+  UPDATE_VIDEO_ASSET: 'updateVideoAsset',
+  DELETE_VIDEO_ASSET: 'deleteVideoAsset',
+  CREATE_VIDEO_ASSET: 'createVideoAsset',
 } as const;
 
 type PermissionKey = keyof typeof PermissionsStore;

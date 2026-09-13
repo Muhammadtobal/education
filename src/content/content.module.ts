@@ -9,6 +9,7 @@ import { AppModule } from 'src/app.module';
 import { VideoAsset } from './entities/video_asset.entity';
 import { BullModule } from '@nestjs/bullmq';
 import { VideoProcessingProcessor } from './processors/video-processing.processor';
+import { VideoStreamService } from './processors/video-stream.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Content, VideoAsset]),
@@ -21,8 +22,13 @@ import { VideoProcessingProcessor } from './processors/video-processing.processo
     forwardRef(() => AppModule),
   ],
 
-  exports: [ContentService],
+  exports: [ContentService, VideoStreamService],
 
-  providers: [ContentService, ContentResolver, VideoProcessingProcessor],
+  providers: [
+    ContentService,
+    ContentResolver,
+    VideoProcessingProcessor,
+    VideoStreamService,
+  ],
 })
 export class ContentModule {}

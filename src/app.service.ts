@@ -783,6 +783,6 @@ export class AppService {
 
     this.globalPermissions = result.items;
 
-    // console.log(this.globalPermissions);
+    console.log(this.globalPermissions);
   }
 }

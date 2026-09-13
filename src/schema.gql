@@ -299,12 +299,14 @@ type Content {
   count_days: Int!
   is_pdf: Boolean!
   has_children: Boolean!
+  playback_url: String
   created_at: DateTime!
   updated_at: DateTime!
   parent: Content
   exam: Exam
   children: [Content!]
   course: Course
+  video_assets: [VideoAsset!]
 }
 
 """Content type (file, video, or audio)"""

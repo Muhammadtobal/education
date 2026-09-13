@@ -40,6 +40,7 @@ import { join } from 'path';
 import { execFile } from 'child_process';
 
 import { promisify } from 'util';
+import { VideoStreamService } from './processors/video-stream.service';
 const ffmpegPath = join(process.cwd(), 'bin', 'ffmpeg');
 const execFileAsync = promisify(execFile);
 @Injectable()
@@ -56,17 +57,20 @@ export class ContentService {
     private readonly appService: AppService,
     @InjectQueue('video-processing')
     private readonly videoProcessingQueue: Queue,
+
+    private readonly videoStreamService: VideoStreamService,
   ) {}
-  public create(createContentInput: CreateContentInput) {
+  public async create(createContentInput: CreateContentInput) {
     const content = this.contentRepository.create(createContentInput);
 
     return this.contentRepository.save(content);
   }
 
-  public findAll(filter: FindAllContentInput) {
+  public async findAll(filter: FindAllContentInput) {
     const query = this.contentRepository
       .createQueryBuilder('content')
       .leftJoinAndSelect('content.course', 'course')
+      .leftJoinAndSelect('content.video_assets', 'video_assets')
       .leftJoinAndSelect('content.exam', 'exam')
       .where('true');
 
@@ -78,10 +82,34 @@ export class ContentService {
     generateQuerySorts<Content>(query, contentFilter, Content, 'content');
     generateQueryConditions<Content>(query, contentFilter, 'content');
 
-    return customPaginate<Content, PaginationMetadata>(query, {
+    const result = await customPaginate<Content, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
     });
+
+    for (const content of result.items) {
+      const asset = content.video_assets?.find(
+        (asset) =>
+          asset.status === VideoAssetStatus.READY &&
+          asset.active === true &&
+          asset.is_current === true &&
+          !!asset.hls_manifest_key,
+      );
+
+      if (!asset) {
+        continue;
+      }
+
+      const hlsKey = asset.hls_manifest_key!;
+
+      const pathPrefix = '/' + hlsKey.substring(0, hlsKey.lastIndexOf('/') + 1);
+
+      const token = this.videoStreamService.generateToken(pathPrefix);
+
+      content.playback_url = `${process.env.PUBLIC_API_URL}/video-stream/${hlsKey}?token=${encodeURIComponent(token)}`;
+    }
+
+    return result;
   }
 
   public findOne(

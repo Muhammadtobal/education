@@ -94,6 +94,9 @@ export class Content {
   })
   hls_key?: string;
 
+  @Field({ nullable: true })
+  playback_url?: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Field(() => Date)
   created_at: Date;
@@ -142,5 +145,6 @@ export class Content {
   plan_coupons: PlanCoupon[];
 
   @OneToMany(() => VideoAsset, (video_asset) => video_asset.content)
+  @Field(() => [VideoAsset], { nullable: true })
   video_assets: VideoAsset[];
 }

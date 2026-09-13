@@ -15,6 +15,8 @@ import {
   Res,
   Body,
   BadRequestException,
+  Query,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { exec } from 'child_process';
@@ -23,11 +25,13 @@ import { ContentService } from './content/content.service';
 import { JwtAuthSharedGuard } from './auth/guards/jwt-auth-shared.guard';
 import { getUserId } from './shared/helpers';
 import { Request, Response } from 'express';
+import { VideoStreamService } from './content/processors/video-stream.service';
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly contentService: ContentService,
+    private readonly videoStreamService: VideoStreamService,
   ) {}
 
   // @Post('upload')
@@ -42,17 +46,73 @@ export class AppController {
   //   };
   // }
 
-  // @Get('test-url')
-  // async getTestUrl() {
-  //   const key = 'test/1789024224421-images (8).jpeg';
+  @Get('video-stream/*')
+  async stream(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Query('token') token?: string,
+  ) {
+    if (!token) {
+      throw new UnauthorizedException('Missing token');
+    }
 
-  //   const url = await this.appService.generateSignedUrl(key);
+    const fullPath = req.path;
 
-  //   return {
-  //     url,
-  //     expires_in: 60,
-  //   };
-  // }
+    // /vendor/video-stream/videos/33/hls/3/master.m3u8
+    const path = fullPath.replace(/^\/vendor\/video-stream/, '');
+
+    this.videoStreamService.verifyToken(token, path);
+
+    const key = path.replace(/^\/+/, '');
+
+    const stream = await this.appService.getFileStreamFromB2(key);
+
+    if (key.endsWith('.m3u8')) {
+      const chunks: Buffer[] = [];
+
+      for await (const chunk of stream as any) {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      }
+
+      let playlist = Buffer.concat(chunks).toString('utf8');
+
+      playlist = playlist
+        .split('\n')
+        .map((line) => {
+          const trimmed = line.trim();
+
+          if (!trimmed || trimmed.startsWith('#')) {
+            return line;
+          }
+
+          const separator = trimmed.includes('?') ? '&' : '?';
+
+          return `${line}${separator}token=${encodeURIComponent(token)}`;
+        })
+        .join('\n');
+
+      res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+
+      return res.send(playlist);
+    }
+
+    if (key.endsWith('.ts')) {
+      res.setHeader('Content-Type', 'video/mp2t');
+    }
+
+    stream.pipe(res);
+  }
+  @Get('test-url')
+  async getTestUrl() {
+    const key = 'test/1789024224421-images (8).jpeg';
+
+    const url = await this.appService.generateSignedUrl(key);
+
+    return {
+      url,
+      expires_in: 60,
+    };
+  }
 
   // @Get('test-download/:contentId')
   // async testDownload(@Param('contentId') contentId: string) {
