@@ -52,9 +52,9 @@ import { BullModule } from '@nestjs/bullmq';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
 
-      ssl: {
-        rejectUnauthorized: false,
-      },
+      // ssl: {
+      //   rejectUnauthorized: false,
+      // },
 
       autoLoadEntities: true,
       synchronize: true,
@@ -87,10 +87,10 @@ import { BullModule } from '@nestjs/bullmq';
       connection: {
         host: process.env.REDIS_HOST,
         port: Number(process.env.REDIS_PORT),
-        // username: process.env.REDIS_USERNAME,
-        // password: process.env.REDIS_PASSWORD,
-        // tls: {},
-        // maxRetriesPerRequest: null,
+        username: process.env.REDIS_USERNAME,
+        password: process.env.REDIS_PASSWORD,
+        tls: {},
+        maxRetriesPerRequest: null,
       },
     }),
     TeacherModule,
