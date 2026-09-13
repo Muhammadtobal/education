@@ -26,9 +26,13 @@ export class CourseService {
     @InjectRepository(Course)
     private readonly courseRepository: Repository<Course>,
   ) {}
-  public create(createCourseInput: CreateCourseInput) {
+  public async create(createCourseInput: CreateCourseInput) {
     const course = this.courseRepository.create(createCourseInput);
-    return this.courseRepository.save(course);
+    const courseSaved = await this.courseRepository.save(course);
+    return await this.findOne(
+      { id: courseSaved.id },
+      { relations: { teacher: true } },
+    );
   }
 
   public findAll(filter: FindAllCourseInput) {

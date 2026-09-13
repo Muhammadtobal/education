@@ -38,7 +38,7 @@ export class UserResolver {
     const oldUser = await this.userService.findOne({
       phone: createUserInput.phone,
     });
-
+    console.log('s');
     if (oldUser)
       throw new HttpException(
         ErrorMessages.USER_EXISTS_CONFLICT,

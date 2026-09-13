@@ -241,6 +241,49 @@ type Exam {
   course: Course
 }
 
+type VideoAsset {
+  id: String!
+  content_id: String!
+  provider: VideoProvider!
+  provider_public_id: String!
+  status: VideoAssetStatus!
+  original_url: String
+  playback_url: String
+  thumbnail_url: String
+  original_key: String
+  hls_manifest_key: String
+  hls_manifest_url: String
+  thumbnail_key: String
+  duration_seconds: Float
+  size_bytes: String
+  format: String
+  metadata: JSON
+  renditions: JSON
+  processing_percentage: Float!
+  error_message: String
+  processing_error: String
+  active: Boolean!
+  is_current: Boolean!
+  processing_started_at: DateTime
+  processing_finished_at: DateTime
+  created_at: DateTime!
+  updated_at: DateTime!
+  content: Content
+}
+
+enum VideoProvider {
+  S3
+}
+
+"""VideoAssetStatus type (failed, processing, or upload)"""
+enum VideoAssetStatus {
+  PENDING_UPLOAD
+  UPLOADED
+  PROCESSING
+  READY
+  FAILED
+}
+
 type Content {
   id: String!
   course_id: String!
@@ -351,6 +394,7 @@ type Course {
   lessons_count: Int!
   teacher_share: Float!
   count_days: Int!
+  course_type: String!
   active: Boolean!
   created_at: DateTime!
   updated_at: DateTime!
@@ -436,6 +480,13 @@ type PaginationMetadata {
   total_pages: Int
 }
 
+type Constant {
+  id: String!
+  key: String!
+  value: JSON!
+  expose: Boolean!
+}
+
 type TeacherPaginationResultOutput {
   items: [Teacher!]!
   meta: PaginationMetadata!
@@ -462,13 +513,6 @@ type CheckActivationUserCodeOutput {
   access_token: String
   refresh_token: String
   expires_in: Int
-}
-
-type Constant {
-  id: String!
-  key: String!
-  value: JSON!
-  expose: Boolean!
 }
 
 type RefreshTokenOutput {
@@ -532,6 +576,27 @@ type CheckAccessOutput {
 type ContentPaginationResultOutput {
   items: [Content!]!
   meta: PaginationMetadata!
+}
+
+type TokenShowContentOutput {
+  playback_url: String!
+  expires_in: Float!
+}
+
+type CreateVideoUploadOutput {
+  video_asset_id: String!
+  provider: String!
+  provider_public_id: String!
+  upload_method: String!
+  upload_url: String!
+  upload_headers: JSON
+  object_key: String
+  public_id: String
+  video_asset: VideoAsset!
+}
+
+type CompleteVideoUploadOutput {
+  video_asset: VideoAsset!
 }
 
 type PlanCoursePaginationResultOutput {
@@ -647,6 +712,8 @@ type Query {
   subscription(id: String!): UserSubscription!
   contents(filter: FindAllContentInput!): ContentPaginationResultOutput!
   content(id: String!): Content!
+  getContentPlaybackUrl(input: TokenShowContentInput!): TokenShowContentOutput!
+  video_Asset(id: String!): VideoAsset!
   plan_courses(filter: FindAllPlanCourseInput!): PlanCoursePaginationResultOutput!
   plan_course(id: String!): PlanCourse!
   courses(filter: FindAllCourseInput!): CoursePaginationResultOutput!
@@ -756,6 +823,10 @@ input FindAllContentInput {
   has_children: Boolean
 }
 
+input TokenShowContentInput {
+  content_id: String!
+}
+
 input FindAllPlanCourseInput {
   pagination: PaginationInput!
   sort: SortInput
@@ -770,6 +841,7 @@ input FindAllCourseInput {
   name: MatchInput
   course_type: MatchInput
   level_id: JSON
+  teacher_share: JSON
 }
 
 input FindAllReviewInput {
@@ -865,6 +937,7 @@ input FindAllLevelInput {
   active: Boolean
   parent_id: JSON
   parent_level: Boolean
+  created_at: JSON
 }
 
 input FindAllPlanInput {
@@ -965,6 +1038,8 @@ type Mutation {
   createContent(createContentInput: CreateContentInput!): Content!
   updateContent(updateContentInput: UpdateContentInput!): Content!
   removeContent(id: String!): DoneResponseOutput!
+  createVideoUpload(input: CreateVideoUploadInput!): CreateVideoUploadOutput!
+  completeVideoUpload(input: CompleteVideoUploadInput!): CompleteVideoUploadOutput!
   createPlanCourse(createPlanCourseInput: CreatePlanCourseInput!): PlanCourse!
   updatePlanCourse(updatePlanCourseInput: UpdatePlanCourseInput!): PlanCourse!
   removePlanCourse(id: String!): DoneResponseOutput!
@@ -1183,6 +1258,7 @@ input CreateContentInput {
   parent_id: String
   url: String
   exam_id: String
+  hls_key: String
   content_info: JSON
   active: Boolean
   price: Float
@@ -1199,6 +1275,7 @@ input UpdateContentInput {
   parent_id: String
   url: String
   exam_id: String
+  hls_key: String
   content_info: JSON
   active: Boolean
   price: Float
@@ -1206,6 +1283,24 @@ input UpdateContentInput {
   is_pdf: Boolean
   has_children: Boolean
   id: String!
+}
+
+input CreateVideoUploadInput {
+  content_id: String!
+  file_name: String!
+  mime_type: String!
+  size_bytes: Float
+}
+
+input CompleteVideoUploadInput {
+  video_asset_id: String!
+  provider_public_id: String!
+  secure_url: String
+  playback_url: String
+  duration_seconds: Float
+  size_bytes: Float
+  format: String
+  metadata: JSON
 }
 
 input CreatePlanCourseInput {

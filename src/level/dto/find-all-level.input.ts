@@ -12,6 +12,8 @@ import {
   SingleNumberInput,
   PaginationInput,
   SortInput,
+  MaxDateInput,
+  MinDateInput,
 } from 'src/shared/types/graphql-input-types';
 import { IsSingleDateOrRange } from 'src/shared/decorators/is-single-date-or-range.decorator';
 import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
@@ -52,4 +54,10 @@ export class FindAllLevelInput {
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })
   parent_level?: boolean;
+
+  @IsOptional()
+  @IsObject()
+  @IsSingleDateOrRange()
+  @Field(() => GraphQLJSON, { nullable: true })
+  created_at?: SingleDateInput | RangeDateInput | MaxDateInput | MinDateInput;
 }

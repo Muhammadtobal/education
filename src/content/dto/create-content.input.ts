@@ -52,6 +52,11 @@ export class CreateContentInput {
   exam_id?: string;
 
   @IsOptional()
+  @IsString()
+  @Field({ nullable: true })
+  hls_key?: string;
+
+  @IsOptional()
   @IsObject()
   @Field(() => GraphQLJSON, { nullable: true })
   content_info?: Record<string, any>;

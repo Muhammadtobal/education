@@ -17,6 +17,12 @@ import { Operation } from 'src/shared/enums/operation.enum';
 import { TokenShowContentOutput } from './dto/token-show-content.output';
 import { TokenShowContentInput } from './dto/token-show-content.input';
 import { GqlContext } from 'src/shared/types/context';
+import { getUserId } from 'src/shared/helpers';
+import { CreateVideoUploadOutput } from './dto/create-video-upload.output';
+import { CreateVideoUploadInput } from './dto/create-video-upload.input';
+import { CompleteVideoUploadOutput } from './dto/complete-video-upload.output';
+import { CompleteVideoUploadInput } from './dto/complete-video-upload.input';
+import { VideoAsset } from './entities/video_asset.entity';
 
 @Resolver(() => Content)
 export class ContentResolver {
@@ -65,11 +71,40 @@ export class ContentResolver {
     };
   }
 
-  // @Query(() => TokenShowContentOutput)
-  // async getContentPlaybackUrl(
-  //   @Context() context: GqlContext,
-  //   @Args('input') tokenShowContentInput: TokenShowContentInput,
-  // ) {
-  //   return this.contentService.getPlaybackUrl(user.id, input.content_id);
-  // }
+  @Query(() => TokenShowContentOutput)
+  @UseGuards(JwtAuthSharedGuard)
+  async getContentPlaybackUrl(
+    @Context() context: GqlContext,
+    @Args('input') tokenShowContentInput: TokenShowContentInput,
+  ) {
+    const user = context.req.user;
+    const userId = getUserId(user);
+    return this.contentService.getPlaybackUrl(
+      userId,
+      tokenShowContentInput.content_id,
+    );
+  }
+
+  @Mutation(() => CreateVideoUploadOutput)
+  @UseGuards(JwtAuthSharedGuard)
+  async createVideoUpload(@Args('input') input: CreateVideoUploadInput) {
+    return this.contentService.createVideoUpload(input);
+  }
+
+  @Mutation(() => CompleteVideoUploadOutput)
+  @UseGuards(JwtAuthSharedGuard)
+  async completeVideoUpload(@Args('input') input: CompleteVideoUploadInput) {
+    const videoAsset = await this.contentService.completeVideoUpload(input);
+
+    return {
+      video_asset: videoAsset,
+    };
+  }
+
+  @Query(() => VideoAsset, { name: 'video_Asset' })
+  @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + VideoAsset.name)
+  public findOneVideoAsset(@Args('id') id: string) {
+    return this.contentService.findOneVideoAsset({ id });
+  }
 }

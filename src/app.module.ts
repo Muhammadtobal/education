@@ -1,5 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -36,6 +36,7 @@ import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { PaymentCodeModule } from './payment_code/payment_code.module';
 import { BannerModule } from './banner/banner.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -80,6 +81,17 @@ import { BannerModule } from './banner/banner.module';
         process.env.NODE_ENV !== 'production'
           ? [ApolloServerPluginLandingPageLocalDefault()]
           : [],
+    }),
+
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT),
+        username: process.env.REDIS_USERNAME,
+        password: process.env.REDIS_PASSWORD,
+        tls: {},
+        maxRetriesPerRequest: null,
+      },
     }),
     TeacherModule,
 

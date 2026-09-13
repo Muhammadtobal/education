@@ -12,6 +12,8 @@ import {
   SingleNumberInput,
   PaginationInput,
   SortInput,
+  MaxNumberInput,
+  MinNumberInput,
 } from 'src/shared/types/graphql-input-types';
 import { IsSingleDateOrRange } from 'src/shared/decorators/is-single-date-or-range.decorator';
 import { IsSingleIdOrList } from 'src/shared/decorators/is-single-id-or-list.decorator';
@@ -48,4 +50,11 @@ export class FindAllCourseInput {
   @IsSingleIdOrList()
   @Field(() => GraphQLJSON, { nullable: true })
   level_id?: SingleIdInput | ListOfIdsInput;
+
+  @IsOptional()
+  @IsObject()
+  @IsSingleNumberOrRange()
+  @Field(() => GraphQLJSON, { nullable: true })
+  teacher_share?:
+    SingleNumberInput | MaxNumberInput | MinNumberInput | RangeNumberInput;
 }
