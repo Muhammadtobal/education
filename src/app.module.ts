@@ -67,6 +67,11 @@ import { BullModule } from '@nestjs/bullmq';
       playground: false,
       debug: process.env.NODE_ENV !== 'production',
       path: process.env.BASE_URL,
+
+      context: ({ req, res }) => ({
+        req,
+        res,
+      }),
       formatError: (formattedError, error) => {
         const graphQLError = error as GraphQLError;
         if (process.env.NODE_ENV === 'production')

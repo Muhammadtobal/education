@@ -61,8 +61,18 @@ export class AppController {
     // /vendor/video-stream/videos/33/hls/3/master.m3u8
     const path = fullPath.replace(/^\/vendor\/video-stream/, '');
 
-    this.videoStreamService.verifyToken(token, path);
+    const tokenPayload = this.videoStreamService.verifyToken(token, path);
 
+    const playbackCookie = req.cookies?.video_playback;
+
+    if (!playbackCookie) {
+      throw new UnauthorizedException('Missing playback session');
+    }
+    const cookiePayload =
+      this.videoStreamService.verifyPlaybackCookie(playbackCookie);
+    if (cookiePayload.user_id !== tokenPayload.user_id) {
+      throw new UnauthorizedException('Playback access denied');
+    }
     const key = path.replace(/^\/+/, '');
 
     const stream = await this.appService.getFileStreamFromB2(key);
@@ -101,6 +111,27 @@ export class AppController {
     }
 
     stream.pipe(res);
+  }
+
+  @Get('video-test-cookie/:userId')
+  async testVideoCookie(
+    @Param('userId') userId: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const cookie = this.videoStreamService.createPlaybackCookie(userId);
+
+    res.cookie('video_playback', cookie, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 10 * 60 * 1000,
+      path: '/vendor/video-stream',
+    });
+
+    return {
+      success: true,
+      userId,
+    };
   }
   @Get('test-url')
   async getTestUrl() {

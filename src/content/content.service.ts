@@ -79,35 +79,15 @@ export class ContentService {
     }
 
     const { parent_content, ...contentFilter } = filter;
+
     generateQuerySorts<Content>(query, contentFilter, Content, 'content');
+
     generateQueryConditions<Content>(query, contentFilter, 'content');
 
     const result = await customPaginate<Content, PaginationMetadata>(query, {
       limit: filter.pagination.limit,
       page: filter.pagination.page,
     });
-
-    for (const content of result.items) {
-      const asset = content.video_assets?.find(
-        (asset) =>
-          asset.status === VideoAssetStatus.READY &&
-          asset.active === true &&
-          asset.is_current === true &&
-          !!asset.hls_manifest_key,
-      );
-
-      if (!asset) {
-        continue;
-      }
-
-      const hlsKey = asset.hls_manifest_key!;
-
-      const pathPrefix = '/' + hlsKey.substring(0, hlsKey.lastIndexOf('/') + 1);
-
-      const token = this.videoStreamService.generateToken(pathPrefix);
-
-      content.playback_url = `${process.env.PUBLIC_API_URL}/video-stream/${hlsKey}?token=${encodeURIComponent(token)}`;
-    }
 
     return result;
   }
@@ -153,12 +133,15 @@ export class ContentService {
   }
 
   async getPlaybackUrl(userId: string, contentId: string) {
+    // 1. Check subscription/access
     const access = await this.subscriptionService.checkContentAccess(
       userId,
       contentId,
     );
 
     console.log('ACCESS RESULT:', access);
+
+    // 2. Get current ready video
     const asset = await this.videoAssetRepository.findOne({
       where: {
         content_id: contentId,
@@ -178,10 +161,30 @@ export class ContentService {
     if (!asset.hls_manifest_key) {
       throw new HttpException('HLS manifest not found', HttpStatus.NOT_FOUND);
     }
+
+    // Example:
+    // videos/33/hls/3/master.m3u8
+
+    const hlsKey = asset.hls_manifest_key;
+
+    const pathPrefix = '/' + hlsKey.substring(0, hlsKey.lastIndexOf('/') + 1);
+    // 3. Generate signed playback token
+    const token = this.videoStreamService.generateToken({
+      userId,
+      contentId,
+      assetId: asset.id,
+      pathPrefix,
+    });
+
+    // 4. Build playback URL
+    const playbackUrl =
+      `${process.env.PUBLIC_API_URL}/video-stream/${hlsKey}` +
+      `?token=${encodeURIComponent(token)}`;
+
     return {
       video_asset_id: asset.id,
-      playback_url: `/vendor/${contentId}/hls/${asset.id}/master.m3u8`,
-      expires_in: 0,
+      playback_url: playbackUrl,
+      expires_in: this.videoStreamService.getTokenTtl(),
     };
   }
 

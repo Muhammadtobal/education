@@ -1,3 +1,5 @@
+import type { Response } from 'express';
+
 interface GqlRequest {
   headers: {
     'account-type': string;
@@ -15,4 +17,6 @@ interface GqlRequest {
 
 export interface GqlContext {
   req: GqlRequest;
+
+  res: Response;
 }

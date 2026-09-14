@@ -6,6 +6,7 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { config } from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 config();
 
@@ -13,6 +14,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
+  app.use(cookieParser());
 
   app.setGlobalPrefix(process.env.BASE_URL || '');
   app.enableCors({ origin: '*' });

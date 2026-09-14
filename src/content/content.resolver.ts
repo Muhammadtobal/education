@@ -23,10 +23,14 @@ import { CreateVideoUploadInput } from './dto/create-video-upload.input';
 import { CompleteVideoUploadOutput } from './dto/complete-video-upload.output';
 import { CompleteVideoUploadInput } from './dto/complete-video-upload.input';
 import { VideoAsset } from './entities/video_asset.entity';
+import { VideoStreamService } from './processors/video-stream.service';
 
 @Resolver(() => Content)
 export class ContentResolver {
-  constructor(private readonly contentService: ContentService) {}
+  constructor(
+    private readonly contentService: ContentService,
+    private readonly videoStreamService: VideoStreamService,
+  ) {}
 
   @Mutation(() => Content)
   @UseGuards(JwtAuthSharedGuard)
@@ -73,26 +77,41 @@ export class ContentResolver {
 
   @Query(() => TokenShowContentOutput)
   @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.GET + VideoAsset.name)
   async getContentPlaybackUrl(
     @Context() context: GqlContext,
     @Args('input') tokenShowContentInput: TokenShowContentInput,
   ) {
     const user = context.req.user;
     const userId = getUserId(user);
-    return this.contentService.getPlaybackUrl(
+    const result = await this.contentService.getPlaybackUrl(
       userId,
       tokenShowContentInput.content_id,
     );
+
+    const playbackCookie = this.videoStreamService.createPlaybackCookie(userId);
+
+    context.res.cookie('video_playback', playbackCookie, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 10 * 60 * 1000,
+      path: '/vendor/video-stream',
+    });
+
+    return result;
   }
 
   @Mutation(() => CreateVideoUploadOutput)
   @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.CREATE + VideoAsset.name)
   async createVideoUpload(@Args('input') input: CreateVideoUploadInput) {
     return this.contentService.createVideoUpload(input);
   }
 
   @Mutation(() => CompleteVideoUploadOutput)
   @UseGuards(JwtAuthSharedGuard)
+  @Permissions(Operation.CREATE + VideoAsset.name)
   async completeVideoUpload(@Args('input') input: CompleteVideoUploadInput) {
     const videoAsset = await this.contentService.completeVideoUpload(input);
 
