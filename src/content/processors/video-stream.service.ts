@@ -83,10 +83,11 @@ export class VideoStreamService {
     return payload;
   }
 
-  createPlaybackCookie(userId: string): string {
+  createPlaybackCookie(userId: string, contentId: string): string {
     const payload = Buffer.from(
       JSON.stringify({
         user_id: userId,
+        content_id: contentId,
         exp: Math.floor(Date.now() / 1000) + 600,
       }),
     ).toString('base64url');
@@ -118,6 +119,7 @@ export class VideoStreamService {
 
     let payload: {
       user_id: string;
+      content_id: string;
       exp: number;
     };
 
@@ -126,6 +128,10 @@ export class VideoStreamService {
         Buffer.from(encodedPayload, 'base64url').toString('utf8'),
       );
     } catch {
+      throw new UnauthorizedException('Invalid playback cookie');
+    }
+
+    if (!payload.user_id || !payload.content_id || !payload.exp) {
       throw new UnauthorizedException('Invalid playback cookie');
     }
 

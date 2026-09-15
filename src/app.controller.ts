@@ -26,25 +26,16 @@ import { JwtAuthSharedGuard } from './auth/guards/jwt-auth-shared.guard';
 import { getUserId } from './shared/helpers';
 import { Request, Response } from 'express';
 import { VideoStreamService } from './content/processors/video-stream.service';
+import { MediaAssetStatus } from './shared/enums/media_asset.enum';
+import { SubscriptionService } from './subscription/subscription.service';
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly contentService: ContentService,
     private readonly videoStreamService: VideoStreamService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
-
-  // @Post('upload')
-  // @UseInterceptors(FileInterceptor('file'))
-  // async upload(@UploadedFile() file: Express.Multer.File) {
-  //   const key = `test/${Date.now()}-${file.originalname}`;
-
-  //   const result = await this.appService.uploadToB2(file, key);
-
-  //   return {
-  //     key: result,
-  //   };
-  // }
 
   @Get('video-stream/*')
   async stream(
@@ -58,25 +49,48 @@ export class AppController {
 
     const fullPath = req.path;
 
-    // /vendor/video-stream/videos/33/hls/3/master.m3u8
     const path = fullPath.replace(/^\/vendor\/video-stream/, '');
 
+    // 1️⃣ تحقق من token الموجود بالرابط
     const tokenPayload = this.videoStreamService.verifyToken(token, path);
 
+    // 2️⃣ جيب cookie
     const playbackCookie = req.cookies?.video_playback;
 
     if (!playbackCookie) {
       throw new UnauthorizedException('Missing playback session');
     }
+
+    // 3️⃣ تحقق من صحة وتوقيع cookie
     const cookiePayload =
       this.videoStreamService.verifyPlaybackCookie(playbackCookie);
+
+    // 4️⃣ نفس المستخدم
     if (cookiePayload.user_id !== tokenPayload.user_id) {
       throw new UnauthorizedException('Playback access denied');
     }
+
+    // 5️⃣ نفس المحتوى
+    if (cookiePayload.content_id !== tokenPayload.content_id) {
+      throw new UnauthorizedException('Playback content mismatch');
+    }
+
+    // 6️⃣ تحقق أن المستخدم عنده صلاحية على المحتوى
+    const hasAccess = await this.subscriptionService.checkContentAccess(
+      cookiePayload.user_id,
+      cookiePayload.content_id,
+    );
+
+    if (!hasAccess) {
+      throw new UnauthorizedException('You do not have access to this content');
+    }
+
+    // 7️⃣ بعد نجاح كل التحققات فقط نجيب الملف من B2
     const key = path.replace(/^\/+/, '');
 
     const stream = await this.appService.getFileStreamFromB2(key);
 
+    // HLS playlist
     if (key.endsWith('.m3u8')) {
       const chunks: Buffer[] = [];
 
@@ -106,6 +120,7 @@ export class AppController {
       return res.send(playlist);
     }
 
+    // TS segments
     if (key.endsWith('.ts')) {
       res.setHeader('Content-Type', 'video/mp2t');
     }
@@ -113,146 +128,64 @@ export class AppController {
     stream.pipe(res);
   }
 
-  @Get('video-test-cookie/:userId')
-  async testVideoCookie(
-    @Param('userId') userId: string,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const cookie = this.videoStreamService.createPlaybackCookie(userId);
-
-    res.cookie('video_playback', cookie, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 10 * 60 * 1000,
-      path: '/vendor/video-stream',
-    });
-
-    return {
-      success: true,
-      userId,
-    };
-  }
-  @Get('test-url')
-  async getTestUrl() {
-    const key = 'test/1789024224421-images (8).jpeg';
-
-    const url = await this.appService.generateSignedUrl(key);
-
-    return {
-      url,
-      expires_in: 60,
-    };
-  }
-
-  // @Get('test-download/:contentId')
-  // async testDownload(@Param('contentId') contentId: string) {
-  //   const content = await this.contentService.findOne({
-  //     id: contentId,
-  //   });
-
-  //   if (!content) {
-  //     throw new NotFoundException('Content not found');
-  //   }
-
-  //   if (!content.url) {
-  //     throw new NotFoundException('Video key not found');
-  //   }
-
-  //   // 1. مكان الفيديو المؤقت
-  //   const videoPath = `/tmp/test-${contentId}.mp4`;
-
-  //   // 2. مكان ملفات HLS المؤقتة
-  //   const hlsPath = `/tmp/hls-${contentId}`;
-
-  //   // 3. نزّل الفيديو من B2 إلى السيرفر
-  //   await this.appService.downloadFromB2(content.url, videoPath);
-
-  //   // 4. حوّل MP4 إلى HLS
-  //   await this.appService.convertToHls(videoPath, hlsPath);
-
-  //   // 5. المسار الذي سنرفع عليه HLS داخل B2
-  //   const hlsPrefix = `videos/${contentId}/hls`;
-
-  //   // 6. ارفع master.m3u8 والـ segments إلى B2
-  //   const uploadResult = await this.appService.uploadHlsDirectory(
-  //     hlsPath,
-  //     hlsPrefix,
-  //   );
-
-  //   await this.contentService.update({
-  //     id: contentId,
-  //     hls_key: `${hlsPrefix}/master.m3u8`,
-  //   });
-
-  //   return {
-  //     success: true,
-  //     videoPath,
-  //     hlsPath,
-  //     uploadResult,
-  //   };
-  // }
-
-  // @UseGuards(JwtAuthSharedGuard)
-  // @Get(':contentId/hls/master.m3u8')
-  // async getHlsMaster(
-  //   @Param('contentId') contentId: string,
-  //   @Req() req: any,
-  //   @Res() res: Response,
-  // ) {
-  //   const user = req.user;
-  //   const userId = getUserId(user);
-
-  //   const playlist = await this.contentService.getHlsMaster(userId, contentId);
-
-  //   res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-
-  //   return res.send(playlist);
-  // }
-
-  @UseGuards(JwtAuthSharedGuard)
-  @Get(':contentId/hls/:segment')
-  async getHlsSegment(
-    @Param('contentId') contentId: string,
-    @Param('segment') segment: string,
-    @Req() req: any,
+  @Get('media-stream/:mediaAssetId')
+  async mediaStream(
+    @Param('mediaAssetId') mediaAssetId: string,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
-    const user = req.user;
-    const userId = getUserId(user);
+    const playbackCookie = req.cookies?.media_playback;
 
-    const result = await this.contentService.getHlsSegment(
-      userId,
-      contentId,
-      segment,
+    if (!playbackCookie) {
+      throw new UnauthorizedException('Missing playback session');
+    }
+
+    const cookiePayload =
+      this.videoStreamService.verifyPlaybackCookie(playbackCookie);
+
+    const asset = await this.contentService.findOneMediaAsset({
+      id: mediaAssetId,
+      status: MediaAssetStatus.READY,
+      active: true,
+    });
+
+    if (!asset) {
+      throw new NotFoundException('Media asset not found');
+    }
+
+    if (!asset.original_key) {
+      throw new NotFoundException('Media file not found');
+    }
+
+    // الـ cookie يجب أن تكون لنفس الـ content
+    if (cookiePayload.content_id !== asset.content_id) {
+      throw new UnauthorizedException('Playback content mismatch');
+    }
+
+    // التحقق من صلاحية المستخدم على الـ content
+    const hasAccess = await this.subscriptionService.checkContentAccess(
+      cookiePayload.user_id,
+      asset.content_id,
     );
 
-    res.setHeader('Content-Type', 'video/mp2t');
-
-    result.pipe(res);
-  }
-
-  @Post('upload-video')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadVideo(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: { contentId: string },
-  ) {
-    console.log('========== UPLOAD VIDEO ==========');
-    console.log('FILE:', file);
-    console.log('BODY:', body);
-    console.log('CONTENT ID:', body?.contentId);
-
-    if (!file) {
-      throw new BadRequestException('Video file is required');
+    if (!hasAccess) {
+      throw new UnauthorizedException('You do not have access to this content');
     }
 
-    if (!body?.contentId) {
-      throw new BadRequestException('contentId is required');
-    }
+    const stream = await this.appService.getFileStreamFromB2(
+      asset.original_key,
+    );
 
-    return this.appService.uploadAndProcessVideo(body.contentId, file);
+    res.setHeader(
+      'Content-Type',
+      asset.mime_type || 'application/octet-stream',
+    );
+
+    res.setHeader('Content-Disposition', 'inline');
+
+    stream.pipe(res);
   }
+
   @Post('selfDeploy')
   selfDeploy(@Headers('x-gitlab-token') token: string) {
     if (token !== process.env.DEPLOY_SECRET)

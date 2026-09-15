@@ -24,6 +24,15 @@ import { CompleteVideoUploadOutput } from './dto/complete-video-upload.output';
 import { CompleteVideoUploadInput } from './dto/complete-video-upload.input';
 import { VideoAsset } from './entities/video_asset.entity';
 import { VideoStreamService } from './processors/video-stream.service';
+import { CreateMediaAssetUploadInput } from './dto/create-media-asset.input';
+import { MediaAsset } from './entities/media_asset.entity';
+import {
+  FailMediaAssetUploadInput,
+  MediaAssetActionInput,
+} from './dto/fail-media-asset-upload.input';
+import { CompleteMediaAssetUploadInput } from './dto/complete-media-asset-upload.input';
+import { CreateMediaAssetUploadOutput } from './dto/create-media-asset-upload.output';
+import { MediaAssetAccessOutput } from './dto/get-media-asset.output';
 
 @Resolver(() => Content)
 export class ContentResolver {
@@ -89,14 +98,17 @@ export class ContentResolver {
       tokenShowContentInput.content_id,
     );
 
-    const playbackCookie = this.videoStreamService.createPlaybackCookie(userId);
+    const playbackCookie = this.videoStreamService.createPlaybackCookie(
+      userId,
+      tokenShowContentInput.content_id,
+    );
 
     context.res.cookie('video_playback', playbackCookie, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 10 * 60 * 1000,
-      path: '/vendor/video-stream',
+      path: `/vendor/video-stream`,
     });
 
     return result;
@@ -125,5 +137,70 @@ export class ContentResolver {
   @Permissions(Operation.GET + VideoAsset.name)
   public findOneVideoAsset(@Args('id') id: string) {
     return this.contentService.findOneVideoAsset({ id });
+  }
+
+  @Mutation(() => CreateMediaAssetUploadOutput)
+  @UseGuards(JwtAuthSharedGuard)
+  async createMediaAssetUpload(
+    @Args('createMediaAssetUploadInput')
+    input: CreateMediaAssetUploadInput,
+  ) {
+    return this.contentService.createMediaAssetUpload(input);
+  }
+
+  @Mutation(() => MediaAsset)
+  @UseGuards(JwtAuthSharedGuard)
+  async completeMediaAssetUpload(
+    @Args('completeMediaAssetUploadInput')
+    input: CompleteMediaAssetUploadInput,
+  ) {
+    return this.contentService.completeMediaAssetUpload(input);
+  }
+
+  @Mutation(() => MediaAsset)
+  @UseGuards(JwtAuthSharedGuard)
+  async failMediaAssetUpload(
+    @Args('failMediaAssetUploadInput')
+    input: FailMediaAssetUploadInput,
+  ) {
+    return this.contentService.failMediaAssetUpload(input);
+  }
+  @Mutation(() => MediaAsset)
+  @UseGuards(JwtAuthSharedGuard)
+  async cancelMediaAssetUpload(
+    @Args('cancelMediaAssetUploadInput')
+    input: MediaAssetActionInput,
+  ) {
+    return this.contentService.cancelMediaAssetUpload(input);
+  }
+
+  @Query(() => MediaAssetAccessOutput)
+  @UseGuards(JwtAuthSharedGuard)
+  async getMediaAssetAccess(
+    @Context() context: GqlContext,
+    @Args('input') tokenShowContentInput: TokenShowContentInput,
+  ) {
+    const user = context.req.user;
+    const userId = getUserId(user);
+
+    const result = await this.contentService.getMediaAssetAccess(
+      userId,
+      tokenShowContentInput.content_id,
+    );
+
+    const playbackCookie = this.videoStreamService.createPlaybackCookie(
+      userId,
+      tokenShowContentInput.content_id,
+    );
+
+    context.res.cookie('media_playback', playbackCookie, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 10 * 60 * 1000,
+      path: `/vendor/media-stream`,
+    });
+
+    return result;
   }
 }

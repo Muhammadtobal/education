@@ -10,9 +10,10 @@ import { VideoAsset } from './entities/video_asset.entity';
 import { BullModule } from '@nestjs/bullmq';
 import { VideoProcessingProcessor } from './processors/video-processing.processor';
 import { VideoStreamService } from './processors/video-stream.service';
+import { MediaAsset } from './entities/media_asset.entity';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Content, VideoAsset]),
+    TypeOrmModule.forFeature([Content, VideoAsset, MediaAsset]),
 
     BullModule.registerQueue({
       name: 'video-processing',

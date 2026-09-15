@@ -22,7 +22,7 @@ registerEnumType(VideoProvider, {
 });
 
 @ObjectType()
-@Entity('video_asset')
+@Entity()
 export class VideoAsset {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   @Field()

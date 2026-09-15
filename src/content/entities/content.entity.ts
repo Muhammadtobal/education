@@ -18,6 +18,7 @@ import { Subscription } from 'src/subscription/entities/subscription.entity';
 import { Exam } from 'src/exam/entities/exam.entity';
 import { PlanCoupon } from 'src/plan_coupon/entities/plan_coupon.entity';
 import { VideoAsset } from './video_asset.entity';
+import { MediaAsset } from './media_asset.entity';
 
 @ObjectType()
 @Entity()
@@ -147,4 +148,8 @@ export class Content {
   @OneToMany(() => VideoAsset, (video_asset) => video_asset.content)
   @Field(() => [VideoAsset], { nullable: true })
   video_assets: VideoAsset[];
+
+  @OneToMany(() => MediaAsset, (media_asset) => media_asset.content)
+  @Field(() => [MediaAsset], { nullable: true })
+  media_assets: MediaAsset[];
 }

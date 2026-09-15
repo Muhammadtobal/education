@@ -708,7 +708,7 @@ export class AppService {
         hls: {
           key: hlsKey,
 
-          playback_url: `/vendor/${contentId}/hls/master.m3u8`,
+          playback_url: `/${process.env.BASE_URL}/${contentId}/hls/master.m3u8`,
         },
 
         files: uploadResult.files,

@@ -284,6 +284,48 @@ enum VideoAssetStatus {
   FAILED
 }
 
+type MediaAsset {
+  id: String!
+  content_id: String!
+  type: MediaAssetType!
+  provider: MediaProvider!
+  provider_public_id: String
+  status: MediaAssetStatus!
+  original_key: String
+  original_url: String
+  thumbnail_key: String
+  file_name: String
+  mime_type: String
+  extension: String
+  size_bytes: String
+  duration_seconds: Float
+  width: Float
+  height: Float
+  is_pdf: Boolean!
+  metadata: JSON
+  error_message: String
+  active: Boolean!
+  uploaded_at: DateTime
+  created_at: DateTime!
+  updated_at: DateTime!
+  content: Content
+}
+
+enum MediaAssetType {
+  FILE
+  AUDIO
+}
+
+enum MediaProvider {
+  S3
+}
+
+enum MediaAssetStatus {
+  PENDING_UPLOAD
+  READY
+  FAILED
+}
+
 type Content {
   id: String!
   course_id: String!
@@ -307,6 +349,7 @@ type Content {
   children: [Content!]
   course: Course
   video_assets: [VideoAsset!]
+  media_assets: [MediaAsset!]
 }
 
 """Content type (file, video, or audio)"""
@@ -601,6 +644,30 @@ type CompleteVideoUploadOutput {
   video_asset: VideoAsset!
 }
 
+type CreateMediaAssetUploadOutput {
+  media_asset_id: String!
+  provider: String!
+  provider_public_id: String!
+  upload_method: String!
+  upload_url: String!
+  upload_headers: JSON
+  object_key: String
+  public_id: String
+  media_asset: MediaAsset!
+}
+
+type MediaAssetAccessOutput {
+  content_id: String!
+  media_asset_id: String!
+  type: MediaAssetType!
+  provider: MediaProvider!
+  access_url: String!
+  file_name: String
+  mime_type: String
+  size_bytes: String
+  is_pdf: Boolean!
+}
+
 type PlanCoursePaginationResultOutput {
   items: [PlanCourse!]!
   meta: PaginationMetadata!
@@ -716,6 +783,7 @@ type Query {
   content(id: String!): Content!
   getContentPlaybackUrl(input: TokenShowContentInput!): TokenShowContentOutput!
   video_Asset(id: String!): VideoAsset!
+  getMediaAssetAccess(input: TokenShowContentInput!): MediaAssetAccessOutput!
   plan_courses(filter: FindAllPlanCourseInput!): PlanCoursePaginationResultOutput!
   plan_course(id: String!): PlanCourse!
   courses(filter: FindAllCourseInput!): CoursePaginationResultOutput!
@@ -1042,6 +1110,10 @@ type Mutation {
   removeContent(id: String!): DoneResponseOutput!
   createVideoUpload(input: CreateVideoUploadInput!): CreateVideoUploadOutput!
   completeVideoUpload(input: CompleteVideoUploadInput!): CompleteVideoUploadOutput!
+  createMediaAssetUpload(createMediaAssetUploadInput: CreateMediaAssetUploadInput!): CreateMediaAssetUploadOutput!
+  completeMediaAssetUpload(completeMediaAssetUploadInput: CompleteMediaAssetUploadInput!): MediaAsset!
+  failMediaAssetUpload(failMediaAssetUploadInput: FailMediaAssetUploadInput!): MediaAsset!
+  cancelMediaAssetUpload(cancelMediaAssetUploadInput: MediaAssetActionInput!): MediaAsset!
   createPlanCourse(createPlanCourseInput: CreatePlanCourseInput!): PlanCourse!
   updatePlanCourse(updatePlanCourseInput: UpdatePlanCourseInput!): PlanCourse!
   removePlanCourse(id: String!): DoneResponseOutput!
@@ -1303,6 +1375,34 @@ input CompleteVideoUploadInput {
   size_bytes: Float
   format: String
   metadata: JSON
+}
+
+input CreateMediaAssetUploadInput {
+  content_id: String!
+  type: MediaAssetType!
+  file_name: String
+  size_bytes: Float!
+  mime_type: String!
+}
+
+input CompleteMediaAssetUploadInput {
+  media_asset_id: String!
+  provider_public_id: String!
+  secure_url: String
+  duration_seconds: Float
+  size_bytes: Float
+  width: Float
+  height: Float
+  metadata: JSON
+}
+
+input FailMediaAssetUploadInput {
+  media_asset_id: String!
+  error_message: String
+}
+
+input MediaAssetActionInput {
+  media_asset_id: String!
 }
 
 input CreatePlanCourseInput {
